@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_macros.html" import work_card %}
+{% block title %}Les aquarelles — galerie d’Hilaire Legentil, aquarelliste{% endblock %}
+{% block desc %}Galerie des aquarelles originales d’Hilaire Legentil : mer, paysages et rivages de Normandie, peints sur papier 100 % coton.{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div class="container reveal">
+    <p class="label">La galerie</p>
+    <h1 class="page-title">Les aquarelles</h1>
+    <p class="page-sub">Mer &amp; paysage — aquarelles originales sur papier 100&nbsp;% coton</p>
+  </div>
+</header>
+
+{% if categories %}
+<div class="container filter-bar reveal" role="group" aria-label="Filtrer les œuvres">
+  <button class="filter-btn is-active" data-filter="*">Toutes</button>
+  {% for c in categories %}
+  <button class="filter-btn" data-filter="{{ c }}">{{ c }}</button>
+  {% endfor %}
+</div>
+{% endif %}
+
+<section class="section gallery-section">
+  <div class="container">
+    {% if works %}
+    <div class="gallery-grid" id="gallery-grid">
+      {% for w in works %}{{ work_card(w, loop.index0) }}{% endfor %}
+    </div>
+    <p class="gallery-count reveal" id="gallery-count">{{ works|length }} œuvre{{ 's' if works|length > 1 }}</p>
+    {% else %}
+    <p class="muted">La galerie sera bientôt en ligne. Merci de revenir très vite.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section contact-invitation">
+  <div class="container narrow center reveal">
+    <h2 class="h2">Une aquarelle vous touche&nbsp;?</h2>
+    <p class="lead">Pour toute information sur une œuvre, écrivez à Hilaire&nbsp;: disponibilité, format, acquisition.</p>
+    <p class="invitation-cta"><a class="btn" href="{{ url_for('contact') }}">Demander des informations</a></p>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/gallery.js" defer></script>
+{% endblock %}

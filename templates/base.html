@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Hilaire Legentil — Artiste aquarelliste · Aquarelles mer &amp; paysage{% endblock %}</title>
+<meta name="description" content="{% block desc %}Hilaire Legentil, artiste aquarelliste à Yvetot-Bocage en Normandie. Aquarelles de mer et de paysage, peintes sur papier 100 % coton.{% endblock %}">
+{% if SITE.domain %}<link rel="canonical" href="{{ SITE.domain }}{{ request.path }}">{% endif %}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Hilaire Legentil — Aquarelles">
+<meta property="og:title" content="{{ self.title() }}">
+<meta property="og:description" content="{{ self.desc() }}">
+<meta property="og:locale" content="fr_FR">
+<meta name="theme-color" content="#11596a">
+<link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/fonts.css">
+<link rel="stylesheet" href="/static/css/main.css">
+{% block head %}{% endblock %}
+{% if SITE.domain %}<meta property="og:url" content="{{ SITE.domain }}{{ request.path }}">{% endif %}
+</head>
+<body>
+<a class="skip-link" href="#contenu">Aller au contenu</a>
+
+<header class="site-header" id="site-header">
+  <div class="header-inner">
+    <a class="brand" href="{{ url_for('home') }}" aria-label="Hilaire Legentil — accueil">
+      <span class="brand-name">Hilaire&nbsp;Legentil</span>
+      <span class="brand-baseline">Aquarelles — mer &amp; paysage</span>
+    </a>
+    <nav class="site-nav" id="site-nav" aria-label="Navigation principale">
+      <ul>
+        <li><a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>Accueil</a></li>
+        <li><a href="{{ url_for('artist') }}" {% if request.endpoint == 'artist' %}aria-current="page"{% endif %}>L’artiste</a></li>
+        <li><a href="{{ url_for('gallery') }}" {% if request.endpoint in ('gallery','work') %}aria-current="page"{% endif %}>Aquarelles</a></li>
+        <li><a href="{{ url_for('news_list') }}" {% if request.endpoint in ('news_list','news_item') %}aria-current="page"{% endif %}>Actualités</a></li>
+        <li><a href="{{ url_for('contact') }}" {% if request.endpoint == 'contact' %}aria-current="page"{% endif %}>Contact</a></li>
+      </ul>
+      <a class="nav-close" href="#site-header" aria-label="Fermer le menu">✕</a>
+    </nav>
+    <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Ouvrir le menu">
+      <span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="contenu">
+{% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-col footer-id">
+      <p class="brand-name">Hilaire&nbsp;Legentil</p>
+      <p class="footer-baseline">Artiste aquarelliste<br>Aquarelles — mer &amp; paysage</p>
+      <p class="footer-loc">Yvetot-Bocage · Normandie</p>
+    </div>
+    <div class="footer-col">
+      <h2 class="footer-title">Contact</h2>
+      <ul class="footer-list">
+        {% if S.get('contact_phone') %}<li><a href="tel:{{ S.get('contact_phone','')|replace(' ','') }}">{{ S.get('contact_phone') }}</a></li>{% endif %}
+        {% if S.get('contact_email') %}<li><a href="mailto:{{ S.get('contact_email') }}">{{ S.get('contact_email') }}</a></li>{% endif %}
+        {% if S.get('instagram') %}<li><a href="https://www.instagram.com/{{ S.get('instagram') }}/" rel="me noopener" target="_blank">Instagram — {{ S.get('instagram') }}</a></li>{% endif %}
+        <li><a href="{{ url_for('contact') }}">Formulaire de contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h2 class="footer-title">Le site</h2>
+      <ul class="footer-list">
+        <li><a href="{{ url_for('artist') }}">L’artiste</a></li>
+        <li><a href="{{ url_for('gallery') }}">Les aquarelles</a></li>
+        <li><a href="{{ url_for('news_list') }}">Actualités &amp; expositions</a></li>
+        <li><a href="{{ url_for('specific_request') }}">Demande spécifique</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-legal">
+    <p>© {{ year }} Hilaire Legentil · SIREN 927 753 780 —
+       <a href="{{ url_for('legal') }}">Mentions légales</a> —
+       <a href="{{ url_for('privacy') }}">Politique de confidentialité</a></p>
+  </div>
+</footer>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flashes" role="status">
+  {% for cat, msg in messages %}<p class="flash flash-{{ cat }}">{{ msg }}</p>{% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<script src="/static/js/main.js" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

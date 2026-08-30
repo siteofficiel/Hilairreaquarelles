@@ -1,0 +1,77 @@
+{% extends "admin/base_admin.html" %}
+{% from "_macros.html" import picture %}
+{% block title %}Les œuvres{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Les œuvres</h1>
+    <p class="admin-sub">Ajoutez, modifiez, masquez ou réordonnez vos aquarelles.
+       L’ordre ci-dessous est celui de la galerie.</p>
+  </div>
+  <a class="btn-primary" href="{{ url_for('admin_work_new') }}">+ Ajouter une œuvre</a>
+</div>
+
+{% if works %}
+<div class="table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th class="col-order">Ordre</th>
+        <th colspan="2">Œuvre</th>
+        <th>Titre &amp; informations</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for w in works %}
+      <tr class="{{ 'row-hidden' if not w.published }}">
+        <td class="col-order">
+          <form method="post">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <input type="hidden" name="action" value="move">
+            <button class="icon-btn" name="dir" value="up" title="Monter dans la galerie" {{ 'disabled' if loop.first }} aria-label="Monter {{ w.title }}">▲</button>
+            <button class="icon-btn" name="dir" value="down" title="Descendre dans la galerie" {{ 'disabled' if loop.last }} aria-label="Descendre {{ w.title }}">▼</button>
+          </form>
+        </td>
+        <td class="col-thumb">
+          <img src="/uploads/works/{{ w.folder }}/small.jpg" alt="" width="72" loading="lazy">
+        </td>
+        <td class="col-title">
+          <a class="row-title" href="{{ url_for('admin_work_edit', wid=w.id) }}">{{ w.title }}</a>
+          <span class="row-meta">
+            {{ w.category }}{% if w.category and w.year %} · {% endif %}{{ w.year }}
+          </span>
+          {% if not w.published %}<span class="badge badge-off">masquée</span>{% endif %}
+        </td>
+        <td class="col-info">
+          <span class="row-meta">{{ w.technique }}{% if w.technique and w.dimensions %} · {% endif %}{{ w.dimensions }}</span>
+        </td>
+        <td class="col-actions">
+          <div class="actions-group">
+            <a class="btn-tiny" href="{{ url_for('admin_work_edit', wid=w.id) }}">Modifier</a>
+            <form method="post" class="inline">
+              <input type="hidden" name="csrf" value="{{ csrf }}">
+              <input type="hidden" name="action" value="toggle">
+              <button class="btn-tiny btn-toggle" type="submit">
+                {{ 'Masquer' if w.published else 'Publier' }}
+              </button>
+            </form>
+            <form method="post" class="inline js-confirm"
+                  data-confirm="Supprimer définitivement « {{ w.title }} » ? Cette action est irréversible.">
+              <input type="hidden" name="csrf" value="{{ csrf }}">
+              <input type="hidden" name="action" value="delete">
+              <button class="btn-tiny btn-danger" type="submit">Supprimer</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="admin-empty">Aucune œuvre pour l’instant. Cliquez sur « Ajouter une œuvre »
+   pour créer votre première fiche.</p>
+{% endif %}
+{% endblock %}

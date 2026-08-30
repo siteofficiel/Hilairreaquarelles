@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Page introuvable — Hilaire Legentil{% endblock %}
+{% block content %}
+<section class="section center" style="min-height:60vh;display:flex;align-items:center;">
+  <div class="container narrow">
+    <p class="label">{{ code }}</p>
+    <h1 class="page-title" style="font-size:clamp(2rem,5vw,3.4rem)">{{ message }}</h1>
+    <p class="invitation-cta" style="margin-top:2rem">
+      <a class="btn" href="{{ url_for('home') }}">Retour à l’accueil</a>
+      <a class="link-arrow" href="{{ url_for('gallery') }}">Voir les aquarelles</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

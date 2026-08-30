@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% from "_macros.html" import picture %}
+
+{% block title %}{{ n.title }} — actualité d’Hilaire Legentil{% endblock %}
+{% block desc %}{{ n.title }}{% if n.event_date %} — {{ n.event_date|date_fr }}{% endif %}. Actualité et expositions d’Hilaire Legentil, artiste aquarelliste.{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div class="container reveal">
+    <p class="label">{% if n.event_date %}{{ n.event_date|date_fr }}{% else %}Actualité{% endif %}</p>
+    <h1 class="page-title">{{ n.title }}</h1>
+  </div>
+</header>
+
+<article class="section">
+  <div class="container article">
+    {% if n.cover %}
+    <figure class="article-cover reveal">
+      {{ picture('news', n.cover, n.title, sizes='(max-width:1000px) 92vw, 880px') }}
+    </figure>
+    {% endif %}
+
+    <div class="article-body reveal">
+      {% for p in n.body|paras %}<p>{{ p }}</p>{% endfor %}
+    </div>
+
+    {% if images %}
+    <div class="article-gallery reveal">
+      {% for img in images %}
+      <figure class="article-fig">
+        {{ picture('news', img.image, n.title ~ ' — image ' ~ loop.index, sizes='(max-width:760px) 92vw, 420px') }}
+      </figure>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if n.link %}
+    <p class="article-link reveal"><a class="link-arrow" href="{{ n.link }}" rel="noopener" target="_blank">En savoir plus ↗</a></p>
+    {% endif %}
+
+    <div class="article-footer reveal">
+      <a class="lnk" href="{{ url_for('news_list') }}">← Toutes les actualités</a>
+    </div>
+  </div>
+</article>
+
+{% if others %}
+<section class="section section-news more-news">
+  <div class="container">
+    <p class="label reveal">À lire également</p>
+    <div class="news-rows">
+      {% for n2 in others %}
+      <a class="news-row reveal" href="{{ url_for('news_item', slug=n2.slug) }}">
+        {% if n2.cover %}
+        <span class="news-thumb">{{ picture('news', n2.cover, n2.title, sizes='(max-width:760px) 30vw, 180px') }}</span>
+        {% endif %}
+        <span class="news-body">
+          {% if n2.event_date %}<span class="news-date">{{ n2.event_date|date_fr }}</span>{% endif %}
+          <span class="news-title">{{ n2.title }}</span>
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

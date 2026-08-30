@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="10" fill="#11596a"/>
+  <path d="M12 38c6-2 9-8 10-15 1 6 4 12 9 15 4 2 9 2 13 0-3 8-11 13-20 13-6 0-11-5-12-13z" fill="#1a9d9a" opacity=".85"/>
+  <path d="M14 26c5-2 8-6 9-11 1 5 4 9 8 11-5 3-13 3-17 0z" fill="#e7f2f0" opacity=".7"/>
+  <text x="32" y="55" font-family="Georgia, serif" font-size="13" fill="#e7f2f0" text-anchor="middle" letter-spacing="1">HL</text>
+</svg>

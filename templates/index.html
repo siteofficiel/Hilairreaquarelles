@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% from "_macros.html" import picture, work_card %}
+
+{% block content %}
+
+{# ---------------------------------------------------------------- héros #}
+<section class="hero" id="hero">
+  <div class="hero-wash" aria-hidden="true">
+    <svg viewBox="0 0 1400 700" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="wc" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="3" seed="7" result="n"/>
+          <feDisplacementMap in="SourceGraphic" in2="n" scale="90"/>
+          <feGaussianBlur stdDeviation="7"/>
+        </filter>
+      </defs>
+      <g filter="url(#wc)">
+        <ellipse cx="980" cy="150" rx="380" ry="190" fill="#1a9d9a" opacity="0.10"/>
+        <ellipse cx="1150" cy="330" rx="300" ry="170" fill="#11596a" opacity="0.08"/>
+        <ellipse cx="820" cy="300" rx="240" ry="130" fill="#4db8ae" opacity="0.08"/>
+        <ellipse cx="180" cy="620" rx="320" ry="160" fill="#1a9d9a" opacity="0.07"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="hero-inner">
+    <p class="hero-baseline reveal">Aquarelles — mer &amp; paysage</p>
+    <h1 class="hero-title reveal d1">Hilaire Legentil</h1>
+    <p class="hero-sub reveal d2">Artiste aquarelliste — Normandie</p>
+    <p class="hero-intro reveal d3">{{ S.get('home_intro') }}</p>
+    <p class="hero-cta reveal d3">
+      <a class="btn" href="{{ url_for('gallery') }}">Découvrir les œuvres</a>
+      <a class="link-arrow" href="{{ url_for('artist') }}">Découvrir son parcours</a>
+    </p>
+  </div>
+
+  {% if hero_works %}
+  <div class="frieze reveal d4" aria-hidden="false">
+    {% for w in hero_works[:3] %}
+      <a class="frieze-item f{{ loop.index }}" href="{{ url_for('work', slug=w.slug) }}" tabindex="{{ '' if loop.index <= 2 else '-1' }}">
+        {{ picture('works', w.folder, 'Aquarelle — ' ~ w.title, sizes='(max-width:760px) 60vw, 30vw', cls='frieze-img') }}
+      </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+
+{# ------------------------------------------------------------- l'artiste #}
+<section class="section section-artist">
+  <div class="container artist-home">
+    <div class="artist-home-text reveal">
+      <p class="label">L’artiste</p>
+      <h2 class="h2">Peindre la lumière,<br>l’eau et le silence</h2>
+      <p class="lead">{{ S.get('artist_intro') }}</p>
+      <blockquote class="mini-quote">
+        « Cette passion m’est venue lors des confinements. Ces aquarelles sont
+        réalisées sur du papier 100&nbsp;% coton, matière qui apporte une tonalité
+        douce aux couleurs. »
+        <cite>— Hilaire Legentil, Ouest-France, mai 2023</cite>
+      </blockquote>
+      <a class="link-arrow" href="{{ url_for('artist') }}">Découvrir son parcours</a>
+    </div>
+    {% if works %}
+    <div class="artist-home-figure reveal">
+      {{ picture('works', works[0].folder, 'Aquarelle — ' ~ works[0].title,
+                 sizes='(max-width:900px) 80vw, 380px', cls='mat-figure') }}
+      <span class="figure-caption">{{ works[0].title }}</span>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{# -------------------------------------------------------------- œuvres #}
+<section class="section section-works">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">Les aquarelles</p>
+        <h2 class="h2">Une galerie à feuilleter</h2>
+      </div>
+      <a class="link-arrow" href="{{ url_for('gallery') }}">Voir toute la galerie</a>
+    </div>
+    <div class="gallery-grid">
+      {% for w in works[:6] %}{{ work_card(w, loop.index0) }}{% endfor %}
+    </div>
+  </div>
+</section>
+
+{# -------------------------------------------------------------- citation #}
+<section class="section quote-section">
+  <div class="container narrow reveal">
+    <svg class="quote-mark" viewBox="0 0 60 45" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M8 40c10-4 16-12 16-24-7 1-12-3-12-9S17-2 23-2c8 0 13 6 13 14 0 16-10 26-24 30z"
+            transform="translate(8 4)" fill="#1a9d9a" opacity=".45"/>
+      <path d="M8 40c10-4 16-12 16-24-7 1-12-3-12-9S17-2 23-2c8 0 13 6 13 14 0 16-10 26-24 30z"
+            transform="translate(34 4)" fill="#1a9d9a" opacity=".28"/>
+    </svg>
+    <blockquote class="big-quote">
+      Peindre, c’est voyager&nbsp;; peindre, c’est méditer.
+      J’ai choisi d’être paysagiste car la nature m’apaise et me recentre.
+      <cite>Hilaire Legentil</cite>
+    </blockquote>
+  </div>
+</section>
+
+{# ----------------------------------------------------------- actualités #}
+<section class="section section-news">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">Actualités</p>
+        <h2 class="h2">Expositions &amp; nouvelles</h2>
+      </div>
+      <a class="link-arrow" href="{{ url_for('news_list') }}">Toutes les actualités</a>
+    </div>
+    <div class="news-rows">
+      {% for n in news %}
+      <a class="news-row reveal" href="{{ url_for('news_item', slug=n.slug) }}">
+        {% if n.cover %}
+        <span class="news-thumb">{{ picture('news', n.cover, n.title, sizes='(max-width:760px) 30vw, 180px') }}</span>
+        {% endif %}
+        <span class="news-body">
+          {% if n.event_date %}<span class="news-date">{{ n.event_date|date_fr }}</span>{% endif %}
+          <span class="news-title">{{ n.title }}</span>
+          {% if n.link %}<span class="news-external">Lien associé ↗</span>{% endif %}
+        </span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{# -------------------------------------------------------- invitation contact #}
+<section class="section contact-invitation">
+  <div class="container narrow reveal">
+    <p class="label">Prendre contact</p>
+    <h2 class="h2">Une question, une œuvre, un projet&nbsp;?</h2>
+    <p class="lead">
+      Renseignement sur une aquarelle, commande d’un tableau, projet particulier
+      ou exposition&nbsp;: écrivez à Hilaire, il vous répond personnellement.
+    </p>
+    <p class="invitation-cta">
+      <a class="btn" href="{{ url_for('contact') }}">Écrire à Hilaire</a>
+      <a class="link-arrow" href="{{ url_for('specific_request') }}">Faire une demande spécifique</a>
+    </p>
+  </div>
+</section>
+
+{% endblock %}

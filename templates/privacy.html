@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Politique de confidentialité — Hilaire Legentil{% endblock %}
+{% block desc %}Politique de confidentialité du site d’Hilaire Legentil, artiste aquarelliste.{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div class="container reveal">
+    <p class="label">Informations</p>
+    <h1 class="page-title">Politique de confidentialité</h1>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container article legal-body reveal">
+    <h2>Données collectées</h2>
+    <p>Le formulaire de contact collecte uniquement les informations que vous
+       saisissez&nbsp;: nom, adresse e-mail, téléphone (facultatif), objet, catégorie
+       et message. Ces données servent exclusivement à répondre à votre demande.</p>
+
+    <h2>Conservation</h2>
+    <p>Les messages sont conservés le temps nécessaire au traitement de la demande,
+       puis supprimés. Aucune donnée n’est cédée, louée ou vendue à des tiers.</p>
+
+    <h2>Cookies</h2>
+    <p>Ce site ne dépose aucun cookie publicitaire ni traceur d’analyse. Seule une
+       session technique est utilisée pour le bon fonctionnement du site et de son
+       espace d’administration.</p>
+
+    <h2>Services tiers</h2>
+    <p>La carte présentée sur la page contact est fournie par les serveurs publics
+       d’OpenStreetMap (fond de carte) qui peuvent enregistrer votre adresse IP
+       conformément à leur propre politique. Le lien vers Instagram, lorsque vous
+       l’empruntez, est soumis aux pratiques de cette plateforme.</p>
+
+    <h2>Vos droits (RGPD)</h2>
+    <p>Vous disposez d’un droit d’accès, de rectification et de suppression des
+       données vous concernant. Pour l’exercer, écrivez à
+       {{ S.get('contact_email') or 'l’adresse indiquée sur la page contact' }}
+       ou via le <a class="lnk" href="{{ url_for('contact') }}">formulaire</a>.</p>
+  </div>
+</section>
+{% endblock %}

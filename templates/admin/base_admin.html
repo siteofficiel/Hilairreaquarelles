@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>{% block title %}Administration{% endblock %} — Hilaire Legentil</title>
+<link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/fonts.css">
+<link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+<header class="admin-top">
+  <div class="admin-top-inner">
+    <a class="admin-brand" href="{{ url_for('admin_home') }}">
+      <span class="admin-brand-name">Hilaire Legentil</span>
+      <span class="admin-brand-sub">Espace d’administration</span>
+    </a>
+    <nav class="admin-nav" aria-label="Administration">
+      <a href="{{ url_for('admin_home') }}" {% if request.endpoint == 'admin_home' %}aria-current="page"{% endif %}>Tableau de bord</a>
+      <a href="{{ url_for('admin_works') }}" {% if request.endpoint in ('admin_works','admin_work_new','admin_work_edit') %}aria-current="page"{% endif %}>Œuvres</a>
+      <a href="{{ url_for('admin_news') }}" {% if request.endpoint in ('admin_news','admin_news_new','admin_news_edit') %}aria-current="page"{% endif %}>Actualités</a>
+      <a href="{{ url_for('admin_messages') }}" {% if request.endpoint == 'admin_messages' %}aria-current="page"{% endif %}>Messages</a>
+      <a href="{{ url_for('admin_settings') }}" {% if request.endpoint == 'admin_settings' %}aria-current="page"{% endif %}>Réglages</a>
+    </nav>
+    <div class="admin-top-actions">
+      <a href="{{ url_for('home') }}" target="_blank" rel="noopener">Voir le site ↗</a>
+      <a class="admin-logout" href="{{ url_for('admin_logout') }}">Déconnexion</a>
+    </div>
+  </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="admin-flashes">
+  {% for cat, msg in messages %}<p class="admin-flash {{ cat }}">{{ msg }}</p>{% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<main class="admin-main">
+{% block content %}{% endblock %}
+</main>
+
+<script src="/static/js/admin.js" defer></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

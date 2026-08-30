@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Les actualités{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Les actualités</h1>
+    <p class="admin-sub">Expositions, salons, nouvelles œuvres, annonces…
+       tout ce que vous voulez faire savoir à vos visiteurs.</p>
+  </div>
+  <a class="btn-primary" href="{{ url_for('admin_news_new') }}">+ Écrire une actualité</a>
+</div>
+
+{% if items %}
+<div class="table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th colspan="2">Actualité</th>
+        <th>Date</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for n in items %}
+      <tr class="{{ 'row-hidden' if not n.published }}">
+        <td class="col-thumb">
+          {% if n.cover %}<img src="/uploads/news/{{ n.cover }}/small.jpg" alt="" width="72" loading="lazy">
+          {% else %}<span class="thumb-empty">—</span>{% endif %}
+        </td>
+        <td class="col-title">
+          <a class="row-title" href="{{ url_for('admin_news_edit', nid=n.id) }}">{{ n.title }}</a>
+          <span class="row-meta">{{ n.imgs }} image{{ 's' if n.imgs > 1 }}{% if n.link %} · lien externe{% endif %}</span>
+          {% if not n.published %}<span class="badge badge-off">masquée</span>{% endif %}
+        </td>
+        <td class="col-info">{{ n.event_date|date_fr if n.event_date else '—' }}</td>
+        <td class="col-actions">
+          <div class="actions-group">
+            <a class="btn-tiny" href="{{ url_for('admin_news_edit', nid=n.id) }}">Modifier</a>
+            <form method="post" class="inline">
+              <input type="hidden" name="csrf" value="{{ csrf }}">
+              <input type="hidden" name="action" value="toggle">
+              <button class="btn-tiny btn-toggle" type="submit">
+                {{ 'Masquer' if n.published else 'Publier' }}
+              </button>
+            </form>
+            <form method="post" class="inline js-confirm"
+                  data-confirm="Supprimer « {{ n.title }} » ? Cette action est irréversible.">
+              <input type="hidden" name="csrf" value="{{ csrf }}">
+              <input type="hidden" name="action" value="delete">
+              <button class="btn-tiny btn-danger" type="submit">Supprimer</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="admin-empty">Aucune actualité pour l’instant.</p>
+{% endif %}
+{% endblock %}

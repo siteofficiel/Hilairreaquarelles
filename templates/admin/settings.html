@@ -1,0 +1,55 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Réglages{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Réglages du site</h1>
+    <p class="admin-sub">Ces informations apparaissent sur les pages du site.
+        Modifiez-les ici, sans toucher au code.</p>
+  </div>
+</div>
+
+<form method="post" class="form-card">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+
+  {% for key, label in keys %}
+  <div class="field{% if key in ('home_intro','artist_intro') %} field-wide{% endif %}">
+    <label for="s-{{ key }}">{{ label }}</label>
+    {% if key in ('home_intro', 'artist_intro') %}
+    <textarea id="s-{{ key }}" name="{{ key }}" rows="4">{{ s.get(key, '') }}</textarea>
+    {% elif key == 'instagram' %}
+    <input id="s-{{ key }}" name="{{ key }}" type="text" value="{{ s.get(key, '') }}"
+           placeholder="hilaire_aquarelles">
+    {% else %}
+    <input id="s-{{ key }}" name="{{ key }}" type="text" value="{{ s.get(key, '') }}">
+    {% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="form-actions">
+    <button class="btn-primary" type="submit">Enregistrer les réglages</button>
+  </div>
+</form>
+
+<section class="admin-section">
+  <h2>Changer mon mot de passe</h2>
+  <form method="post" class="form-card">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="password">
+    <div class="field-row">
+      <div class="field">
+        <label for="p-current">Mot de passe actuel</label>
+        <input id="p-current" name="current_password" type="password" required autocomplete="current-password">
+      </div>
+      <div class="field">
+        <label for="p-new">Nouveau mot de passe <span class="opt">(10 caractères minimum)</span></label>
+        <input id="p-new" name="new_password" type="password" required minlength="10" autocomplete="new-password">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-secondary" type="submit">Mettre à jour le mot de passe</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

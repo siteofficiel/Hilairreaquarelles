@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Connexion — Administration</title>
+<link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/static/css/fonts.css">
+<link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body class="login-body">
+<main class="login-card">
+  <p class="login-baseline">Hilaire Legentil</p>
+  <h1>Espace d’administration</h1>
+  <p class="login-hint">Réservé à l’artiste — indiquez vos identifiants.</p>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}<p class="admin-flash {{ cat }}">{{ msg }}</p>{% endfor %}
+  {% endwith %}
+
+  <form method="post" action="{{ url_for('admin_login') }}">
+    <div class="field">
+      <label for="l-user">Identifiant</label>
+      <input id="l-user" name="username" type="text" required autofocus autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="l-pass">Mot de passe</label>
+      <input id="l-pass" name="password" type="password" required autocomplete="current-password">
+    </div>
+    <button class="btn-primary btn-block" type="submit">Se connecter</button>
+  </form>
+  <p class="login-back"><a href="{{ url_for('home') }}">← Retour au site</a></p>
+</main>
+</body>
+</html>

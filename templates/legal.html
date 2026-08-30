@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Mentions légales — Hilaire Legentil{% endblock %}
+{% block desc %}Mentions légales du site d’Hilaire Legentil, artiste aquarelliste.{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div class="container reveal">
+    <p class="label">Informations</p>
+    <h1 class="page-title">Mentions légales</h1>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container article legal-body reveal">
+    <h2>Éditeur du site</h2>
+    <p>Hilaire Legentil — artiste aquarelliste (entrepreneur individuel)<br>
+       Yvetot-Bocage, 50700 Valognes, Manche (Normandie), France<br>
+       SIREN&nbsp;: 927&nbsp;753&nbsp;780<br>
+       Téléphone&nbsp;: {{ S.get('contact_phone') or 'sur demande' }}<br>
+       E-mail&nbsp;: {{ S.get('contact_email') or 'sur demande' }}</p>
+
+    <h2>Responsable de publication</h2>
+    <p>Hilaire Legentil.</p>
+
+    <h2>Hébergement</h2>
+    <p>À renseigner lors de la mise en ligne (coordonnées de l’hébergeur du site).</p>
+
+    <h2>Propriété intellectuelle</h2>
+    <p>L’ensemble des œuvres (aquarelles), photographies et textes présentés sur ce
+       site est la propriété d’Hilaire Legentil. Toute reproduction, représentation
+       ou diffusion, totale ou partielle, sans autorisation écrite préalable est
+       interdite.</p>
+
+    <h2>Crédits photographiques</h2>
+    <p>Photographies des aquarelles et documents d’exposition&nbsp;: Hilaire Legentil.</p>
+
+    <h2>Contact</h2>
+    <p>Via la <a class="lnk" href="{{ url_for('contact') }}">page contact</a>.</p>
+  </div>
+</section>
+{% endblock %}

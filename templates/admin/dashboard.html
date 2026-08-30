@@ -1,0 +1,55 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Bonjour Hilaire</h1>
+    <p class="admin-sub">Voici l’état de votre site en un coup d’œil.</p>
+  </div>
+</div>
+
+<div class="stat-grid">
+  <a class="stat-card" href="{{ url_for('admin_works') }}">
+    <span class="stat-num">{{ stats.works }}</span>
+    <span class="stat-label">œuvre{{ 's' if stats.works > 1 }} enregistrée{{ 's' if stats.works > 1 }}</span>
+    <span class="stat-extra">{{ stats.published }} visible{{ 's' if stats.published > 1 }} sur le site</span>
+  </a>
+  <a class="stat-card" href="{{ url_for('admin_news') }}">
+    <span class="stat-num">{{ stats.news }}</span>
+    <span class="stat-label">actualité{{ 's' if stats.news > 1 }}</span>
+    <span class="stat-extra">expositions &amp; nouvelles</span>
+  </a>
+  <a class="stat-card" href="{{ url_for('admin_messages') }}">
+    <span class="stat-num">{{ stats.messages }}</span>
+    <span class="stat-label">message{{ 's' if stats.messages > 1 }} reçu{{ 's' if stats.messages > 1 }}</span>
+    <span class="stat-extra">demandes du formulaire de contact</span>
+  </a>
+</div>
+
+<div class="admin-actions">
+  <a class="btn-primary" href="{{ url_for('admin_work_new') }}">+ Ajouter une œuvre</a>
+  <a class="btn-secondary" href="{{ url_for('admin_news_new') }}">+ Écrire une actualité</a>
+</div>
+
+<section class="admin-section">
+  <h2>Derniers messages reçus</h2>
+  {% if messages %}
+  <div class="msg-list">
+    {% for m in messages %}
+    <article class="msg-card">
+      <header>
+        <strong>{{ m.subject }}</strong>
+        <span class="msg-meta">{{ m.created_at }} · {{ m.name }} · {{ m.email }}</span>
+      </header>
+      <p>{{ m.body[:220] }}{% if m.body|length > 220 %}…{% endif %}</p>
+    </article>
+    {% endfor %}
+  </div>
+  <p><a class="admin-link" href="{{ url_for('admin_messages') }}">Voir tous les messages →</a></p>
+  {% else %}
+  <p class="admin-empty">Aucun message pour l’instant. Les demandes envoyées depuis la page
+    Contact du site apparaîtront ici.</p>
+  {% endif %}
+</section>
+{% endblock %}

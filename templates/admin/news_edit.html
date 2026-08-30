@@ -1,0 +1,88 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ 'Écrire une actualité' if new else 'Modifier l’actualité' }}{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>{{ 'Écrire une actualité' if new else 'Modifier l’actualité' }}</h1>
+    <p class="admin-sub">Le titre et le texte suffisent. Vous pourrez toujours
+        compléter ou corriger plus tard.</p>
+  </div>
+  <a class="btn-secondary" href="{{ url_for('admin_news') }}">← Retour à la liste</a>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="form-card">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+
+  <div class="field">
+    <label for="n-title">Titre</label>
+    <input id="n-title" name="title" type="text" maxlength="200" required
+           value="{{ n.title or '' }}" placeholder="Ex. : Exposition à la salle polyvalente de Barfleur">
+  </div>
+
+  <div class="field-row">
+    <div class="field">
+      <label for="n-date">Date <span class="opt">(facultatif — ex. 2025-07-21, 2025-07 ou 2025)</span></label>
+      <input id="n-date" name="event_date" type="text" maxlength="20"
+             value="{{ n.event_date or '' }}" placeholder="2025-07-21">
+    </div>
+    <div class="field">
+      <label for="n-link">Lien externe <span class="opt">(facultatif)</span></label>
+      <input id="n-link" name="link" type="url" maxlength="300"
+             value="{{ n.link or '' }}" placeholder="https://…">
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="n-body">Texte de l’actualité</label>
+    <textarea id="n-body" name="body" rows="9" maxlength="20000"
+              placeholder="Décrivez l’événement : lieu, dates, horaires, partenaires…">{{ n.body or '' }}</textarea>
+    <p class="field-help">Laissez une ligne vide entre les paragraphes.</p>
+  </div>
+
+  <div class="field">
+    <label for="n-cover">Image principale {{ '(laisser vide pour conserver l’actuelle)' if not new and n.cover else '(affichée en tête et dans les listes)' }}</label>
+    {% if n.cover %}
+    <div class="current-image">
+      <img id="cover-preview" src="/uploads/news/{{ n.cover }}/medium.jpg" alt="Image principale actuelle">
+    </div>
+    {% else %}
+    <div class="current-image current-image-empty">
+      <img id="cover-preview" src="" alt="" hidden>
+      <p id="cover-preview-hint">Aucune image choisie</p>
+    </div>
+    {% endif %}
+    <input id="n-cover" name="cover" type="file" accept=".jpg,.jpeg,.png,.webp"
+           class="file-input" data-preview="cover-preview" data-hint="cover-preview-hint">
+  </div>
+
+  <div class="field">
+    <label for="n-images">Images complémentaires <span class="opt">(vous pouvez en choisir plusieurs)</span></label>
+    <input id="n-images" name="images" type="file" accept=".jpg,.jpeg,.png,.webp" multiple
+           class="file-input">
+    {% if images %}
+    <div class="gallery-manage">
+      {% for img in images %}
+      <figure class="gm-item">
+        <img src="/uploads/news/{{ img.image }}/small.jpg" alt="Image de l’actualité">
+        <button class="btn-tiny btn-danger" type="submit" name="delete_image"
+                value="{{ img.id }}">Retirer</button>
+      </figure>
+      {% endfor %}
+    </div>
+    <p class="field-help">Cliquez sur « Retirer » pour supprimer une image complémentaire.</p>
+    {% endif %}
+  </div>
+
+  <label class="check-field">
+    <input type="checkbox" name="published" value="1"
+           {{ 'checked' if (n.published if n.published is defined else 1) }}>
+    <span>Publiée sur le site</span>
+  </label>
+
+  <div class="form-actions">
+    <button class="btn-primary" type="submit">{{ 'Publier l’actualité' if new else 'Enregistrer les modifications' }}</button>
+    <a class="btn-secondary" href="{{ url_for('admin_news') }}">Annuler</a>
+  </div>
+</form>
+{% endblock %}

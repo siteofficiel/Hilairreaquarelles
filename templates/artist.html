@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}L’artiste — Hilaire Legentil, aquarelliste en Normandie{% endblock %}
+{% block desc %}Parcours et démarche d’Hilaire Legentil, artiste aquarelliste : la mer et le paysage, l’aquarelle sur papier 100 % coton, entre Yvetot-Bocage et les rivages de la Manche.{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div class="container reveal">
+    <p class="label">L’artiste</p>
+    <h1 class="page-title">Hilaire Legentil</h1>
+    <p class="page-sub">Artiste aquarelliste · Aquarelles — mer &amp; paysage</p>
+  </div>
+</header>
+
+<section class="section artist-intro">
+  <div class="container two-col">
+    <div class="artist-text reveal">
+      <p class="lead">{{ S.get('artist_intro') }}</p>
+      <p>
+        Sa signature tient en quelques mots imprimés sur sa carte&nbsp;:
+        <em>«&nbsp;Aquarelles — mer &amp; paysage&nbsp;»</em>. De la pointe de Barfleur
+        aux horizons bocagers du Cotentin, il peint ce qu’il regarde&nbsp;: la mer,
+        les ciels, la terre — des paysages apaisés, d’une tonalité douce.
+      </p>
+    </div>
+    <aside class="artist-aside reveal">
+      <div class="fact-card">
+        <h2 class="fact-title">En un regard</h2>
+        <dl class="fact-list">
+          <div><dt>Art</dt><dd>Aquarelle</dd></div>
+          <div><dt>Sujets</dt><dd>Mer &amp; paysage</dd></div>
+          <div><dt>Support</dt><dd>Papier 100&nbsp;% coton</dd></div>
+          <div><dt>Région</dt><dd>Normandie — Yvetot-Bocage (Manche)</dd></div>
+        </dl>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="section wash-band">
+  <div class="container narrow center reveal">
+    <blockquote class="big-quote">
+      Peindre, c’est voyager&nbsp;; peindre, c’est méditer.
+      J’ai choisi d’être paysagiste car la nature m’apaise et me recentre.
+      <cite>Hilaire Legentil</cite>
+    </blockquote>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container two-col">
+    <div class="artist-text reveal">
+      <p class="label">La démarche</p>
+      <h2 class="h2">Ce que l’eau<br>emporte, ce qu’elle laisse</h2>
+      <p>
+        C’est pendant les confinements que la passion de l’aquarelle s’est imposée.
+        Depuis, Hilaire Legentil peint régulièrement, sur papier 100&nbsp;% coton,
+        une matière qu’il aime pour la <em>tonalité douce</em> qu’elle apporte aux
+        couleurs.
+      </p>
+      <p>
+        Paysagiste, il cherche dans la nature ce qui l’apaise et le recentre&nbsp;:
+        la mer et ses marées, les rivages de la Manche, les lumières changeantes
+        du Cotentin. L’aquarelle, vive et sans repentir, convient à ces visions
+        fugitives&nbsp;: l’eau décide, l’artiste guide.
+      </p>
+    </div>
+    <div class="artist-text reveal">
+      <p class="label">La matière</p>
+      <h2 class="h2">Le papier,<br>l’eau, la couleur</h2>
+      <p>
+        Chaque aquarelle est réalisée sur un papier 100&nbsp;% coton, choisi pour
+        sa douceur et sa longévité. Le coton absorbe l’eau lentement&nbsp;: les
+        couleurs se posent en transparences successives, les ciels gardent la
+        trace du geste.
+      </p>
+      <p>
+        Les œuvres présentées sur ce site sont des aquarelles originales.
+        Pour toute information sur une pièce, sa disponibilité ou un projet,
+        <a class="lnk" href="{{ url_for('contact') }}">écrivez à Hilaire</a>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="section section-expos">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">Expositions</p>
+        <h2 class="h2">Rencontrer les aquarelles</h2>
+      </div>
+      <a class="link-arrow" href="{{ url_for('news_list') }}">Toutes les actualités</a>
+    </div>
+    {% if expositions %}
+    <ol class="timeline">
+      {% for n in expositions %}
+      <li class="reveal">
+        <a href="{{ url_for('news_item', slug=n.slug) }}">
+          <span class="tl-date">{{ n.event_date|date_fr if n.event_date else '' }}</span>
+          <span class="tl-body">
+            <span class="tl-title">{{ n.title }}</span>
+          </span>
+          <span class="tl-arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}
+    <p class="muted">Les expositions seront annoncées ici prochainement.</p>
+    {% endif %}
+  </div>
+</section>
+
+<section class="section contact-invitation">
+  <div class="container narrow center reveal">
+    <h2 class="h2">Un projet, une demande particulière&nbsp;?</h2>
+    <p class="lead">Hilaire étudie toute demande&nbsp;: aquarelle sur commande, projet, exposition.</p>
+    <p class="invitation-cta">
+      <a class="btn" href="{{ url_for('contact') }}">Contacter l’artiste</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

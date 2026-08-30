@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% from "_macros.html" import picture %}
+
+{% block title %}{{ w.title }} — aquarelle d’Hilaire Legentil{% endblock %}
+{% block desc %}« {{ w.title }} », aquarelle originale d’Hilaire Legentil{{ (' — ' ~ w.category) if w.category }}{{ (' — ' ~ w.year) if w.year }}. Mer & paysage, papier 100 % coton.{% endblock %}
+
+{% block head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VisualArtwork",
+  "name": {{ w.title|tojson }},
+  "artform": "Aquarelle",
+  "artMedium": "Aquarelle sur papier 100 % coton",
+  "creator": {"@type": "Person", "name": "Hilaire Legentil", "jobTitle": "Artiste aquarelliste"}
+  {% if w.year %},"dateCreated": {{ w.year|tojson }}{% endif %}
+}
+</script>
+{% endblock %}
+
+{% block content %}
+<header class="page-head work-head">
+  <div class="container reveal">
+    <p class="label">Aquarelle</p>
+    <h1 class="page-title">{{ w.title }}</h1>
+    <p class="page-sub">{{ w.category ~ ' · ' ~ w.year if w.category and w.year else (w.category or w.year or 'Aquarelle originale') }}</p>
+  </div>
+</header>
+
+<section class="section work-section">
+  <div class="container work-layout">
+    <figure class="work-figure reveal">
+      {{ picture('works', w.folder, 'Aquarelle « ' ~ w.title ~ ' » d’Hilaire Legentil',
+                 sizes='(max-width:1000px) 92vw, 980px', cls='work-full-img', loading='eager') }}
+      {% if w.img_w and w.img_h %}
+      <figcaption class="work-tech">Aquarelle sur papier 100&nbsp;% coton{% if w.dimensions %} — {{ w.dimensions }}{% endif %}</figcaption>
+      {% endif %}
+    </figure>
+
+    <aside class="work-aside reveal">
+      <dl class="work-facts">
+        {% if w.category %}<div><dt>Catégorie</dt><dd>{{ w.category }}</dd></div>{% endif %}
+        {% if w.technique %}<div><dt>Technique</dt><dd>{{ w.technique }}</dd></div>{% endif %}
+        {% if w.dimensions %}<div><dt>Format</dt><dd>{{ w.dimensions }}</dd></div>{% endif %}
+        {% if w.year %}<div><dt>Année</dt><dd>{{ w.year }}</dd></div>{% endif %}
+      </dl>
+
+      {% if w.description %}
+      <div class="work-description">
+        {% for p in w.description|paras %}<p>{{ p }}</p>{% endfor %}
+      </div>
+      {% endif %}
+
+      <a class="btn btn-full" href="{{ url_for('contact', oeuvre=w.slug) }}">Demander des informations</a>
+
+      <nav class="work-nav" aria-label="Navigation entre les œuvres">
+        {% if prev %}
+        <a class="work-nav-link" href="{{ url_for('work', slug=prev.slug) }}">
+          <span class="wn-label">Œuvre précédente</span>
+          <span class="wn-title">{{ prev.title }}</span>
+        </a>
+        {% endif %}
+        {% if next %}
+        <a class="work-nav-link is-next" href="{{ url_for('work', slug=next.slug) }}">
+          <span class="wn-label">Œuvre suivante</span>
+          <span class="wn-title">{{ next.title }}</span>
+        </a>
+        {% endif %}
+      </nav>
+
+      <p class="work-counter">{{ index }} / {{ total }} — <a class="lnk" href="{{ url_for('gallery') }}">retour à la galerie</a></p>
+    </aside>
+  </div>
+</section>
+
+{% if next and next.folder %}
+<section class="section next-teaser reveal">
+  <div class="container teaser-inner">
+    <div>
+      <p class="label">À voir ensuite</p>
+      <h2 class="h3">{{ next.title }}</h2>
+      <a class="link-arrow" href="{{ url_for('work', slug=next.slug) }}">Voir l’œuvre suivante</a>
+    </div>
+    <a class="teaser-figure" href="{{ url_for('work', slug=next.slug) }}" aria-hidden="true" tabindex="-1">
+      {{ picture('works', next.folder, '', sizes='(max-width:760px) 50vw, 300px') }}
+    </a>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('keydown', function (e) {
+  if (e.target.matches('input, textarea, select')) return;
+  {% if next %}if (e.key === 'ArrowRight') window.location = "{{ url_for('work', slug=next.slug) }}";{% endif %}
+  {% if prev %}if (e.key === 'ArrowLeft') window.location = "{{ url_for('work', slug=prev.slug) }}";{% endif %}
+});
+</script>
+{% endblock %}

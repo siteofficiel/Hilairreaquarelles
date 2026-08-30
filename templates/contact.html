@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% from "_macros.html" import picture %}
+
+{% block title %}Contact — Hilaire Legentil, aquarelliste · Yvetot-Bocage{% endblock %}
+{% block desc %}Contactez Hilaire Legentil, artiste aquarelliste à Yvetot-Bocage en Normandie : information sur une œuvre, commande, demande spécifique ou exposition.{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div class="container reveal">
+    <p class="label">Contact</p>
+    <h1 class="page-title">Écrire à Hilaire</h1>
+    <p class="page-sub">Une réponse personnelle, sans engagement</p>
+  </div>
+</header>
+
+<section class="section" id="formulaire">
+  <div class="container contact-layout">
+
+    <div class="contact-form-wrap reveal">
+      {% if sent %}
+      <div class="form-success" role="status">
+        <p class="form-success-title">Merci, votre message est bien envoyé.</p>
+        <p>Hilaire vous répondra dès que possible à l’adresse indiquée.</p>
+      </div>
+      {% endif %}
+
+      <form class="contact-form" method="post" action="{{ url_for('contact_send') }}" novalidate>
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="form_ts" id="form-ts" value="0">
+
+        <div class="field">
+          <label for="f-name">Nom / prénom <span class="req" aria-hidden="true">*</span></label>
+          <input id="f-name" name="name" type="text" required maxlength="120"
+                 autocomplete="name" placeholder="Votre nom">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="f-email">Adresse e-mail <span class="req" aria-hidden="true">*</span></label>
+            <input id="f-email" name="email" type="email" required maxlength="160"
+                   autocomplete="email" placeholder="vous@exemple.fr">
+          </div>
+          <div class="field">
+            <label for="f-phone">Téléphone <span class="opt">(facultatif)</span></label>
+            <input id="f-phone" name="phone" type="tel" maxlength="40"
+                   autocomplete="tel" placeholder="06 …">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="f-category">Votre demande concerne</label>
+          <select id="f-category" name="category">
+            <option value="Information sur une œuvre">Une information sur une œuvre</option>
+            <option value="Demande spécifique">Une demande spécifique</option>
+            <option value="Commande">Une commande</option>
+            <option value="Exposition">Une exposition</option>
+            <option value="Autre">Autre chose</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="f-subject">Objet <span class="req" aria-hidden="true">*</span></label>
+          <input id="f-subject" name="subject" type="text" required maxlength="160"
+                 placeholder="Ex. : information sur une aquarelle" value="{{ prefill }}">
+        </div>
+
+        <div class="field">
+          <label for="f-message">Message <span class="req" aria-hidden="true">*</span></label>
+          <textarea id="f-message" name="message" rows="6" required maxlength="4000"
+                    placeholder="Votre message…"></textarea>
+        </div>
+
+        {# Pot de miel anti-spam : invisible pour les humains #}
+        <p class="hp-field" aria-hidden="true">
+          <label for="f-web">Site web</label>
+          <input id="f-web" name="site_web" type="text" tabindex="-1" autocomplete="off">
+        </p>
+
+        <button class="btn btn-full" type="submit">Envoyer le message</button>
+        <p class="form-note">Les champs suivis d’un <span class="req">*</span> sont indispensables
+          pour pouvoir vous répondre.</p>
+      </form>
+    </div>
+
+    <aside class="contact-aside reveal">
+      <div class="contact-card">
+        <h2 class="h3">En direct</h2>
+        <ul class="contact-list">
+          {% if S.get('contact_phone') %}
+          <li><span>Téléphone</span><a class="lnk" href="tel:{{ S.get('contact_phone')|replace(' ','') }}">{{ S.get('contact_phone') }}</a></li>
+          {% endif %}
+          {% if S.get('contact_email') %}
+          <li><span>E-mail</span><a class="lnk" href="mailto:{{ S.get('contact_email') }}">{{ S.get('contact_email') }}</a></li>
+          {% endif %}
+          {% if S.get('instagram') %}
+          <li><span>Instagram</span><a class="lnk" href="https://www.instagram.com/{{ S.get('instagram') }}/" rel="me noopener" target="_blank">{{ S.get('instagram') }}</a></li>
+          {% endif %}
+          <li><span>Atelier</span><span>Yvetot-Bocage · Manche · Normandie</span></li>
+        </ul>
+      </div>
+
+      <div class="contact-card" id="demande-specifique">
+        <h2 class="h3">Demande spécifique</h2>
+        <p class="small">
+          Tableau sur demande, projet particulier, renseignement sur une œuvre,
+          exposition ou collaboration&nbsp;: décrivez simplement votre projet,
+          Hilaire vous répond personnellement.
+        </p>
+        <p class="small"><a class="lnk" href="#f-category">Utilisez le formulaire en choisissant
+          «&nbsp;Une demande spécifique&nbsp;»</a>.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="section map-section">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">La région</p>
+        <h2 class="h2">Autour d’Yvetot-Bocage</h2>
+      </div>
+    </div>
+    <p class="map-note reveal">
+      Hilaire travaille dans le Cotentin, à Yvetot-Bocage (Manche). La zone
+      entourée ci-dessous correspond à un rayon d’environ 75&nbsp;km — de la côte
+      Ouest au pays de Caux, au cœur de la Normandie maritime.
+    </p>
+    <div class="map-wrap reveal" id="map-wrap">
+      <div id="map" role="application" aria-label="Carte interactive : zone d’environ 75 kilomètres autour d’Yvetot-Bocage en Normandie"></div>
+      <p class="map-credit">Carte © les contributeurs d’<a href="https://www.openstreetmap.org/copyright" rel="noopener" target="_blank">OpenStreetMap</a></p>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="/static/css/leaflet.css">
+<script src="/static/js/leaflet.js" defer></script>
+<script src="/static/js/contact.js" defer></script>
+{% endblock %}

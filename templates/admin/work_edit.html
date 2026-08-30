@@ -1,0 +1,93 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}{{ 'Ajouter une œuvre' if new else 'Modifier une œuvre' }}{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>{{ 'Ajouter une œuvre' if new else 'Modifier l’œuvre' }}</h1>
+    <p class="admin-sub">Seuls la photographie et le titre sont indispensables.
+        Tout le reste peut rester vide.</p>
+  </div>
+  <a class="btn-secondary" href="{{ url_for('admin_works') }}">← Retour à la liste</a>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="form-card">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+
+  <div class="form-grid">
+    <div class="form-col">
+
+      <div class="field">
+        <label for="w-title">Titre de l’aquarelle</label>
+        <input id="w-title" name="title" type="text" maxlength="160" required
+               value="{{ w.title if w.title != 'Sans titre' else '' }}"
+               placeholder="Ex. : Marée basse à Barfleur">
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="w-category">Catégorie</label>
+          <input id="w-category" name="category" type="text" maxlength="80"
+                 value="{{ w.category or '' }}" placeholder="Ex. : Marines">
+        </div>
+        <div class="field">
+          <label for="w-year">Année</label>
+          <input id="w-year" name="year" type="text" maxlength="20"
+                 value="{{ w.year or '' }}" placeholder="Ex. : 2024">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="w-technique">Technique</label>
+          <input id="w-technique" name="technique" type="text" maxlength="120"
+                 value="{{ w.technique or '' }}" placeholder="Ex. : Aquarelle sur papier coton">
+        </div>
+        <div class="field">
+          <label for="w-dimensions">Format</label>
+          <input id="w-dimensions" name="dimensions" type="text" maxlength="60"
+                 value="{{ w.dimensions or '' }}" placeholder="Ex. : 30 × 40 cm">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="w-description">Description <span class="opt">(facultatif)</span></label>
+        <textarea id="w-description" name="description" rows="5" maxlength="3000"
+                  placeholder="Quelques mots sur cette aquarelle : le lieu, la lumière, le moment…">{{ w.description or '' }}</textarea>
+      </div>
+
+      <label class="check-field">
+        <input type="checkbox" name="published" value="1"
+               {{ 'checked' if (w.published if w.published is defined else 1) }}>
+        <span>Visible dans la galerie du site</span>
+      </label>
+    </div>
+
+    <div class="form-col">
+      <div class="field">
+        <label for="w-image">Photographie de l’aquarelle {{ '(obligatoire)' if new else '(laisser vide pour conserver l’actuelle)' }}</label>
+        {% if not new and w.folder %}
+        <div class="current-image">
+          <img id="img-preview" src="/uploads/works/{{ w.folder }}/medium.jpg"
+               alt="Photographie actuelle de l’œuvre">
+        </div>
+        {% else %}
+        <div class="current-image current-image-empty">
+          <img id="img-preview" src="" alt="" hidden>
+          <p id="img-preview-hint">Aucune image choisie</p>
+        </div>
+        {% endif %}
+        <input id="w-image" name="image" type="file" accept=".jpg,.jpeg,.png,.webp"
+               class="file-input" data-preview="img-preview" data-hint="img-preview-hint">
+        <p class="field-help">JPG, PNG ou WebP — 26 Mo maximum. L’image est optimisée
+           automatiquement, sans retouche de l’œuvre.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button class="btn-primary" type="submit">{{ 'Ajouter à la galerie' if new else 'Enregistrer les modifications' }}</button>
+    <a class="btn-secondary" href="{{ url_for('admin_works') }}">Annuler</a>
+  </div>
+</form>
+{% endblock %}

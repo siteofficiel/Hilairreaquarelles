@@ -1,0 +1,33 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Messages{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Messages reçus</h1>
+    <p class="admin-sub">Demandes envoyées depuis la page Contact du site.</p>
+  </div>
+</div>
+
+{% if messages %}
+<div class="msg-list msg-list-full">
+  {% for m in messages %}
+  <article class="msg-card">
+    <header>
+      <strong>{{ m.subject }}</strong>
+      <span class="badge">{{ m.category or '—' }}</span>
+      <span class="msg-meta">
+        {{ m.created_at }} · {{ m.name }}
+        · <a class="admin-link" href="mailto:{{ m.email }}">{{ m.email }}</a>
+        {% if m.phone %} · {{ m.phone }}{% endif %}
+      </span>
+    </header>
+    <p>{{ m.body }}</p>
+    <a class="btn-tiny" href="mailto:{{ m.email }}?subject=Re: {{ m.subject }}">Répondre par e-mail</a>
+  </article>
+  {% endfor %}
+</div>
+{% else %}
+<p class="admin-empty">Aucun message pour l’instant.</p>
+{% endif %}
+{% endblock %}
