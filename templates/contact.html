@@ -113,7 +113,7 @@
   </div>
 </section>
 
-<section class="section map-section">
+<section class="section map-section tint-sky">
   <div class="container">
     <div class="section-head reveal">
       <div>
@@ -123,11 +123,21 @@
     </div>
     <p class="map-note reveal">
       Hilaire travaille dans le Cotentin, à Yvetot-Bocage (Manche). La zone
-      entourée ci-dessous correspond à un rayon d’environ 75&nbsp;km — de la côte
-      Ouest au pays de Caux, au cœur de la Normandie maritime.
+      entourée correspond à un rayon d’environ 75&nbsp;km — de la côte Ouest au
+      pays de Caux, au cœur de la Normandie maritime.
     </p>
     <div class="map-wrap reveal" id="map-wrap">
-      <div id="map" role="application" aria-label="Carte interactive : zone d’environ 75 kilomètres autour d’Yvetot-Bocage en Normandie"></div>
+      <div id="map" hidden role="application" aria-label="Carte interactive : zone d’environ 75 kilomètres autour d’Yvetot-Bocage en Normandie"></div>
+      <div id="map-consent" class="map-consent" hidden>
+        <div class="map-consent-inner">
+          <p class="label">Carte interactive</p>
+          <p>La carte est servie par OpenStreetMap, un service tiers susceptible de
+             déposer des cookies. Elle ne se charge qu’avec votre accord — le reste
+             de la page fonctionne sans elle.</p>
+          <p><button class="btn" id="map-load" type="button">Charger la carte</button>
+             <a class="lnk" style="margin-left:1.2rem" href="{{ url_for('privacy') }}#cookies">En savoir plus</a></p>
+        </div>
+      </div>
       <p class="map-credit">Carte © les contributeurs d’<a href="https://www.openstreetmap.org/copyright" rel="noopener" target="_blank">OpenStreetMap</a></p>
     </div>
   </div>
@@ -135,7 +145,5 @@
 {% endblock %}
 
 {% block scripts %}
-<link rel="stylesheet" href="/static/css/leaflet.css">
 <script src="/static/js/leaflet.js" defer></script>
-<script src="/static/js/contact.js" defer></script>
 {% endblock %}

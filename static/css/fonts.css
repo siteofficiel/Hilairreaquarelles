@@ -1,9 +1,6 @@
-@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:400;font-display:swap;src:url('../fonts/CormorantGaramond-400i.woff2') format('woff2');}
-@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:500;font-display:swap;src:url('../fonts/CormorantGaramond-500i.woff2') format('woff2');}
 @font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/CormorantGaramond-400.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:400;font-display:swap;src:url('../fonts/CormorantGaramond-400i.woff2') format('woff2');}
 @font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/CormorantGaramond-500.woff2') format('woff2');}
 @font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('../fonts/CormorantGaramond-600.woff2') format('woff2');}
-@font-face{font-family:'Jost';font-style:italic;font-weight:400;font-display:swap;src:url('../fonts/Jost-400i.woff2') format('woff2');}
-@font-face{font-family:'Jost';font-style:normal;font-weight:300;font-display:swap;src:url('../fonts/Jost-300.woff2') format('woff2');}
 @font-face{font-family:'Jost';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/Jost-400.woff2') format('woff2');}
 @font-face{font-family:'Jost';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/Jost-500.woff2') format('woff2');}

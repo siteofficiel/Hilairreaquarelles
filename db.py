@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS works (
     img_h INTEGER DEFAULT 0,
     position INTEGER NOT NULL DEFAULT 0,
     published INTEGER NOT NULL DEFAULT 1,
+    tonality TEXT DEFAULT '',
+    chroma REAL DEFAULT 0,
     created_at TEXT NOT NULL
 );
 

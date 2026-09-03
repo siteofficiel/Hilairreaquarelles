@@ -5,7 +5,87 @@
 <div class="admin-page-head">
   <div>
     <h1>Bonjour Hilaire</h1>
-    <p class="admin-sub">Voici l’état de votre site en un coup d’œil.</p>
+    <p class="admin-sub">Mettez la clé GitHub une fois, puis publiez les photos directement.</p>
+  </div>
+</div>
+
+<div class="admin-section">
+  <div class="gh-gate">
+    <h2 class="gh-title">Mettre le site <em>en ligne</em></h2>
+    <p class="admin-sub">Collez votre clé GitHub une seule fois&nbsp;: les photos ajoutées
+       partent directement en ligne et le site se met à jour automatiquement en 1 à 2 minutes.</p>
+    <p class="gh-state">
+      <strong>Clé&nbsp;:</strong> {{ '✔ enregistrée' if has_token else '— absente' }}
+      {% if login %} — connecté en tant que {{ login }}{% endif %}
+      {% if s.get('github_repo') %} · <strong>Dépôt&nbsp;:</strong> {{ s.get('github_repo') }}
+      (branche {{ s.get('github_branch', 'main') }}){% endif %}
+    </p>
+
+    {% if not has_token %}
+    <form method="post" class="gh-form">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <input type="hidden" name="action" value="github_key">
+      <label for="gh-token">Jeton d’accès GitHub (la clé)</label>
+      <div class="gh-row">
+        <input id="gh-token" name="github_token" type="password" autocomplete="off"
+               placeholder="github_pat_… ou ghp_…" required>
+        <button class="btn-primary" type="submit">🔑 Vérifier et enregistrer</button>
+      </div>
+    </form>
+    {% else %}
+    <form method="post" class="gh-form">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <input type="hidden" name="action" value="github_repo">
+      <label for="gh-repo">Dépôt et branche</label>
+      <div class="gh-row">
+        {% if repos %}
+        <select id="gh-repo" name="github_repo">
+          {% for r in repos %}
+          <option value="{{ r }}" {{ 'selected' if r == s.get('github_repo') }}>{{ r }}</option>
+          {% endfor %}
+        </select>
+        {% else %}
+        <input id="gh-repo" name="github_repo" type="text"
+               value="{{ s.get('github_repo', '') }}" placeholder="compte/dépôt" required>
+        {% endif %}
+        <input name="github_branch" type="text" value="{{ s.get('github_branch', 'main') }}"
+               aria-label="Branche" style="flex:0 1 120px">
+        <button class="btn-secondary" type="submit">Enregistrer</button>
+      </div>
+    </form>
+    <div class="gh-actions">
+      <form method="post" style="display:inline">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="action" value="github_publish">
+        <button class="btn-primary" type="submit">Publier le site maintenant</button>
+      </form>
+      <form method="post" style="display:inline">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="action" value="github_forget">
+        <button class="btn-secondary" type="submit">Supprimer la clé</button>
+      </form>
+    </div>
+    {% endif %}
+
+    <details class="gh-help">
+      <summary>📖 Comment obtenir un jeton&nbsp;? (5 minutes, pas à pas)</summary>
+      <ol>
+        <li>Sur github.com, cliquez votre avatar → <strong>Settings</strong> → Developer
+            settings → Personal access tokens → <strong>Fine-grained tokens</strong> →
+            Generate new token.</li>
+        <li><strong>Nom</strong>&nbsp;: «&nbsp;Site Hilaire&nbsp;» ·
+            <strong>Expiration</strong>&nbsp;: 1 an.</li>
+        <li><strong>Repository access</strong>&nbsp;: Only select repositories →
+            sélectionnez le dépôt du site.</li>
+        <li><strong>Permissions</strong> → Repository permissions →
+            <strong>Contents&nbsp;: Read and write</strong>.</li>
+        <li>Cliquez <strong>Generate token</strong>, copiez la clé et collez-la ci-dessus.</li>
+      </ol>
+      <p class="admin-sub">💡 Avec un jeton «&nbsp;classic&nbsp;», cochez simplement la case
+         <strong>repo</strong> entière. Si GitHub répond «&nbsp;Resource not accessible by
+         personal access token&nbsp;», le jeton n’a pas le droit d’écriture&nbsp;:
+         vérifiez l’étape&nbsp;4 et que le bon dépôt est sélectionné.</p>
+    </details>
   </div>
 </div>
 

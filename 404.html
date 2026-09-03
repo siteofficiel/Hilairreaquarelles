@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hilaire Legentil — page introuvable</title>
+<style>
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+background:radial-gradient(60% 80% at 80% 0%,rgba(26,157,154,.14),transparent 60%),#faf8f3;
+font-family:Georgia,serif;color:#263a40;text-align:center;padding:2rem}
+.box{max-width:520px}
+p{line-height:1.7}
+a{color:#0a615e}
+small{font-family:system-ui,sans-serif;color:#5a6a68}
+</style>
+</head>
+<body>
+<div class="box">
+<p style="letter-spacing:.25em;text-transform:uppercase;font-size:.8rem;color:#0a615e;font-family:system-ui,sans-serif">Hilaire Legentil</p>
+<h1 style="font-size:2rem;margin:.4rem 0 1rem">Cette page n’existe pas.</h1>
+<p id="msg">Vous serez ramené à la galerie dans un instant.</p>
+<p><a href="./">← Revenir à l’accueil</a></p>
+<small>Espace administrateur : <a href="./#/admin">cette adresse</a></small>
+</div>
+<script>
+var p=location.pathname;
+if(/\/admin\/?$/.test(p)){location.replace(p.replace(/admin\/?$/,"")+"#/admin");}
+else if(document.getElementById("msg")){document.getElementById("msg").style.display="none";}
+</script>
+</body>
+</html>

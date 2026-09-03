@@ -202,11 +202,12 @@ def seed():
         if folder in existing:
             continue
         slug = unique_slug(conn, "works", slugify(title, "aquarelle"))
+        tonality, chroma = imaging.compute_tonality(os.path.join(WORKS_DIR, folder))
         conn.execute(
             "INSERT INTO works(title,slug,description,category,technique,dimensions,"
-            "year,folder,img_w,img_h,position,published,created_at) "
-            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (title, slug, "", cat, "", "", year, folder, w, h, i, 1, db.now_iso()))
+            "year,folder,img_w,img_h,position,published,tonality,chroma,created_at) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            (title, slug, "", cat, "", "", year, folder, w, h, i, 1, tonality, chroma, db.now_iso()))
         count += 1
         print(f"  + œuvre : {fname} ({w}×{h})")
     conn.commit()

@@ -20,6 +20,7 @@
       <a href="{{ url_for('admin_home') }}" {% if request.endpoint == 'admin_home' %}aria-current="page"{% endif %}>Tableau de bord</a>
       <a href="{{ url_for('admin_works') }}" {% if request.endpoint in ('admin_works','admin_work_new','admin_work_edit') %}aria-current="page"{% endif %}>Œuvres</a>
       <a href="{{ url_for('admin_news') }}" {% if request.endpoint in ('admin_news','admin_news_new','admin_news_edit') %}aria-current="page"{% endif %}>Actualités</a>
+      <a href="{{ url_for('admin_atelier') }}" {% if request.endpoint == 'admin_atelier' %}aria-current="page"{% endif %}>Atelier</a>
       <a href="{{ url_for('admin_messages') }}" {% if request.endpoint == 'admin_messages' %}aria-current="page"{% endif %}>Messages</a>
       <a href="{{ url_for('admin_settings') }}" {% if request.endpoint == 'admin_settings' %}aria-current="page"{% endif %}>Réglages</a>
     </nav>
@@ -42,7 +43,7 @@
 {% block content %}{% endblock %}
 </main>
 
-<script src="/static/js/admin.js" defer></script>
+<script src="/static/js/app.js" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

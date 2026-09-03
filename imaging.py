@@ -16,10 +16,7 @@ MAX_UPLOAD_BYTES = 26 * 1024 * 1024  # 26 Mo
 
 # (nom, grande largeur, qualité JPEG, qualité WebP)
 DERIVATIVES = [
-    ("xlarge", 1600, 0, 72, False),
-    ("large", 1200, 0, 70, False),
-    ("medium", 880, 74, 70, True),
-    ("small", 480, 72, 68, True),
+    ("medium", 1280, 0, 74, False),
 ]
 
 MIME = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
@@ -103,3 +100,42 @@ def import_existing_file(src_path, target_root, base_name=None):
     """Importe un fichier déjà présent sur le serveur (seed initial)."""
     with open(src_path, "rb") as f:
         return store_image(f, os.path.basename(src_path), target_root, base_name=base_name)
+
+
+# ------------------------------------------------------------- tonalité
+# Vivacité colorimétrique d'une œuvre (métrique de Hasler & Süsstrunk).
+# Mesurée sur l'image réelle : seuil choisi sur le creux naturel observé
+# entre les aquarelles ternes (< 32) et colorées (>= 32) de la galerie.
+TONALITY_THRESHOLD = 32
+
+
+def chroma_of_image(path):
+    from PIL import Image as _Image
+    im = _Image.open(path).convert("RGB")
+    im.thumbnail((220, 220))
+    px = list(im.getdata())
+    rg = [r - g for r, g, b in px]
+    yb = [0.5 * (r + g) - b for r, g, b in px]
+
+    def _mean(x):
+        return sum(x) / len(x)
+
+    def _std(x):
+        m = _mean(x)
+        return (sum((v - m) ** 2 for v in x) / len(x)) ** 0.5
+
+    return (( _std(rg) ** 2 + _std(yb) ** 2) ** 0.5
+            + 0.3 * (_mean(rg) ** 2 + _mean(yb) ** 2) ** 0.5)
+
+
+def compute_tonality(variant_dir):
+    """('Colorée'|'Terne', vivacité) mesurés sur les dérivés d'une œuvre."""
+    for name in ("medium.webp", "medium.jpg", "xlarge.webp"):
+        p = os.path.join(variant_dir, name)
+        if os.path.exists(p):
+            try:
+                c = chroma_of_image(p)
+            except Exception:
+                return "", 0.0
+            return ("Colorée" if c >= TONALITY_THRESHOLD else "Terne"), round(c, 1)
+    return "", 0.0

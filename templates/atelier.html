@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}L’atelier — Hilaire Legentil, aquarelliste{% endblock %}
+{% block desc %}L’atelier d’Hilaire Legentil : la palette de couleurs où naissent ses aquarelles, entre papier 100 % coton et pigments.{% endblock %}
+
+{% block content %}
+<header class="page-head">
+  <div class="container reveal">
+    <p class="label">L’atelier</p>
+    <h1 class="page-title">Dans l’atelier</h1>
+    <p class="page-sub">Le lieu où naissent les aquarelles</p>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">L’atelier</p>
+        <h2 class="h2">L’atelier en photos</h2>
+      </div>
+    </div>
+    <p class="atelier-note reveal">L’atelier d’Hilaire en photos — la palette et le lieu où
+      naissent les aquarelles. Cliquez pour agrandir.</p>
+    <div class="atelier-grid{% if photos|length == 1 %} atelier-one{% endif %}"
+         id="atelier-grid" data-cap="L’atelier">
+      {%- for p in photos %}
+      <figure class="atelier-item reveal">
+        <button type="button" class="atelier-btn"
+                data-full="/uploads/atelier/{{ p.folder }}/medium.webp"
+                aria-label="Agrandir la photo {{ loop.index }} sur {{ photos|length }}">
+          <img loading="lazy" decoding="async"
+               src="/uploads/atelier/{{ p.folder }}/medium.webp"
+               alt="L’atelier d’Hilaire Legentil — photo {{ loop.index }}"
+               width="{{ p.img_w }}" height="{{ p.img_h }}">
+        </button>
+      </figure>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section wash-band">
+  <div class="container narrow center reveal">
+    <h2 class="h2">Envie de voir le résultat&nbsp;?</h2>
+    <p class="lead">Les aquarelles nées de cette palette — et quelques-unes peintes sur le vif.</p>
+    <p class="invitation-cta">
+      <a class="btn" href="{{ url_for('gallery') }}">Découvrir les aquarelles</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

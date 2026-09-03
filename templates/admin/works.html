@@ -35,13 +35,14 @@
           </form>
         </td>
         <td class="col-thumb">
-          <img src="/uploads/works/{{ w.folder }}/small.jpg" alt="" width="72" loading="lazy">
+          <img src="/uploads/works/{{ w.folder }}/medium.webp" alt="" width="72" loading="lazy">
         </td>
         <td class="col-title">
           <a class="row-title" href="{{ url_for('admin_work_edit', wid=w.id) }}">{{ w.title }}</a>
           <span class="row-meta">
             {{ w.category }}{% if w.category and w.year %} · {% endif %}{{ w.year }}
           </span>
+          {% if w.tonality %}<span class="badge {{ 'badge-mute' if w.tonality == 'Terne' }}">{{ w.tonality }}</span>{% endif %}
           {% if not w.published %}<span class="badge badge-off">masquée</span>{% endif %}
         </td>
         <td class="col-info">
@@ -74,4 +75,64 @@
 <p class="admin-empty">Aucune œuvre pour l’instant. Cliquez sur « Ajouter une œuvre »
    pour créer votre première fiche.</p>
 {% endif %}
+
+<div class="admin-section">
+  <h2>Sur le vif <span class="badge">{{ vif|length }}</span></h2>
+  <p class="admin-sub">Les aquarelles peintes devant le sujet, affichées dans la
+     galerie en dessous des œuvres (rubrique «&nbsp;Sur le vif&nbsp;»).</p>
+  <form method="post" enctype="multipart/form-data" class="form-card"
+        action="{{ url_for('admin_vif') }}">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="upload">
+    <div class="field">
+      <label for="vif-image">Ajouter une aquarelle sur le vif (JPG, PNG ou WebP — 26&nbsp;Mo maximum)</label>
+      <input id="vif-image" name="image" type="file" accept=".jpg,.jpeg,.png,.webp" required>
+    </div>
+    <p><button class="btn-primary" type="submit">Ajouter à la galerie</button></p>
+  </form>
+  {% if vif %}
+  <div class="table-wrap">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th class="col-order">Ordre</th>
+          <th colspan="2">Aquarelle</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in vif %}
+        <tr>
+          <td class="col-order">
+            <form method="post" class="inline" action="{{ url_for('admin_vif') }}">
+              <input type="hidden" name="csrf" value="{{ csrf }}">
+              <input type="hidden" name="action" value="move">
+              <input type="hidden" name="id" value="{{ a.id }}">
+              <button class="icon-btn" name="dir" value="up" title="Monter" {{ 'disabled' if loop.first }} aria-label="Monter l’aquarelle n°{{ loop.index }}">▲</button>
+              <button class="icon-btn" name="dir" value="down" title="Descendre" {{ 'disabled' if loop.last }} aria-label="Descendre l’aquarelle n°{{ loop.index }}">▼</button>
+            </form>
+          </td>
+          <td class="col-thumb">
+            <img src="/uploads/atelier/{{ a.folder }}/medium.webp" alt="" width="72" loading="lazy">
+          </td>
+          <td class="col-title">
+            <span class="row-title">Aquarelle sur le vif — n°{{ loop.index }}</span>
+            <span class="row-meta">{{ a.img_w }}×{{ a.img_h }} px</span>
+          </td>
+          <td class="col-actions">
+            <form method="post" class="inline" action="{{ url_for('admin_vif') }}"
+                  onsubmit="return confirm('Supprimer définitivement cette aquarelle ?')">
+              <input type="hidden" name="csrf" value="{{ csrf }}">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ a.id }}">
+              <button class="btn-tiny btn-danger" type="submit">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
 {% endblock %}

@@ -40,6 +40,7 @@
     <aside class="work-aside reveal">
       <dl class="work-facts">
         {% if w.category %}<div><dt>Catégorie</dt><dd>{{ w.category }}</dd></div>{% endif %}
+        {% if w.tonality %}<div><dt>Tonalité</dt><dd>{{ w.tonality }}</dd></div>{% endif %}
         {% if w.technique %}<div><dt>Technique</dt><dd>{{ w.technique }}</dd></div>{% endif %}
         {% if w.dimensions %}<div><dt>Format</dt><dd>{{ w.dimensions }}</dd></div>{% endif %}
         {% if w.year %}<div><dt>Année</dt><dd>{{ w.year }}</dd></div>{% endif %}

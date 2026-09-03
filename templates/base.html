@@ -18,7 +18,7 @@
 {% block head %}{% endblock %}
 {% if SITE.domain %}<meta property="og:url" content="{{ SITE.domain }}{{ request.path }}">{% endif %}
 </head>
-<body>
+<body class="pg-{{ request.endpoint or 'home' }}">
 <a class="skip-link" href="#contenu">Aller au contenu</a>
 
 <header class="site-header" id="site-header">
@@ -31,6 +31,7 @@
       <ul>
         <li><a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>Accueil</a></li>
         <li><a href="{{ url_for('artist') }}" {% if request.endpoint == 'artist' %}aria-current="page"{% endif %}>L’artiste</a></li>
+        <li><a href="{{ url_for('atelier') }}" {% if request.endpoint == 'atelier' %}aria-current="page"{% endif %}>L’atelier</a></li>
         <li><a href="{{ url_for('gallery') }}" {% if request.endpoint in ('gallery','work') %}aria-current="page"{% endif %}>Aquarelles</a></li>
         <li><a href="{{ url_for('news_list') }}" {% if request.endpoint in ('news_list','news_item') %}aria-current="page"{% endif %}>Actualités</a></li>
         <li><a href="{{ url_for('contact') }}" {% if request.endpoint == 'contact' %}aria-current="page"{% endif %}>Contact</a></li>
@@ -47,6 +48,7 @@
 {% block content %}{% endblock %}
 </main>
 
+<div class="spectrum" aria-hidden="true"></div>
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-col footer-id">
@@ -67,16 +69,19 @@
       <h2 class="footer-title">Le site</h2>
       <ul class="footer-list">
         <li><a href="{{ url_for('artist') }}">L’artiste</a></li>
+        <li><a href="{{ url_for('atelier') }}">L’atelier</a></li>
         <li><a href="{{ url_for('gallery') }}">Les aquarelles</a></li>
         <li><a href="{{ url_for('news_list') }}">Actualités &amp; expositions</a></li>
         <li><a href="{{ url_for('specific_request') }}">Demande spécifique</a></li>
+        <li><a href="{{ url_for('admin_login') }}" rel="nofollow">✎ Espace administrateur</a></li>
       </ul>
     </div>
   </div>
   <div class="footer-legal">
     <p>© {{ year }} Hilaire Legentil · SIREN 927 753 780 —
        <a href="{{ url_for('legal') }}">Mentions légales</a> —
-       <a href="{{ url_for('privacy') }}">Politique de confidentialité</a></p>
+       <a href="{{ url_for('privacy') }}">Politique de confidentialité</a> —
+       <a href="{{ url_for('privacy') }}#cookies">Cookies</a></p>
   </div>
 </footer>
 
@@ -88,7 +93,21 @@
 {% endif %}
 {% endwith %}
 
-<script src="/static/js/main.js" defer></script>
+{% if request.cookies.get('hl_consent') is none %}
+<aside class="cookie-bar" id="cookie-bar" role="region" aria-label="Gestion des cookies">
+  <div class="cookie-inner">
+    <p class="cookie-txt">Ce site ne dépose qu’un cookie <strong>technique</strong>, nécessaire à son fonctionnement.
+       La carte de la page Contact (tuiles OpenStreetMap) ne se charge qu’avec votre accord.
+       <a class="lnk" href="{{ url_for('privacy') }}#cookies">En savoir plus</a></p>
+    <p class="cookie-actions">
+      <button class="btn" id="ck-accept" type="button">Accepter</button>
+      <button class="btn btn-outline" id="ck-refuse" type="button">Refuser</button>
+    </p>
+  </div>
+</aside>
+{% endif %}
+<script>if(location.hash==="#/admin")location.replace("/admin");</script>
+<script src="/static/js/app.js" defer></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

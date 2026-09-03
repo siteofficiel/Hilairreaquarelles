@@ -40,7 +40,8 @@ with open(SECRET_FILE) as f:
 UPLOADS = os.path.join(BASE_DIR, "uploads")
 WORKS_DIR = os.path.join(UPLOADS, "works")
 NEWS_DIR = os.path.join(UPLOADS, "news")
-for d in (WORKS_DIR, NEWS_DIR):
+ATELIER_DIR = os.path.join(UPLOADS, "atelier")
+for d in (WORKS_DIR, NEWS_DIR, ATELIER_DIR):
     os.makedirs(d, exist_ok=True)
 
 SITE = {
@@ -135,13 +136,26 @@ def get_news_item(slug):
 @app.route("/")
 def home():
     works = get_works()
+    cand = [w for w in works if w["chroma"]]
+    vivid = max(cand, key=lambda w: w["chroma"]) if cand else None
+    mute = min(cand, key=lambda w: w["chroma"]) if cand else None
     return render_template("index.html", works=works[:6], news=get_news(limit=3),
-                           hero_works=works[:5])
+                           hero_works=works[:5], vivid=vivid, mute=mute)
 
 
 @app.route("/artiste")
 def artist():
     return render_template("artist.html", expositions=get_news(limit=12))
+
+
+@app.route("/atelier")
+def atelier():
+    conn = db.connect()
+    photos = conn.execute(
+        "SELECT folder, img_w, img_h FROM atelier "
+        "WHERE kind='palette' ORDER BY position, id").fetchall()
+    conn.close()
+    return render_template("atelier.html", photos=photos)
 
 
 @app.route("/aquarelles")
@@ -151,7 +165,11 @@ def gallery():
     for w in works:
         if w["category"] and w["category"] not in cats:
             cats.append(w["category"])
-    return render_template("gallery.html", works=works, categories=cats)
+    conn = db.connect()
+    vif = conn.execute("SELECT folder, img_w, img_h FROM atelier "
+                       "WHERE kind='vif' ORDER BY position, id").fetchall()
+    conn.close()
+    return render_template("gallery.html", works=works, categories=cats, vif=vif)
 
 
 @app.route("/aquarelles/<slug>")
@@ -266,7 +284,7 @@ def privacy():
 
 @app.route("/uploads/<area>/<folder>/<path:filename>")
 def uploaded_file(area, folder, filename):
-    root = {"works": WORKS_DIR, "news": NEWS_DIR}.get(area)
+    root = {"works": WORKS_DIR, "news": NEWS_DIR, "atelier": ATELIER_DIR}.get(area)
     if root is None or "/" in folder or ".." in folder:
         abort(404)
     return send_from_directory(os.path.join(root, folder), filename,
@@ -277,7 +295,8 @@ def uploaded_file(area, folder, filename):
 
 @app.route("/sitemap.xml")
 def sitemap():
-    items = [("artist", None), ("gallery", None), ("news_list", None), ("contact", None)]
+    items = [("artist", None), ("atelier", None), ("gallery", None),
+             ("news_list", None), ("contact", None)]
     conn = db.connect()
     works = conn.execute("SELECT slug FROM works WHERE published=1").fetchall()
     news = conn.execute("SELECT slug FROM news WHERE published=1").fetchall()
@@ -355,9 +374,80 @@ def admin_logout():
     return redirect(url_for("home"))
 
 
-@app.route("/admin")
+@app.route("/admin", methods=["GET", "POST"])
 @require_admin
 def admin_home():
+    if request.method == "POST":
+        if not auth.csrf_ok(request):
+            abort(400)
+        action = request.form.get("action")
+        if action == "github_key":
+            token = request.form.get("github_token", "").strip()
+            if not token:
+                flash("Collez d’abord la clé (jeton d’accès).", "error")
+            else:
+                st, me = _gh_call("GET", "https://api.github.com/user", token)
+                if st == 200:
+                    db.set_setting("github_token", token)
+                    flash(f"Clé vérifiée ✔ — connecté en tant que "
+                          f"{me.get('login', '?')}.", "ok")
+                else:
+                    hint = {401: "clé invalide ou expirée",
+                            403: "clé sans accès"}.get(st, me.get("message", ""))
+                    flash(f"GitHub a refusé la clé ({st}) : {hint}.", "error")
+            return redirect(url_for("admin_home"))
+        if action == "github_forget":
+            db.set_setting("github_token", "")
+            flash("Clé supprimée de cet ordinateur.", "ok")
+            return redirect(url_for("admin_home"))
+        if action == "github_repo":
+            repo = clean(request.form.get("github_repo", ""), 120).strip().strip("/")
+            branch = clean(request.form.get("github_branch", ""), 60).strip() or "main"
+            if "/" not in repo:
+                flash("Choisissez le dépôt dans la liste (ou indiquez compte/dépôt).",
+                      "error")
+            else:
+                db.set_setting("github_repo", repo)
+                db.set_setting("github_branch", branch)
+                flash(f"Dépôt enregistré : {repo} (branche {branch}).", "ok")
+            return redirect(url_for("admin_home"))
+        if action == "github_publish":
+            s = db.get_settings()
+            repo = s.get("github_repo", "")
+            branch = s.get("github_branch", "main") or "main"
+            token = s.get("github_token", "")
+            if not token:
+                flash("Ajoutez d’abord votre clé (étape 1).", "error")
+                return redirect(url_for("admin_home"))
+            if not repo:
+                flash("Choisissez d’abord le dépôt (étape 2).", "error")
+                return redirect(url_for("admin_home"))
+            try:
+                import build_standalone
+                html = build_standalone.build_html()
+            except Exception as e:
+                flash(f"Impossible de générer la page unique : {e}", "error")
+                return redirect(url_for("admin_home"))
+            import base64 as _b64
+            api = f"https://api.github.com/repos/{repo}/contents/index.html"
+            st, cur = _gh_call("GET", f"{api}?ref={branch}", token)
+            payload = {"message": "Site mis à jour depuis l'espace d'administration",
+                       "content": _b64.b64encode(html.encode()).decode(),
+                       "branch": branch}
+            if st == 200 and cur.get("sha"):
+                payload["sha"] = cur["sha"]
+            st, res = _gh_call("PUT", api, token, payload)
+            if st in (200, 201):
+                sha = (res.get("commit") or {}).get("sha", "")[:7]
+                flash(f"Site publié sur GitHub ✔ (commit {sha}). GitHub Pages se met "
+                      "à jour dans une à deux minutes.", "ok")
+            else:
+                hint = {401: "clé invalide", 403: "clé sans droit d’écriture",
+                        404: "dépôt ou branche introuvable",
+                        409: "conflit — réessayez"}.get(st, res.get("message", ""))
+                flash(f"Publication refusée ({st}) : {hint}.", "error")
+            return redirect(url_for("admin_home"))
+        abort(400)
     conn = db.connect()
     stats = {
         "works": conn.execute("SELECT COUNT(*) c FROM works").fetchone()["c"],
@@ -370,7 +460,20 @@ def admin_home():
     messages = conn.execute(
         "SELECT * FROM messages ORDER BY id DESC LIMIT 6").fetchall()
     conn.close()
-    return render_template("admin/dashboard.html", stats=stats, messages=messages)
+    s = db.get_settings()
+    repos, login = [], ""
+    token = s.get("github_token", "")
+    if token:
+        st, me = _gh_call("GET", "https://api.github.com/user", token)
+        if st == 200:
+            login = me.get("login", "")
+        st, rl = _gh_call("GET", "https://api.github.com/user/repos"
+                          "?per_page=100&sort=pushed", token)
+        if st == 200:
+            repos = [r["full_name"] for r in rl
+                     if (r.get("permissions") or {}).get("push")]
+    return render_template("admin/dashboard.html", stats=stats, messages=messages,
+                           s=s, repos=repos, login=login, has_token=bool(token))
 
 
 # ---------------------------------------------------------- œuvres
@@ -378,7 +481,12 @@ def admin_home():
 @app.route("/admin/oeuvres")
 @require_admin
 def admin_works():
-    return render_template("admin/works.html", works=get_works(only_published=False))
+    conn = db.connect()
+    vif = conn.execute("SELECT * FROM atelier WHERE kind='vif' "
+                       "ORDER BY position, id").fetchall()
+    conn.close()
+    return render_template("admin/works.html",
+                           works=get_works(only_published=False), vif=vif)
 
 
 @app.route("/admin/oeuvres/nouvelle", methods=["GET", "POST"])
@@ -398,6 +506,8 @@ def admin_work_new():
                 up = request.files["image"]
                 folder, w, h = imaging.store_image(up, up.filename, WORKS_DIR)
                 data["folder"], data["img_w"], data["img_h"] = folder, w, h
+                data["tonality"], data["chroma"] = imaging.compute_tonality(
+                    os.path.join(WORKS_DIR, folder))
         except imaging.ImageError as e:
             flash(str(e), "error")
             return render_template("admin/work_edit.html", w=data, new=True)
@@ -411,9 +521,9 @@ def admin_work_new():
         data["slug"] = unique_slug(conn, "works", slugify(data["title"], "aquarelle"))
         conn.execute(
             "INSERT INTO works(title,slug,description,category,technique,dimensions,"
-            "year,folder,img_w,img_h,position,published,created_at) "
+            "year,folder,img_w,img_h,position,published,tonality,chroma,created_at) "
             "VALUES(:title,:slug,:description,:category,:technique,:dimensions,"
-            ":year,:folder,:img_w,:img_h,:position,:published,:created_at)",
+            ":year,:folder,:img_w,:img_h,:position,:published,:tonality,:chroma,:created_at)",
             {**data, "position": pos, "created_at": db.now_iso()})
         conn.commit()
         conn.close()
@@ -478,12 +588,15 @@ def admin_work_edit(wid):
                 folder, wpx, hpx = imaging.store_image(up, up.filename, WORKS_DIR)
                 imaging.delete_image_folder(WORKS_DIR, w["folder"])
                 data["folder"], data["img_w"], data["img_h"] = folder, wpx, hpx
+                data["tonality"], data["chroma"] = imaging.compute_tonality(
+                    os.path.join(WORKS_DIR, folder))
             except imaging.ImageError as e:
                 flash(str(e), "error")
                 data["id"] = wid
                 return render_template("admin/work_edit.html", w=data, new=False)
         else:
             data["folder"], data["img_w"], data["img_h"] = w["folder"], w["img_w"], w["img_h"]
+            data["tonality"], data["chroma"] = w["tonality"] or "", w["chroma"] or 0
 
         conn = db.connect()
         if data["title"] == w["title"]:
@@ -494,8 +607,8 @@ def admin_work_edit(wid):
         conn.execute(
             "UPDATE works SET title=:title, slug=:slug, description=:description, "
             "category=:category, technique=:technique, dimensions=:dimensions, "
-            "year=:year, folder=:folder, img_w=:img_w, img_h=:img_h, published=:published "
-            "WHERE id=:id",
+            "year=:year, folder=:folder, img_w=:img_w, img_h=:img_h, published=:published, "
+            "tonality=:tonality, chroma=:chroma WHERE id=:id",
             {**data, "id": wid})
         conn.commit(); conn.close()
         flash("Œuvre mise à jour.", "ok")
@@ -513,7 +626,7 @@ def validate_work_form(request):
         "dimensions": clean(request.form.get("dimensions", ""), 60),
         "year": clean(request.form.get("year", ""), 20),
         "published": 1 if request.form.get("published") else 0,
-        "folder": None, "img_w": 0, "img_h": 0,
+        "folder": None, "img_w": 0, "img_h": 0, "tonality": "", "chroma": 0,
     }
     errors = []
     if request.files.get("image"):
@@ -695,6 +808,175 @@ def save_news_images(conn, nid, request):
 
 # ---------------------------------------------------------- réglages & mot de passe
 
+# ---------------------------------------------------------- atelier (photos)
+
+@app.route("/admin/atelier", methods=["GET", "POST"])
+@require_admin
+def admin_atelier():
+    if request.method == "POST":
+        if not auth.csrf_ok(request):
+            abort(400)
+        action = request.form.get("action")
+        conn = db.connect()
+        if action == "upload":
+            up = request.files.get("image")
+            if not up or not up.filename:
+                conn.close()
+                flash("Choisissez d’abord une image.", "error")
+                return redirect(url_for("admin_atelier"))
+            try:
+                folder, w, h = imaging.store_image(up, up.filename, ATELIER_DIR)
+            except Exception:
+                conn.close()
+                flash("Image illisible ou trop lourde (26 Mo maximum).", "error")
+                return redirect(url_for("admin_atelier"))
+            pos = conn.execute(
+                "SELECT COALESCE(MAX(position),0)+1 p FROM atelier").fetchone()["p"]
+            conn.execute("INSERT INTO atelier(folder,img_w,img_h,position,kind) "
+                         "VALUES(?,?,?,?,'palette')", (folder, w, h, pos))
+            conn.commit(); conn.close()
+            flash("Photo ajoutée à la page L’atelier.", "ok")
+            return redirect(url_for("admin_atelier"))
+        pid = request.form.get("id", "")
+        row = (conn.execute("SELECT * FROM atelier WHERE id=? AND kind='palette'",
+                            (pid,)).fetchone() if pid.isdigit() else None)
+        if row is None:
+            conn.close()
+            abort(404)
+        if action == "replace":
+            up = request.files.get("image")
+            if not up or not up.filename:
+                flash("Choisissez d’abord une image.", "error")
+            else:
+                try:
+                    folder, w, h = imaging.store_image(up, up.filename, ATELIER_DIR)
+                except Exception:
+                    folder = None
+                    flash("Image illisible ou trop lourde (26 Mo maximum).", "error")
+                if folder:
+                    imaging.delete_image_folder(ATELIER_DIR, row["folder"])
+                    conn.execute("UPDATE atelier SET folder=?, img_w=?, img_h=? "
+                                 "WHERE id=?", (folder, w, h, row["id"]))
+                    flash("Photo remplacée.", "ok")
+        elif action == "move":
+            delta = -1 if request.form.get("dir") == "up" else 1
+            ids = [r["id"] for r in conn.execute(
+                "SELECT id FROM atelier WHERE kind='palette' ORDER BY position, id")]
+            i = ids.index(row["id"])
+            j = max(0, min(len(ids) - 1, i + delta))
+            if i != j:
+                ids[i], ids[j] = ids[j], ids[i]
+                for k, rid in enumerate(ids, 1):
+                    conn.execute("UPDATE atelier SET position=? WHERE id=?", (k, rid))
+            flash("Ordre mis à jour.", "ok")
+        elif action == "delete":
+            imaging.delete_image_folder(ATELIER_DIR, row["folder"])
+            conn.execute("DELETE FROM atelier WHERE id=?", (row["id"],))
+            for k, r in enumerate(conn.execute(
+                    "SELECT id FROM atelier WHERE kind='palette' "
+                    "ORDER BY position, id"), 1):
+                conn.execute("UPDATE atelier SET position=? WHERE id=?", (k, r["id"]))
+            flash("Photo supprimée.", "ok")
+        else:
+            flash("Action inconnue.", "error")
+        conn.commit(); conn.close()
+        return redirect(url_for("admin_atelier"))
+    conn = db.connect()
+    photos = conn.execute("SELECT * FROM atelier WHERE kind='palette' "
+                          "ORDER BY position, id").fetchall()
+    conn.close()
+    return render_template("admin/atelier.html", photos=photos)
+
+
+# ---------------------------------------------------------- sur le vif
+
+@app.route("/admin/vif", methods=["GET", "POST"])
+@require_admin
+def admin_vif():
+    if request.method == "POST":
+        if not auth.csrf_ok(request):
+            abort(400)
+        action = request.form.get("action")
+        conn = db.connect()
+        if action == "upload":
+            up = request.files.get("image")
+            if not up or not up.filename:
+                conn.close()
+                flash("Choisissez d’abord une image.", "error")
+                return redirect(url_for("admin_vif"))
+            try:
+                folder, w, h = imaging.store_image(up, up.filename, ATELIER_DIR)
+            except Exception:
+                conn.close()
+                flash("Image illisible ou trop lourde (26 Mo maximum).", "error")
+                return redirect(url_for("admin_vif"))
+            pos = conn.execute(
+                "SELECT COALESCE(MAX(position),0)+1 p FROM atelier").fetchone()["p"]
+            conn.execute("INSERT INTO atelier(folder,img_w,img_h,position,kind) "
+                         "VALUES(?,?,?,?,'vif')", (folder, w, h, pos))
+            conn.commit(); conn.close()
+            flash("Aquarelle sur le vif ajoutée à la galerie.", "ok")
+            return redirect(url_for("admin_vif"))
+        vid = request.form.get("id", "")
+        row = (conn.execute("SELECT * FROM atelier WHERE id=? AND kind='vif'",
+                            (vid,)).fetchone() if vid.isdigit() else None)
+        if row is None:
+            conn.close()
+            abort(404)
+        if action == "move":
+            delta = -1 if request.form.get("dir") == "up" else 1
+            ids = [r["id"] for r in conn.execute(
+                "SELECT id FROM atelier WHERE kind='vif' ORDER BY position, id")]
+            i = ids.index(row["id"])
+            j = max(0, min(len(ids) - 1, i + delta))
+            if i != j:
+                ids[i], ids[j] = ids[j], ids[i]
+                for k, rid in enumerate(ids, 1):
+                    conn.execute("UPDATE atelier SET position=? WHERE id=?", (k, rid))
+            flash("Ordre mis à jour.", "ok")
+        elif action == "delete":
+            imaging.delete_image_folder(ATELIER_DIR, row["folder"])
+            conn.execute("DELETE FROM atelier WHERE id=?", (row["id"],))
+            for k, r in enumerate(conn.execute(
+                    "SELECT id FROM atelier WHERE kind='vif' ORDER BY position, id"), 1):
+                conn.execute("UPDATE atelier SET position=? WHERE id=?", (k, r["id"]))
+            flash("Aquarelle sur le vif supprimée.", "ok")
+        else:
+            flash("Action inconnue.", "error")
+        conn.commit(); conn.close()
+        return redirect(url_for("admin_vif"))
+    conn = db.connect()
+    items = conn.execute("SELECT * FROM atelier WHERE kind='vif' "
+                         "ORDER BY position, id").fetchall()
+    conn.close()
+    return render_template("admin/vif.html", items=items)
+
+
+# ------------------------------------------------- publication GitHub
+
+def _gh_call(method, url, token, payload=None):
+    """Appel à l'API GitHub (urllib, aucune dépendance). Retourne (statut, json)."""
+    import json as _json, urllib.request, urllib.error
+    req = urllib.request.Request(
+        url, method=method,
+        headers={"Authorization": f"Bearer {token}",
+                 "Accept": "application/vnd.github+json",
+                 "User-Agent": "hilaire-legentil-site",
+                 "X-GitHub-Api-Version": "2022-11-28"})
+    body = _json.dumps(payload).encode() if payload is not None else None
+    if body is not None:
+        req.add_header("Content-Type", "application/json")
+    try:
+        with urllib.request.urlopen(req, body, timeout=30) as r:
+            return r.status, _json.loads(r.read().decode() or "{}")
+    except urllib.error.HTTPError as e:
+        try:
+            detail = _json.loads(e.read().decode()).get("message", "")
+        except Exception:
+            detail = ""
+        return e.code, {"message": detail or str(e.reason)}
+
+
 @app.route("/admin/reglages", methods=["GET", "POST"])
 @require_admin
 def admin_settings():
@@ -733,6 +1015,8 @@ def admin_settings():
     return render_template("admin/settings.html", keys=keys, s=s)
 
 
+# ------------------------------------------------- publication GitHub
+
 @app.route("/admin/messages")
 @require_admin
 def admin_messages():
@@ -754,6 +1038,28 @@ def time_now():
 
 
 db.init_db()
+
+
+def ensure_admin():
+    """Crée un compte administrateur au premier lancement (dépôt GitHub,
+    base vierge) : identifiant hilaire + mot de passe aléatoire écrit dans
+    data/admin_password.txt."""
+    conn = db.connect()
+    has = conn.execute("SELECT COUNT(*) c FROM admin").fetchone()["c"]
+    conn.close()
+    if has:
+        return
+    import secrets as _secrets
+    import string as _string
+    pwd = "".join(_secrets.choice(_string.ascii_letters + _string.digits)
+                  for _ in range(14))
+    auth.create_admin("hilaire", pwd)
+    with open(os.path.join(db.DATA_DIR, "admin_password.txt"), "w") as f:
+        f.write("Identifiant : hilaire\nMot de passe : " + pwd + "\n")
+    print("* Compte administrateur créé — mot de passe initial : data/admin_password.txt")
+
+
+ensure_admin()
 
 
 # ------------------------------------------------------- en-têtes HTTP

@@ -1,3 +1,666 @@
+/* --- Leaflet (carte interactive) --- */
+/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+
 /* ============================================================
    HILAIRE LEGENTIL — Artiste aquarelliste
    Identité : papier écru, vert d'eau (carte de visite), encre pétrole.
@@ -8,15 +671,15 @@
   --paper:      #faf8f3;   /* fond papier */
   --paper-2:    #f3efe7;   /* panneaux écru */
   --card:       #fffdf9;
-  --ink:        #1c3a41;   /* titres — encre pétrole */
-  --text:       #4d5c5c;   /* corps de texte */
-  --muted:      #8d9897;
+  --ink:        #0e2a32;   /* titres — encre pétrole profond */
+  --text:       #263a40;   /* corps de texte */
+  --muted:      #5a6a68;
   --teal:       #1a9d9a;   /* ligne directrice — vert d'eau de la carte */
-  --teal-ink:   #0e7b78;   /* liens texte (contraste aa) */
+  --teal-ink:   #0a615e;   /* liens texte (contraste aaa) */
   --teal-deep:  #11596a;   /* bleu profond de la carte */
   --teal-soft:  #e7f2f0;
   --teal-wash:  #d9ebe8;
-  --hair:       #e3ddd1;   /* filets sur papier */
+  --hair:       #d2c9b6;   /* filets sur papier */
   --shadow:     0 18px 40px -18px rgba(28, 58, 65, .22);
   --shadow-soft:0 10px 26px -14px rgba(28, 58, 65, .18);
   --serif: "Cormorant Garamond", "Times New Roman", Georgia, serif;
@@ -28,7 +691,7 @@
 html{ scroll-behavior:smooth; }
 body{
   margin:0; background:var(--paper); color:var(--text);
-  font:300 17px/1.72 var(--sans);
+  font:400 17px/1.72 var(--sans);
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
 }
 img{ max-width:100%; height:auto; display:block; }
@@ -57,8 +720,8 @@ em{ font-style:italic; }
 
 /* ------------------------------------------------------------------ label */
 .label{
-  font-family:var(--sans); font-weight:500; font-size:.72rem;
-  letter-spacing:.22em; text-transform:uppercase; color:var(--teal);
+  font-family:var(--sans); font-weight:600; font-size:.74rem;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--teal-ink);
   margin:0 0 1.1rem; display:flex; align-items:center; gap:.8rem;
 }
 .label::before{ content:""; width:2rem; height:1px; background:var(--teal); opacity:.65; }
@@ -66,7 +729,7 @@ em{ font-style:italic; }
 
 .h2{ font-size:clamp(1.9rem, 3.6vw, 2.9rem); }
 .h3{ font-size:clamp(1.4rem, 2.6vw, 1.9rem); }
-.lead{ font-size:1.13rem; line-height:1.75; color:#41504f; }
+.lead{ font-size:1.13rem; line-height:1.75; color:#2e4247; }
 
 /* ------------------------------------------------------------ en-tête site */
 .site-header{
@@ -139,8 +802,8 @@ em{ font-style:italic; }
   margin:0 auto 3.2rem;
 }
 .hero-baseline{
-  font-family:var(--sans); font-size:.78rem; font-weight:500;
-  letter-spacing:.3em; text-transform:uppercase; color:var(--teal);
+  font-family:var(--sans); font-size:.8rem; font-weight:600;
+  letter-spacing:.3em; text-transform:uppercase; color:var(--teal-ink);
   margin-bottom:1.3rem;
 }
 .hero-title{
@@ -156,12 +819,14 @@ em{ font-style:italic; }
 
 .btn{
   display:inline-block; font-family:var(--sans); font-weight:500; font-size:.8rem;
-  letter-spacing:.18em; text-transform:uppercase; color:var(--ink);
-  border:1px solid var(--teal); padding:.95rem 2.1rem; border-radius:2px;
-  transition:background .3s, color .3s, border-color .3s; background:transparent;
+  letter-spacing:.18em; text-transform:uppercase; color:#fff;
+  border:1px solid var(--teal-deep); padding:.95rem 2.1rem; border-radius:2px;
+  transition:background .3s, color .3s, border-color .3s; background:var(--teal-deep);
   cursor:pointer;
 }
 .btn:hover{ background:var(--teal); border-color:var(--teal); color:#fff; }
+.btn.btn-outline{ background:transparent; color:var(--teal-ink); border-color:var(--teal); }
+.btn.btn-outline:hover{ background:var(--teal); color:#fff; }
 .btn-full{ width:100%; text-align:center; }
 
 .link-arrow{
@@ -209,7 +874,7 @@ em{ font-style:italic; }
 .page-head{
   padding:clamp(9rem, 16vw, 12rem) 0 clamp(2.2rem, 5vw, 3.6rem);
   background:
-    radial-gradient(120% 90% at 85% -10%, rgba(26,157,154,.075), transparent 55%),
+    radial-gradient(120% 90% at 85% -10%, rgba(26,157,154,.17), transparent 55%),
     linear-gradient(180deg, #f5f1e9 0%, var(--paper) 100%);
 }
 .page-title{ font-size:clamp(2.5rem, 6vw, 4.3rem); margin-bottom:.35rem; }
@@ -237,16 +902,16 @@ em{ font-style:italic; }
 }
 .mini-quote{
   margin:1.8rem 0; padding:1.4rem 0 .2rem; border-top:1px solid var(--hair);
-  font-family:var(--serif); font-style:italic; font-size:1.18rem; color:#3c4b4b; line-height:1.6;
+  font-family:var(--serif); font-style:italic; font-size:1.18rem; color:#2e4247; line-height:1.6;
 }
 .mini-quote cite{ display:block; margin-top:.8rem; font-family:var(--sans); font-style:normal;
   font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
 @media (max-width: 900px){ .artist-home{ grid-template-columns:1fr; } }
 
-.quote-section{ background:var(--paper-2); border-top:1px solid var(--hair); border-bottom:1px solid var(--hair); }
+.quote-section{ background:linear-gradient(180deg,#edf3f1,var(--teal-soft)); border-top:1px solid var(--hair); border-bottom:1px solid var(--hair); }
 .quote-mark{ width:52px; margin:0 auto 1.6rem; display:block; }
 .big-quote{
-  margin:0; font-family:var(--serif); font-style:italic; font-weight:500;
+  margin:0; font-family:var(--serif); font-style:italic; font-weight:400;
   font-size:clamp(1.45rem, 3.2vw, 2.15rem); line-height:1.5; color:var(--ink);
 }
 .big-quote cite{
@@ -255,14 +920,17 @@ em{ font-style:italic; }
 }
 .wash-band{
   background:
-    radial-gradient(60% 120% at 20% 50%, rgba(26,157,154,.06), transparent 60%),
-    radial-gradient(50% 100% at 85% 40%, rgba(17,89,106,.05), transparent 60%);
+    radial-gradient(60% 120% at 20% 50%, rgba(26,157,154,.14), transparent 60%),
+    radial-gradient(50% 100% at 85% 40%, rgba(17,89,106,.12), transparent 60%);
 }
 
 .section-works{ padding-bottom:clamp(3rem,7vw,5.5rem); }
 
 .contact-invitation{
-  background:linear-gradient(180deg, var(--paper) 0%, var(--teal-soft) 320%);
+  background:
+    radial-gradient(70% 110% at 12% 0%, rgba(201,162,94,.13), transparent 60%),
+    radial-gradient(70% 110% at 88% 8%, rgba(26,157,154,.13), transparent 60%),
+    linear-gradient(180deg, var(--paper) 0%, var(--teal-soft) 320%);
   text-align:center;
 }
 .contact-invitation .label{ justify-content:center; }
@@ -277,7 +945,7 @@ em{ font-style:italic; }
   padding:.5rem 1.15rem; border-radius:999px; cursor:pointer; transition:all .3s;
 }
 .filter-btn:hover{ border-color:var(--teal); color:var(--teal-ink); }
-.filter-btn.is-active{ background:var(--teal); border-color:var(--teal); color:#fff; }
+.filter-btn.is-active{ background:var(--teal-deep); border-color:var(--teal-deep); color:#fff; }
 
 .gallery-grid{
   display:grid; grid-template-columns:repeat(6, 1fr);
@@ -353,7 +1021,7 @@ em{ font-style:italic; }
   transition:border-color .3s, background .3s;
 }
 .work-nav-link:hover{ border-color:var(--teal); color:inherit; }
-.wn-label{ font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--teal); }
+.wn-label{ font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:var(--teal-ink); }
 .wn-title{ font-family:var(--serif); font-size:1.1rem; color:var(--ink); }
 .is-next{ text-align:right; align-items:flex-end; }
 .work-counter{ font-size:.8rem; color:var(--muted); letter-spacing:.08em; }
@@ -377,7 +1045,7 @@ em{ font-style:italic; }
 .news-thumb{ flex:0 0 clamp(96px, 16vw, 220px); }
 .news-thumb picture{ display:block; border:1px solid var(--hair); padding:.3rem; background:var(--card); }
 .news-body{ flex:1; display:flex; flex-direction:column; gap:.28rem; }
-.news-date{ font-size:.72rem; letter-spacing:.18em; text-transform:uppercase; color:var(--teal); }
+.news-date{ font-size:.73rem; font-weight:500; letter-spacing:.18em; text-transform:uppercase; color:var(--teal-ink); }
 .news-title{ font-family:var(--serif); font-size:clamp(1.25rem, 2.6vw, 1.7rem);
   color:var(--ink); line-height:1.25; }
 .news-excerpt{ color:var(--muted); font-size:.95rem; }
@@ -456,7 +1124,7 @@ select{ appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmln
 .fact-list div{ display:flex; gap:1.4rem; padding:.6rem 0; border-bottom:1px solid var(--hair);
   justify-content:space-between; }
 .fact-list div:last-child{ border-bottom:0; }
-.fact-list dt{ font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--teal); padding-top:.25rem; }
+.fact-list dt{ font-size:.72rem; letter-spacing:.16em; text-transform:uppercase; color:var(--teal-ink); padding-top:.25rem; }
 .fact-list dd{ margin:0; text-align:right; color:var(--ink); font-size:.98rem; }
 
 .section-expos{ background:var(--paper-2); border-top:1px solid var(--hair); }
@@ -466,7 +1134,7 @@ select{ appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmln
 .timeline a{ display:flex; align-items:baseline; gap:1.8rem; padding:1.35rem .4rem; color:inherit;
   transition:background .3s, padding-left .3s; }
 .timeline a:hover{ background:#f5f1e8; padding-left:1rem; color:inherit; }
-.tl-date{ flex:0 0 170px; font-size:.74rem; letter-spacing:.14em; text-transform:uppercase; color:var(--teal); }
+.tl-date{ flex:0 0 170px; font-size:.74rem; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--teal-ink); }
 .tl-title{ font-family:var(--serif); font-size:1.3rem; color:var(--ink); flex:1; }
 .tl-arrow{ color:var(--teal); opacity:0; transition:opacity .3s; }
 .timeline a:hover .tl-arrow{ opacity:1; }
@@ -519,3 +1187,653 @@ select{ appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmln
 /* ---------------------------------------------------------------- divers */
 .legal-body h2{ font-size:1.45rem; margin-top:2.4rem; }
 .legal-body h2:first-child{ margin-top:0; }
+
+/* ═══════════════════════ DÉCOR AQUARELLE (DA carte de visite) ═══════════════════════
+   Vaguelettes signature, lavis derrière les œuvres, houle du pied de page. */
+
+/* — vague signature sous les labels — */
+.label::before{
+  width:34px;height:8px;min-width:34px;background:var(--teal);opacity:1;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='8' viewBox='0 0 34 8'><path d='M1 5c4-4 8-4 12 0s8 4 12 0 6-3 8-1' fill='none' stroke='%231a9d9a' stroke-width='1.7' stroke-linecap='round'/></svg>") center/34px 8px no-repeat;
+}
+
+/* — en-têtes de page : lavis aux coins + vague sous le titre — */
+.page-head{position:relative;}
+.page-head::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:
+    radial-gradient(42% 62% at 7% 10%, rgba(26,157,154,.16), transparent 66%),
+    radial-gradient(36% 56% at 93% 26%, rgba(17,89,106,.12), transparent 66%),
+    radial-gradient(34% 52% at 68% 0%, rgba(74,148,201,.13), transparent 66%),
+    radial-gradient(30% 46% at 96% 92%, rgba(201,162,94,.11), transparent 66%),
+    radial-gradient(30% 46% at 18% 96%, rgba(138,154,106,.09), transparent 64%);
+}
+.page-head::after{
+  content:"";position:absolute;left:50%;bottom:.9rem;transform:translateX(-50%);
+  width:132px;height:10px;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='132' height='10' viewBox='0 0 132 10'><path d='M2 6c14-6 28-6 42 0s28 6 42 0 28-6 44-2' fill='none' stroke='%231a9d9a' stroke-width='1.7' stroke-linecap='round' opacity='.85'/><circle cx='124' cy='3.4' r='1.5' fill='%2311596a' opacity='.55'/></svg>") center/contain no-repeat;
+}
+.page-head .container{position:relative;}
+
+/* — tache d'aquarelle derrière chaque œuvre (comme un fond d'atelier) — */
+.work{position:relative;z-index:0;}
+.work-frame{position:relative;}
+.work-frame::before{
+  content:"";position:absolute;inset:-16px 12px -20px -16px;z-index:-1;
+  opacity:.6;transition:opacity .5s ease;
+  background:
+    radial-gradient(55% 60% at 30% 28%, rgba(26,157,154,.16), transparent 70%),
+    radial-gradient(46% 50% at 72% 78%, rgba(17,89,106,.10), transparent 72%);
+}
+.work:hover .work-frame::before{opacity:1;}
+.frieze a{position:relative;z-index:0;}
+.frieze a::before{
+  content:"";position:absolute;inset:-14px 8px -18px -12px;z-index:-1;
+  background:
+    radial-gradient(55% 60% at 32% 30%, rgba(26,157,154,.18), transparent 70%),
+    radial-gradient(46% 50% at 70% 76%, rgba(17,89,106,.11), transparent 72%);
+}
+.artist-home-figure{z-index:0;}
+.artist-home-figure::before{
+  content:"";position:absolute;inset:-22px 14px -26px -20px;z-index:-1;
+  background:
+    radial-gradient(50% 58% at 30% 26%, rgba(26,157,154,.15), transparent 70%),
+    radial-gradient(44% 50% at 72% 80%, rgba(17,89,106,.10), transparent 72%);
+}
+.work-figure{position:relative;z-index:0;}
+.work-figure::before{
+  content:"";position:absolute;inset:-18px 14px -22px -18px;z-index:-1;
+  background:
+    radial-gradient(50% 58% at 30% 26%, rgba(26,157,154,.14), transparent 70%),
+    radial-gradient(44% 50% at 72% 80%, rgba(17,89,106,.10), transparent 72%);
+}
+
+/* — citation : nuage d'aquarelle organique derrière le texte — */
+.quote-section .narrow{position:relative;}
+.quote-section .narrow::before{
+  content:"";position:absolute;inset:-34px -48px;z-index:0;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='560' height='300' viewBox='0 0 560 300'><filter id='w'><feTurbulence type='fractalNoise' baseFrequency='0.013 0.02' numOctaves='3' seed='11'/><feDisplacementMap in='SourceGraphic' scale='70'/><feGaussianBlur stdDeviation='7'/></filter><g filter='url(%23w)'><ellipse cx='280' cy='150' rx='225' ry='105' fill='%231a9d9a' opacity='0.10'/><ellipse cx='330' cy='120' rx='150' ry='78' fill='%2311596a' opacity='0.06'/><ellipse cx='215' cy='185' rx='120' ry='64' fill='%234db8ae' opacity='0.07'/></g></svg>") center/100% 100% no-repeat;
+}
+.quote-section .narrow > *{position:relative;z-index:1;}
+
+/* — houle au-dessus du pied de page — */
+.site-footer{position:relative;}
+.site-footer::before{
+  content:"";position:absolute;left:0;right:0;top:-52px;height:54px;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='620' height='54' viewBox='0 0 620 54' preserveAspectRatio='none'><path d='M0 34 C 80 16, 160 50, 240 34 S 400 16, 480 34 S 570 48, 620 30' fill='none' stroke='%231a9d9a' stroke-width='2' opacity='.55'/><path d='M0 24 C 90 8, 190 36, 290 24 S 470 8, 570 22 S 610 26, 620 20' fill='none' stroke='%234a94c9' stroke-width='1.6' opacity='.42'/><path d='M0 46 C 100 30, 200 58, 300 46 S 500 30, 620 44' fill='none' stroke='%2311596a' stroke-width='1.6' opacity='.4'/><circle cx='95' cy='24' r='2' fill='%231a9d9a' opacity='.55'/><circle cx='410' cy='16' r='2.4' fill='%23c9a25e' opacity='.6'/><circle cx='540' cy='40' r='2' fill='%238a9a6a' opacity='.55'/></svg>") repeat-x bottom;background-size:620px 54px;
+}
+
+/* — invitation contact : ligne de rivage en tête de section — */
+.contact-invitation{position:relative;overflow:hidden;}
+.contact-invitation::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:44px;opacity:.75;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='520' height='44' viewBox='0 0 520 44'><path d='M0 16 C 65 4, 130 28, 195 16 S 325 4, 390 16 S 485 26, 520 12' fill='none' stroke='%231a9d9a' stroke-width='1.8' stroke-linecap='round' opacity='.8'/><path d='M0 30 C 70 18, 140 40, 210 30 S 350 18, 420 30 S 490 38, 520 26' fill='none' stroke='%2311596a' stroke-width='1.4' stroke-linecap='round' opacity='.5'/></svg>") repeat-x top;background-size:520px 44px;
+}
+
+/* — transition douce sous le héros — */
+.section-artist{position:relative;}
+.section-artist::before{
+  content:"";position:absolute;top:1.6rem;left:8vw;right:8vw;height:12px;opacity:.5;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='90' height='12' viewBox='0 0 90 12'><path d='M2 7c12-6 24-6 36 0s24 6 36 0 10-4 14-2' fill='none' stroke='%231a9d9a' stroke-width='1.5' stroke-linecap='round'/></svg>") repeat-x center/auto 12px;
+}
+
+/* — signature discrète dans les cartes — */
+.contact-card,.fact-card{position:relative;}
+.contact-card::after,.fact-card::after{
+  content:"";position:absolute;bottom:.9rem;right:1rem;width:30px;height:7px;opacity:.55;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='7' viewBox='0 0 30 7'><path d='M1 4.5c4-4 7-4 11 0s7 4 11 0 4-2.5 6-1.5' fill='none' stroke='%231a9d9a' stroke-width='1.4' stroke-linecap='round'/></svg>") center/contain no-repeat;
+}
+
+
+/* ════════════════ DUO — tantôt couleur, tantôt silence ════════════════ */
+.duo-section{background:linear-gradient(180deg,var(--paper) 0%,#f4f1ea 100%);}
+.duo-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.6rem,3.5vw,3rem);}
+.duo-panel{
+  display:flex;flex-direction:column;gap:1.15rem;
+  padding:clamp(1.5rem,3vw,2.3rem);border-radius:4px;color:inherit;
+  border:1px solid var(--hair);transition:transform .45s ease, box-shadow .45s ease;
+}
+.duo-panel:hover{transform:translateY(-5px);box-shadow:var(--shadow);color:inherit;}
+.duo-vivid{
+  background:linear-gradient(160deg,#eaf6f3 0%,#dcf0ec 38%,#e0edf8 74%,#eaf6f3 100%);
+  border-color:#b3d8d2;
+}
+.duo-mute{
+  background:linear-gradient(160deg,#f2f0ea 0%,#e9e6de 60%,#e0dcd2 100%);
+  border-color:#d6cfc1;
+}
+.duo-figure picture{
+  display:block;background:#fffdf9;border:1px solid rgba(14,42,50,.10);
+  padding:.5rem;box-shadow:var(--shadow-soft);
+}
+.duo-txt{display:flex;flex-direction:column;gap:.32rem;}
+.duo-tag{
+  font-family:var(--sans);font-weight:600;font-size:.72rem;
+  letter-spacing:.22em;text-transform:uppercase;
+}
+.duo-vivid .duo-tag{color:var(--teal-ink);}
+.duo-mute .duo-tag{color:#4e5c58;}
+.duo-line{
+  font-family:var(--serif);font-style:italic;font-size:1.3rem;
+  color:var(--ink);line-height:1.35;
+}
+.duo-see{
+  margin-top:.45rem;font-family:var(--sans);font-size:.78rem;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--teal-ink);
+}
+.duo-mute .duo-see{color:#4e5c58;}
+.duo-panel:hover .duo-see{text-decoration:underline;}
+.duo-note{
+  margin:2.6rem auto 0;max-width:640px;text-align:center;
+  color:var(--text);font-size:1.04rem;
+}
+@media (max-width:800px){.duo-grid{grid-template-columns:1fr;}}
+
+/* ════════════════ SYMPHONIE DE COULEURS — aquarelle enrichie ════════════════ */
+/* teintes réelles des aquarelles : céruléen, ocre, sauge, terre */
+.tint-sand{background:linear-gradient(180deg,#f8f4ea,#f3ebd9);}
+.tint-sky{background:linear-gradient(180deg,#edf4fb,#e1ecf8);}
+.tint-sage{background:linear-gradient(180deg,#f0f4ec,#e7efdd);}
+.tint-sand .label{color:#8a6528;}
+.tint-sky .label{color:#2b6cb0;}
+.tint-sage .label{color:#55663a;}
+
+/* spectre aquarelle au-dessus du pied de page */
+.spectrum{height:7px;background:linear-gradient(90deg,#1a9d9a 0%,#4a94c9 25%,#8a9a6a 50%,#c9a25e 75%,#b4714f 100%);}
+
+/* pastilles colorées des filtres tonalité */
+.filter-btn[data-filter="tn:Colorée"]::before,
+.filter-btn[data-filter="tn:Terne"]::before{content:"";display:inline-block;width:9px;height:9px;
+  border-radius:50%;margin-right:.55rem;vertical-align:1px;}
+.filter-btn[data-filter="tn:Colorée"]::before{background:#1a9d9a;}
+.filter-btn[data-filter="tn:Terne"]::before{background:#c9a25e;}
+
+/* lavis derrière chaque œuvre selon sa tonalité */
+.work[data-tn="Colorée"] .work-frame::before{background:
+  radial-gradient(55% 60% at 30% 28%, rgba(26,157,154,.19), transparent 70%),
+  radial-gradient(46% 50% at 72% 78%, rgba(74,148,201,.16), transparent 72%);}
+.work[data-tn="Terne"] .work-frame::before{background:
+  radial-gradient(55% 60% at 30% 28%, rgba(201,162,94,.21), transparent 70%),
+  radial-gradient(46% 50% at 72% 78%, rgba(143,120,90,.14), transparent 72%);}
+
+/* point de tonalité à côté du titre */
+.work-title::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;
+  margin-right:.5rem;vertical-align:2px;background:#1a9d9a;}
+.work[data-tn="Terne"] .work-title::before{background:#c9a25e;}
+
+/* dates qui alternent les teintes de la palette */
+.timeline li:nth-child(5n+1) .tl-date{color:#0a615e;}
+.timeline li:nth-child(5n+2) .tl-date{color:#2b6cb0;}
+.timeline li:nth-child(5n+3) .tl-date{color:#8a6528;}
+.timeline li:nth-child(5n+4) .tl-date{color:#8f4a28;}
+.timeline li:nth-child(5n+5) .tl-date{color:#55663a;}
+.news-rows .news-row:nth-child(5n+2) .news-date{color:#2b6cb0;}
+.news-rows .news-row:nth-child(5n+3) .news-date{color:#8a6528;}
+.news-rows .news-row:nth-child(5n+4) .news-date{color:#8f4a28;}
+.news-rows .news-row:nth-child(5n+5) .news-date{color:#55663a;}
+
+
+/* ═══════════════════ HYPER-AQUARELLE — toute la page en lavis ═══════════════════ */
+/* parcours coloré du fond : le papier se teinte au fil du défilement */
+body{
+  background:
+    radial-gradient(52% 38% at 8% 2%,  rgba(26,157,154,.075), transparent 70%),
+    radial-gradient(46% 34% at 94% 14%, rgba(74,148,201,.07), transparent 70%),
+    radial-gradient(50% 36% at 6% 46%,  rgba(201,162,94,.06), transparent 70%),
+    radial-gradient(48% 34% at 95% 66%, rgba(138,154,106,.06), transparent 70%),
+    radial-gradient(50% 36% at 10% 96%, rgba(180,113,79,.055), transparent 70%),
+    var(--paper);
+}
+/* labels en dégradé d'encres (fallback solide conservé) */
+.label{color:#0a615e;}
+@supports (-webkit-background-clip: text){
+  .label{background:linear-gradient(90deg,#0a615e 0%,#2b6cb0 52%,#8a6528 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+}
+/* signature du nom : filet d'aquarelle sous la marque */
+.brand-name{position:relative;}
+.brand-name::after{content:"";position:absolute;left:.02em;right:.35em;bottom:-.28rem;height:5px;
+  border-radius:3px;opacity:.85;
+  background:linear-gradient(90deg,#1a9d9a 0%,#4a94c9 38%,#8a9a6a 66%,#c9a25e 100%);}
+/* menu : soulignements arc-en-ciel, une teinte par rubrique */
+.site-nav ul li:nth-child(1) a:not(.nav-close)::after{background:linear-gradient(90deg,#1a9d9a,#4a94c9);}
+.site-nav ul li:nth-child(2) a:not(.nav-close)::after{background:linear-gradient(90deg,#4a94c9,#8a9a6a);}
+.site-nav ul li:nth-child(3) a:not(.nav-close)::after{background:linear-gradient(90deg,#8a9a6a,#c9a25e);}
+.site-nav ul li:nth-child(4) a:not(.nav-close)::after{background:linear-gradient(90deg,#c9a25e,#b4714f);}
+.site-nav ul li:nth-child(5) a:not(.nav-close)::after{background:linear-gradient(90deg,#b4714f,#1a9d9a);}
+/* bouton principal : aplat dégradé + halo d'aquarelle au survol */
+.btn{
+  background:linear-gradient(135deg,#0f7a77 0%,#11596a 55%,#2b6cb0 100%);
+  color:#fff;border-color:transparent;
+  box-shadow:0 10px 26px -14px rgba(17,89,106,.55);
+}
+.btn:hover{filter:brightness(1.12);box-shadow:0 16px 34px -14px rgba(26,157,154,.65);}
+.btn-outline{background:transparent;color:var(--teal-ink);border-color:var(--teal);
+  box-shadow:none;}
+.btn-outline:hover{background:var(--teal);color:#fff;}
+/* filets d'aquarelle : les lignes plates deviennent des fils colorés */
+.page-head{border-bottom:2px solid transparent;
+  border-image:linear-gradient(90deg,#1a9d9a,#4a94c9,#8a9a6a,#c9a25e,#b4714f) 1;}
+.section-artist,.section-expos,.map-section{border-top:2px solid transparent;
+  border-image:linear-gradient(90deg,#1a9d9a,#4a94c9,#8a9a6a,#c9a25e,#b4714f) 1;}
+.spectrum{height:10px;
+  box-shadow:0 6px 22px -8px rgba(26,157,154,.5);}
+/* lavis propres à chaque rubrique */
+.pg-artist .page-head,.pg-artiste .page-head{background:
+  radial-gradient(60% 80% at 12% 0%,rgba(201,162,94,.16),transparent 60%),
+  radial-gradient(55% 75% at 90% 15%,rgba(26,157,154,.12),transparent 60%),
+  linear-gradient(180deg,#f7f1e4,var(--paper));}
+.pg-gallery .page-head,.pg-work .page-head,.pg-aquarelles .page-head,.pg-oeuvre .page-head{background:
+  radial-gradient(55% 78% at 85% -5%,rgba(74,148,201,.15),transparent 62%),
+  radial-gradient(50% 72% at 8% 20%,rgba(26,157,154,.14),transparent 60%),
+  radial-gradient(45% 60% at 92% 95%,rgba(201,162,94,.11),transparent 65%),
+  linear-gradient(180deg,#f2f6fb,var(--paper));}
+.pg-news_list .page-head,.pg-news_item .page-head,.pg-actualites .page-head,.pg-actualite .page-head{background:
+  radial-gradient(58% 80% at 10% 0%,rgba(74,148,201,.14),transparent 62%),
+  radial-gradient(50% 70% at 92% 30%,rgba(138,154,106,.11),transparent 62%),
+  linear-gradient(180deg,#eef5fb,var(--paper));}
+.pg-contact .page-head{background:
+  radial-gradient(55% 78% at 88% -5%,rgba(26,157,154,.15),transparent 60%),
+  radial-gradient(50% 70% at 8% 25%,rgba(138,154,106,.12),transparent 60%),
+  linear-gradient(180deg,#f0f5ef,var(--paper));}
+/* cadres : passe-partouts teintés qui alternent + halo coloré au survol */
+.work-frame{background:#fffdf9;}
+.work:nth-child(3n) .work-frame{background:#f8fcfb;}
+.work:nth-child(3n+1) .work-frame{background:#fdfbf6;}
+.work:nth-child(3n+2) .work-frame{background:#f9faf6;}
+.work:hover .work-frame{box-shadow:0 22px 46px -18px rgba(26,157,154,.45);}
+.work[data-tn="Terne"]:hover .work-frame{box-shadow:0 22px 46px -18px rgba(201,162,94,.45);}
+.work-figure picture{box-shadow:0 24px 52px -20px rgba(17,89,106,.4);}
+/* cartes & encadrés : liseré d'aquarelle en tête */
+.contact-card,.fact-card{border-top:3px solid transparent;
+  border-image:linear-gradient(90deg,#1a9d9a,#4a94c9 45%,#c9a25e) 1;}
+/* pied de page : lueur d'aquarelle sur le bleu nuit */
+.site-footer{background:
+  radial-gradient(70% 90% at 15% 0%,rgba(26,157,154,.16),transparent 60%),
+  radial-gradient(60% 80% at 85% 10%,rgba(74,148,201,.10),transparent 60%),
+  #0f2e35;}
+
+/* ═══════════════════ RESPONSIVE+ — du 320 px au grand écran ═══════════════════ */
+/* cibles tactiles confortables (doigt ≈ 44 px) */
+@media (hover:none){
+  .btn,.filter-btn,.work-nav-link{min-height:46px;}
+  .filter-btn{padding:.65rem 1.3rem;}
+  .site-nav ul a:not(.nav-close){padding:.7rem .4rem;}
+}
+/* très petits téléphones (≤ 400 px) */
+@media (max-width:400px){
+  body{font-size:16px;}
+  .hero-title{font-size:clamp(2.3rem,11vw,3rem);}
+  .hero-cta{flex-direction:column;align-items:flex-start;gap:1.1rem;}
+  .gallery-grid{gap:1rem .9rem;}
+  .work-title{font-size:1.02rem;}
+  .work-meta{font-size:.66rem;}
+  .cookie-actions{width:100%;flex-direction:column;}
+  .cookie-actions .btn{width:100%;}
+  .footer-legal p{font-size:.7rem;}
+}
+/* téléphones (≤ 600 px) : respiration et empilement */
+@media (max-width:600px){
+  .hero{padding-top:5.6rem;}
+  .hero-inner{margin-bottom:2.2rem;}
+  .page-head{padding-top:clamp(7.2rem,18vw,9rem);}
+  .section-head{flex-direction:column;align-items:flex-start;gap:.9rem;}
+  .news-row{align-items:flex-start;}
+  .news-title{font-size:1.18rem;}
+  .timeline a{flex-wrap:wrap;gap:.45rem 1rem;}
+  .tl-date{flex-basis:100%;}
+  .duo-line{font-size:1.16rem;}
+  .invitation-cta{flex-direction:column;gap:1.2rem;}
+  .work-facts div{flex-wrap:wrap;}
+  .work-facts dd{text-align:left;flex:1;}
+  .map-consent{min-height:240px;}
+  .cookie-bar{left:.5rem;right:.5rem;transform:none;width:auto;}
+  .cookie-inner{flex-direction:column;align-items:flex-start;gap:.9rem;}
+  .article-gallery{gap:.9rem;}
+  .teaser-figure{flex-basis:auto;width:100%;}
+}
+/* tableau cookies lisible sur mobile */
+@media (max-width:640px){
+  .cookie-table thead{display:none;}
+  .cookie-table,.cookie-table tbody,.cookie-table tr,.cookie-table td{display:block;width:100%;}
+  .cookie-table tr{margin-bottom:1rem;border:1px solid var(--hair);border-radius:4px;overflow:hidden;}
+  .cookie-table td{border:0;border-bottom:1px solid var(--hair);padding:.55rem .8rem;}
+  .cookie-table td::before{content:attr(data-l);display:block;font-size:.68rem;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--teal-ink);margin-bottom:.2rem;}
+}
+/* tablettes (601–1000 px) */
+@media (min-width:601px) and (max-width:1000px){
+  .hero-title{font-size:clamp(3rem,9vw,5rem);}
+  .duo-line{font-size:1.24rem;}
+}
+/* écrans larges : la galerie respire davantage */
+@media (min-width:1500px){
+  :root{--w-container:1280px;}
+  .gallery-grid{gap:3rem 2.6rem;}
+}
+/* mode impression : papier propre, œuvres avant tout */
+@media print{
+  .site-header,.site-footer,.spectrum,.cookie-bar,.map-wrap,.hero-wash,
+  .contact-invitation,.next-teaser,.work-nav,.filter-bar{display:none !important;}
+  body{background:#fff;color:#000;font-size:12pt;}
+  .work-frame,.work-figure picture{box-shadow:none;border:1px solid #999;}
+  .reveal{opacity:1;transform:none;}
+}
+
+/* ═══════════════════ ATELIER — photos & visionneuse ═══════════════════ */
+.pg-atelier .page-head{background:
+  radial-gradient(60% 80% at 10% 0%,rgba(201,162,94,.20),transparent 60%),
+  radial-gradient(55% 75% at 92% 12%,rgba(138,154,106,.18),transparent 60%),
+  linear-gradient(180deg,#f6f1e3,var(--paper));}
+.atelier-note{margin:0 0 1.6rem;color:var(--muted);font-size:.95rem}
+.atelier-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1.6rem}
+.atelier-item{margin:0;background:var(--card);border:1px solid rgba(26,157,154,.16);
+  border-radius:10px;padding:10px;box-shadow:var(--shadow-soft);
+  transition:transform .35s ease,box-shadow .35s ease}
+.atelier-item:nth-child(3n+2){background:#f3f4eb;border-color:rgba(138,154,106,.30)}
+.atelier-item:nth-child(3n){background:#f8f1e2;border-color:rgba(201,162,94,.32)}
+.atelier-item:hover{transform:translateY(-5px);
+  box-shadow:0 18px 40px -18px rgba(26,157,154,.55)}
+.atelier-btn{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in;
+  border-radius:6px;overflow:hidden}
+.atelier-btn:focus-visible{outline:2px solid var(--teal);outline-offset:3px}
+.atelier-btn img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;
+  transition:transform .5s ease}
+.atelier-item:hover .atelier-btn img{transform:scale(1.04)}
+.portrait-card{margin:0 0 1.4rem;background:var(--card);border:1px solid rgba(201,162,94,.35);
+  border-radius:10px;padding:10px 10px 8px;box-shadow:var(--shadow);
+  transform:rotate(-1.4deg)}
+.portrait-card img{display:block;width:100%;max-width:280px;margin:0 auto;border-radius:6px}
+.portrait-card figcaption{margin-top:.55rem;text-align:center;font-family:var(--sans);
+  font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.hl-lightbox{position:fixed;inset:0;z-index:1200;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;background:rgba(10,19,27,.93);
+  padding:1.2rem;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.hl-lightbox[hidden]{display:none}
+.hl-lightbox figure{margin:0;max-width:min(1200px,94vw);text-align:center}
+.hl-lightbox img{max-width:100%;max-height:78vh;border:2px solid rgba(255,255,255,.55);
+  border-radius:8px;box-shadow:0 30px 80px -20px rgba(0,0,0,.7)}
+.hl-lightbox figcaption{margin-top:.8rem;color:#e8eef1;font-size:.85rem;letter-spacing:.08em}
+.hl-lb-btn{position:absolute;top:50%;transform:translateY(-50%);min-width:46px;min-height:46px;
+  border:1px solid rgba(255,255,255,.4);border-radius:50%;background:rgba(255,255,255,.12);
+  color:#fff;font-size:1.3rem;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+.hl-lb-btn:hover{background:rgba(26,157,154,.55)}
+.hl-lb-prev{left:14px}.hl-lb-next{right:14px}
+.hl-lb-close{position:absolute;top:14px;right:14px;min-width:46px;min-height:46px;
+  border-radius:50%;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);
+  color:#fff;font-size:1.05rem;cursor:pointer}
+.hl-lb-close:hover{background:rgba(26,157,154,.55)}
+@media (max-width:600px){
+  .atelier-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:.9rem}
+  .atelier-item{padding:6px}
+  .hl-lb-btn{min-width:52px;min-height:52px}
+  .portrait-card img{max-width:230px}
+}
+@media print{.hl-lightbox{display:none!important}.atelier-item{break-inside:avoid}}
+
+/* ═══════════════════ COULEURS-MAXIMALES — le site en pleine aquarelle ═══════════════════ */
+/* voile multicolore fixe : les 5 teintes des aquarelles traversent tout le site */
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
+  radial-gradient(42rem 30rem at 6% 3%,rgba(26,157,154,.17),transparent 62%),
+  radial-gradient(38rem 26rem at 96% 10%,rgba(74,148,201,.16),transparent 60%),
+  radial-gradient(44rem 30rem at 3% 40%,rgba(201,162,94,.13),transparent 62%),
+  radial-gradient(40rem 28rem at 97% 58%,rgba(138,154,106,.14),transparent 60%),
+  radial-gradient(46rem 32rem at 50% 97%,rgba(180,113,79,.13),transparent 62%);}
+/* bandes alternées à peine teintées : la couleur monte à chaque section */
+.main .section:nth-of-type(even):not([class*="tint-"]):not(.wash-band){background:
+  linear-gradient(180deg,rgba(26,157,154,.05),rgba(74,148,201,.04) 55%,rgba(201,162,94,.05));}
+.main .section:nth-of-type(odd):not([class*="tint-"]):not(.wash-band){background:
+  linear-gradient(180deg,rgba(138,154,106,.035),rgba(180,113,79,.035) 60%,rgba(26,157,154,.045));}
+/* titres en dégradé d'encre (encres toutes validées AA sur papier) */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .page-title,.h2,.fact-title,.big-quote,.hero-baseline{
+    background:linear-gradient(100deg,#0a615e 0%,#2b6cb0 48%,#8a6528 100%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;}
+  .site-footer .footer-title,.footer-col .brand-name{
+    background:linear-gradient(90deg,#9fd8d2,#a8cfe8 48%,#e2c289);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;}
+}
+/* en-têtes de rubrique : lavis plus généreux */
+.page-head{background:
+  radial-gradient(60% 85% at 8% 0%,rgba(26,157,154,.18),transparent 62%),
+  radial-gradient(55% 80% at 92% 8%,rgba(201,162,94,.16),transparent 60%),
+  radial-gradient(45% 65% at 50% 100%,rgba(74,148,201,.10),transparent 65%),
+  linear-gradient(180deg,#f6f4ec,var(--paper)) !important;}
+.pg-artist .page-head,.pg-artiste .page-head{background:
+  radial-gradient(60% 80% at 12% 0%,rgba(201,162,94,.28),transparent 62%),
+  radial-gradient(55% 75% at 90% 15%,rgba(26,157,154,.20),transparent 60%),
+  radial-gradient(40% 55% at 55% 100%,rgba(180,113,79,.12),transparent 65%),
+  linear-gradient(180deg,#f8f0dc,var(--paper)) !important;}
+.pg-gallery .page-head,.pg-work .page-head,.pg-aquarelles .page-head,.pg-oeuvre .page-head{background:
+  radial-gradient(55% 78% at 85% -5%,rgba(74,148,201,.27),transparent 62%),
+  radial-gradient(50% 72% at 8% 20%,rgba(26,157,154,.22),transparent 60%),
+  radial-gradient(45% 60% at 92% 95%,rgba(201,162,94,.18),transparent 65%),
+  linear-gradient(180deg,#eaf2fb,var(--paper)) !important;}
+.pg-news_list .page-head,.pg-news_item .page-head,.pg-actualites .page-head,.pg-actualite .page-head{background:
+  radial-gradient(58% 80% at 10% 0%,rgba(74,148,201,.24),transparent 62%),
+  radial-gradient(50% 70% at 92% 30%,rgba(138,154,106,.18),transparent 62%),
+  radial-gradient(42% 58% at 45% 100%,rgba(26,157,154,.14),transparent 65%),
+  linear-gradient(180deg,#e9f2fa,var(--paper)) !important;}
+.pg-contact .page-head{background:
+  radial-gradient(55% 78% at 88% -5%,rgba(26,157,154,.26),transparent 60%),
+  radial-gradient(50% 70% at 8% 25%,rgba(138,154,106,.20),transparent 60%),
+  linear-gradient(180deg,#eaf3ea,var(--paper)) !important;}
+.pg-atelier .page-head{background:
+  radial-gradient(60% 80% at 10% 0%,rgba(201,162,94,.30),transparent 62%),
+  radial-gradient(55% 75% at 92% 12%,rgba(138,154,106,.26),transparent 60%),
+  radial-gradient(42% 58% at 50% 100%,rgba(180,113,79,.14),transparent 65%),
+  linear-gradient(180deg,#f8f0dd,var(--paper)) !important;}
+/* rubriques teintées : saturation doucement augmentée */
+.tint-sand{background:linear-gradient(180deg,#f9f3e2,#f1e6cb);}
+.tint-sky{background:linear-gradient(180deg,#e9f2fb,#dcebf9);}
+.tint-sage{background:linear-gradient(180deg,#edf3e6,#e0ebd2);}
+.wash-band{background:
+  radial-gradient(60% 120% at 20% 50%,rgba(26,157,154,.20),transparent 60%),
+  radial-gradient(50% 100% at 85% 40%,rgba(74,148,201,.16),transparent 62%),
+  radial-gradient(45% 90% at 55% 110%,rgba(201,162,94,.12),transparent 65%);}
+/* spectre plus présent, avec lueur */
+.spectrum{height:14px;
+  box-shadow:0 -8px 22px -8px rgba(26,157,154,.5),0 8px 22px -8px rgba(201,162,94,.45);}
+/* en-tête fixe : liseré arc-en-ciel dès qu'on défile */
+.site-header.is-scrolled{border-bottom:2px solid transparent;
+  border-image:linear-gradient(90deg,#1a9d9a,#4a94c9,#8a9a6a,#c9a25e,#b4714f) 1;
+  box-shadow:0 12px 30px -20px rgba(74,148,201,.45);}
+/* menu : chaque rubrique prend sa couleur d'encre (AA) */
+.site-nav ul li:nth-child(1) a:not(.nav-close):hover,
+.site-nav ul li:nth-child(1) a[aria-current="page"]{color:#0a615e;}
+.site-nav ul li:nth-child(2) a:not(.nav-close):hover,
+.site-nav ul li:nth-child(2) a[aria-current="page"]{color:#2b6cb0;}
+.site-nav ul li:nth-child(3) a:not(.nav-close):hover,
+.site-nav ul li:nth-child(3) a[aria-current="page"]{color:#8a6528;}
+.site-nav ul li:nth-child(4) a:not(.nav-close):hover,
+.site-nav ul li:nth-child(4) a[aria-current="page"]{color:#8f4a28;}
+.site-nav ul li:nth-child(5) a:not(.nav-close):hover,
+.site-nav ul li:nth-child(5) a[aria-current="page"]{color:#55663a;}
+.site-nav ul li:nth-child(6) a:not(.nav-close):hover,
+.site-nav ul li:nth-child(6) a[aria-current="page"]{color:#0a615e;}
+/* boutons : double halo coloré, éclat au survol (dégradé AA inchangé) */
+.btn{box-shadow:0 12px 32px -12px rgba(26,157,154,.6),0 8px 26px -14px rgba(74,148,201,.5);
+  transition:background .3s,color .3s,border-color .3s,box-shadow .3s,transform .3s,filter .3s;}
+.btn:hover{filter:saturate(1.18) brightness(1.05);transform:translateY(-2px);}
+/* fiche « En un regard » : liseré d'aquarelle */
+.fact-card{border-top:4px solid transparent;
+  border-image:linear-gradient(90deg,#1a9d9a,#4a94c9,#8a9a6a,#c9a25e,#b4714f) 1;}
+/* héros : voile multicolore au-dessus du lavis SVG */
+.hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(55% 45% at 85% 12%,rgba(74,148,201,.20),transparent 62%),
+  radial-gradient(45% 40% at 8% 30%,rgba(26,157,154,.16),transparent 60%),
+  radial-gradient(50% 45% at 60% 95%,rgba(201,162,94,.14),transparent 62%);}
+/* pied de page : nuit bleutée traversée de lueurs */
+.site-footer{background:
+  radial-gradient(50rem 20rem at 12% 0%,rgba(26,157,154,.25),transparent 60%),
+  radial-gradient(46rem 18rem at 88% 8%,rgba(74,148,201,.20),transparent 62%),
+  radial-gradient(40rem 16rem at 50% 112%,rgba(201,162,94,.16),transparent 60%),
+  linear-gradient(180deg,#123840,#0f2e35 45%,#0b2530);}
+.footer-list a:hover{color:#9fd8d2;border-color:rgba(159,216,210,.5);}
+/* détails */
+::selection{background:rgba(26,157,154,.30);}
+.lnk{border-bottom-color:rgba(43,108,176,.45);}
+.lnk:hover{color:#2b6cb0;}
+.link-arrow:hover{color:#8f4a28;}
+/* impression : on retire les effets pour un papier propre */
+@media print{
+  body::after,.hero::after{display:none;}
+  .page-title,.h2,.fact-title,.big-quote,.hero-baseline{
+    background:none;-webkit-text-fill-color:initial;color:var(--ink);}
+  .site-footer .footer-title,.footer-col .brand-name{
+    background:none;-webkit-text-fill-color:initial;color:#f4efe6;}
+  .spectrum{height:6px;box-shadow:none;}
+  .main .section:nth-of-type(even):not([class*="tint-"]):not(.wash-band),
+  .main .section:nth-of-type(odd):not([class*="tint-"]):not(.wash-band){background:none;}
+  .fact-card,.site-header.is-scrolled,.page-head{border-image:none;}
+}
+
+/* ═══════════════════ SUR LE VIF — définition encadrée & cadres d'œuvres ═══════════════════ */
+.vif-def{position:relative;margin:0 0 1.6rem;padding:1.25rem 1.5rem 1.25rem 1.9rem;
+  background:linear-gradient(180deg,#fffdf9,#faf5ea);border:1px solid rgba(201,162,94,.5);
+  border-radius:6px;box-shadow:var(--shadow-soft)}
+.vif-def::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  border-radius:6px 0 0 6px;
+  background:linear-gradient(180deg,#1a9d9a,#4a94c9,#8a9a6a,#c9a25e,#b4714f)}
+.vif-def-title{font-family:var(--sans);font-weight:600;font-size:.76rem;letter-spacing:.18em;
+  text-transform:uppercase;color:#8a6528;margin:0 0 .55rem}
+.vif-def p:last-child{margin:0;color:var(--text);max-width:62ch}
+/* les images deviennent des œuvres encadrées : passe-partout + cadre + tampon */
+.atelier-item{padding:14px 14px 34px;background:#fffdf9;border:1px solid #cfc4a8;
+  border-radius:4px;position:relative}
+.atelier-item:nth-child(3n+2),.atelier-item:nth-child(3n){background:#fffdf9}
+.atelier-item::after{content:"";position:absolute;inset:5px;border:1px solid rgba(14,42,50,.16);
+  border-radius:2px;pointer-events:none}
+.atelier-item:hover{border-color:#b9a97f}
+.atelier-btn img{aspect-ratio:auto;object-fit:contain;max-height:24rem;background:#fff}
+.vif-badge{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);
+  font-family:var(--sans);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;
+  color:#8a6528;white-space:nowrap}
+.vif-badge::before,.vif-badge::after{content:"·";margin:0 .45em;color:#c9a25e}
+@media (max-width:600px){
+  .atelier-item{padding:8px 8px 26px}
+  .vif-badge{bottom:6px;font-size:.56rem}
+  .atelier-btn img{max-height:17rem}
+}
+@media print{.vif-def{break-inside:avoid}}
+
+/* ═══ SUR LE VIF passe en galerie · la palette reste à l'atelier ═══ */
+.atelier-grid.atelier-one{grid-template-columns:minmax(0,430px);justify-content:center}
+.atelier-one .atelier-btn img{max-height:32rem}
+.hl-lightbox.hl-lb-single .hl-lb-btn{display:none}
+
+/* ═══════════════ RYTHME & ULTRA-RESPONSIVE — espacements harmonisés ═══════════════ */
+:root{--gap:clamp(1.15rem,2.6vw,1.9rem);}
+html,body{overflow-x:clip;}
+img,picture,svg,video{max-width:100%;}
+.section{padding:clamp(3.4rem,8vw,6.4rem) 0;}
+.section-head{margin-bottom:clamp(1.7rem,4vw,2.6rem);gap:1.2rem;}
+.gallery-grid{gap:var(--gap);}
+.atelier-grid{gap:var(--gap);}
+.duo-grid{gap:var(--gap);}
+.news-row{padding:clamp(1.15rem,3vw,1.65rem) .4rem;}
+.timeline a{padding:clamp(1.05rem,2.6vw,1.4rem) .4rem;}
+.gallery-count{margin-top:clamp(1.6rem,4vw,2.6rem);}
+.atelier-note{margin:0 0 clamp(1.2rem,3vw,1.7rem);}
+.vif-def{margin:0 0 clamp(1.1rem,2.6vw,1.5rem);}
+.footer-inner{gap:clamp(1.8rem,4.5vw,2.6rem);padding:clamp(2.6rem,6vw,4.3rem) 0 2.1rem;}
+@media (max-width:600px){
+  .footer-inner{grid-template-columns:1fr;gap:1.7rem;}
+  .section{padding:clamp(2.9rem,9vw,4rem) 0;}
+  .page-head{padding-top:clamp(7.2rem,19vw,9rem);}
+  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));}
+  .section-head{margin-bottom:1.5rem;}
+  .news-thumb{flex-basis:86px;}
+}
+@media (max-width:360px){
+  .container,.narrow{width:94vw;}
+  .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(126px,1fr));}
+  .page-title{font-size:clamp(1.85rem,8.5vw,2.3rem);}
+  .btn{width:100%;text-align:center;}
+  .section-head{flex-direction:column;align-items:flex-start;}
+  .filter-btn{padding:.5rem .7rem;font-size:.7rem;}
+}
+@media (hover:none){
+  .filter-btn,.footer-list a,.site-nav a:not(.nav-close),.icon-btn,.btn-tiny{min-height:46px;}
+  .work:hover .work-frame,.atelier-item:hover{transform:none;}
+  .atelier-item:hover .atelier-btn img{transform:none;}
+}
+@media (orientation:landscape) and (max-height:540px){
+  .hero{min-height:auto;padding-top:5.2rem;}
+}
+@media (min-width:1600px){:root{--w-container:1300px;}}
+
+/* ═══════════ CADRAGES UNIFORMES — sur le vif, atelier & actualités ═══════════ */
+/* vignettes « sur le vif » et photos d'atelier : cadres nets et alignés
+   (miniature recadrée ; l'image entière s'affiche au clic dans la visionneuse) */
+.atelier-grid .atelier-btn img{aspect-ratio:4/3;object-fit:cover;max-height:none;}
+.atelier-grid.atelier-one .atelier-btn img{aspect-ratio:auto;object-fit:contain;max-height:32rem;}
+/* actualités sur téléphone : rangées bien cadrées */
+@media (max-width:600px){
+  .news-row{gap:.95rem;padding:1.05rem 0;}
+  .news-thumb{flex:0 0 104px;}
+  .news-thumb img{width:100%;aspect-ratio:1/1;object-fit:cover;}
+  .news-title{font-size:1.12rem;}
+}
+
+/* ═══════════ GALERIE PLEIN ÉCRAN SUR PC — les aquarelles occupent l'écran ═══════════ */
+@media (min-width:1100px){
+  .gallery-section .container{width:min(1760px,94vw);}
+  .gallery-grid{grid-template-columns:repeat(8,1fr);}
+  .filter-bar{width:min(1760px,94vw);}
+}
+@media (min-width:1600px){
+  .gallery-section .container,.filter-bar{width:min(1920px,94vw);}
+}
+
+/* ═══════════ UNIFORMITÉ & FLUIDITÉ — un seul rythme pour tout le site ═══════════ */
+:root{
+  --r-card:10px; --r-img:6px; --r-btn:4px;
+  --section-pad:clamp(3rem,7vw,6rem);
+  --t-soft:cubic-bezier(.22,1,.36,1);
+}
+/* sections & conteneurs : une seule règle de respiration */
+.section{padding:var(--section-pad) 0;}
+.page-head{padding:clamp(7.5rem,14vw,11rem) 0 clamp(1.8rem,4vw,3.2rem);}
+.section-head{margin-bottom:clamp(1.6rem,3.6vw,2.4rem);}
+/* cartes : mêmes angles, mêmes ombres, mêmes bordilles partout */
+.work-frame,.atelier-item,.fact-card,.portrait-card,.news-thumb picture,
+.duo-panel,.msg-card,.form-card{border-radius:var(--r-card);box-shadow:var(--shadow-soft);}
+.atelier-btn img,.atelier-btn,.work-frame img,.news-thumb img,
+.hl-lightbox img{border-radius:var(--r-img);}
+.btn,.filter-btn,.icon-btn,.btn-tiny,.btn-primary,.btn-secondary{border-radius:var(--r-btn);}
+/* boutons : même gabarit, même geste */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  min-height:48px;padding:.85rem clamp(1.2rem,2.4vw,2rem);text-align:center;}
+.btn,.work-frame,.atelier-item,.filter-btn{transition:all .35s var(--t-soft);}
+/* titres : même respiration */
+h1,h2,h3{margin:0 0 .5em;}
+/* focus unique et visible */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,
+textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--teal);
+  outline-offset:2px;border-radius:var(--r-btn);}
+/* grilles : écart unique */
+.gallery-grid,.atelier-grid,.duo-grid,.news-rows{gap:var(--gap);}
+/* ── hyper responsive : fluide du 320 px au 4K ── */
+@media (max-width:340px){
+  html{font-size:15px;}
+  .container,.narrow{width:94vw;}
+  .page-title{font-size:clamp(1.7rem,9vw,2.1rem);}
+  .page-sub{font-size:1rem;}
+  .filter-btn{padding:.5rem .65rem;letter-spacing:.08em;}
+}
+@media (min-width:2000px){
+  :root{--w-container:1500px;}
+  html{font-size:17.5px;}
+}
+@media (orientation:landscape) and (max-height:500px){
+  .page-head{padding-top:clamp(5.6rem,12vh,7.5rem);}
+  .section{padding:clamp(2.2rem,6vh,4rem) 0;}
+}
+@media (hover:none){
+  .btn,.filter-btn,.icon-btn,.btn-tiny,.hl-lb-btn,.hl-lb-close,
+  .nav-toggle{min-height:48px;min-width:48px;}
+}

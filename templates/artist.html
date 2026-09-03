@@ -23,6 +23,12 @@
       </p>
     </div>
     <aside class="artist-aside reveal">
+      <figure class="portrait-card">
+        <img src="{{ url_for('static', filename='img/portrait.jpg') }}"
+             alt="Portrait de Hilaire Legentil" width="302" height="452"
+             loading="lazy" decoding="async">
+        <figcaption>Hilaire Legentil</figcaption>
+      </figure>
       <div class="fact-card">
         <h2 class="fact-title">En un regard</h2>
         <dl class="fact-list">
@@ -63,6 +69,13 @@
         du Cotentin. L’aquarelle, vive et sans repentir, convient à ces visions
         fugitives&nbsp;: l’eau décide, l’artiste guide.
       </p>
+      <p>
+        Selon la lumière et l’humeur du paysage, ses aquarelles assument deux
+        registres&nbsp;: des couleurs franches, parfois presque vives, puis
+        soudain des gammes ternes et douces, proches du papier. Ce va-et-vient
+        fait partie du propos — la <a class="lnk" href="{{ url_for('gallery') }}">galerie</a>
+        permet de suivre l’une ou l’autre tonalité.
+      </p>
     </div>
     <div class="artist-text reveal">
       <p class="label">La matière</p>
@@ -82,7 +95,7 @@
   </div>
 </section>
 
-<section class="section section-expos">
+<section class="section section-expos tint-sage">
   <div class="container">
     <div class="section-head reveal">
       <div>

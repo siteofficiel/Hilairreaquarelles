@@ -1,42 +1,117 @@
 {% extends "base.html" %}
-{% block title %}Politique de confidentialité — Hilaire Legentil{% endblock %}
-{% block desc %}Politique de confidentialité du site d’Hilaire Legentil, artiste aquarelliste.{% endblock %}
+{% block title %}Politique de confidentialité & cookies — Hilaire Legentil{% endblock %}
+{% block desc %}Politique de confidentialité, cookies et données personnelles du site d’Hilaire Legentil, artiste aquarelliste (RGPD).{% endblock %}
 
 {% block content %}
 <header class="page-head">
   <div class="container reveal">
     <p class="label">Informations</p>
-    <h1 class="page-title">Politique de confidentialité</h1>
+    <h1 class="page-title">Confidentialité &amp; cookies</h1>
   </div>
 </header>
 
 <section class="section">
   <div class="container article legal-body reveal">
-    <h2>Données collectées</h2>
+
+    <h2>Responsable du traitement</h2>
+    <p>Hilaire Legentil — entrepreneur individuel, SIREN 927&nbsp;753&nbsp;780,
+       Yvetot-Bocage (Manche, Normandie).
+       Contact pour toute question relative à vos données&nbsp;:
+       <a class="lnk" href="mailto:{{ S.get('contact_email') or 'voir la page contact' }}">{{ S.get('contact_email') or 'page contact' }}</a>.</p>
+
+    <h2>Données collectées et finalités</h2>
     <p>Le formulaire de contact collecte uniquement les informations que vous
        saisissez&nbsp;: nom, adresse e-mail, téléphone (facultatif), objet, catégorie
-       et message. Ces données servent exclusivement à répondre à votre demande.</p>
+       et message.</p>
+    <ul>
+      <li><strong>Finalité</strong>&nbsp;: répondre à votre demande (information sur une
+          œuvre, commande, exposition…).</li>
+      <li><strong>Base légale</strong>&nbsp;: votre consentement, matérialisé par l’envoi
+          volontaire du formulaire (RGPD, art.&nbsp;6&nbsp;1&nbsp;f et mesure
+          d’anticipation CNIL pour les demandes de contact).</li>
+      <li><strong>Destinataires</strong>&nbsp;: Hilaire Legentil uniquement. Aucune cession,
+          location ou vente à des tiers.</li>
+      <li><strong>Durée</strong>&nbsp;: le temps du traitement de la demande, puis suppression.</li>
+    </ul>
 
-    <h2>Conservation</h2>
-    <p>Les messages sont conservés le temps nécessaire au traitement de la demande,
-       puis supprimés. Aucune donnée n’est cédée, louée ou vendue à des tiers.</p>
+    <h2 id="cookies">Cookies et traceurs</h2>
+    <p>Ce site <strong>n’utilise aucun cookie publicitaire, mesure d’audience ou
+       traceur de profilage</strong>. Les polices et les images sont hébergées par le
+       site lui-même.</p>
+    <table class="cookie-table">
+      <caption>Cookies strictement nécessaires déposés</caption>
+      <thead>
+        <tr><th scope="col">Cookie</th><th scope="col">Finalité</th><th scope="col">Durée</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-l="Cookie"><code>session</code></td>
+          <td data-l="Finalité">Session technique&nbsp;: protection du formulaire (anti-spam/CSRF) et
+              accès de l’artiste à son administration. Exempté de consentement
+              (art.&nbsp;82 II de la loi Informatique et Libertés).</td>
+          <td data-l="Durée">12 heures</td>
+        </tr>
+        <tr>
+          <td data-l="Cookie"><code>hl_consent</code></td>
+          <td data-l="Finalité">Mémorisation de votre choix concernant les cookies et la carte
+              (strictement nécessaire pour enregistrer votre décision).</td>
+          <td data-l="Durée">6 mois</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <h2>Cookies</h2>
-    <p>Ce site ne dépose aucun cookie publicitaire ni traceur d’analyse. Seule une
-       session technique est utilisée pour le bon fonctionnement du site et de son
-       espace d’administration.</p>
+    <h3>Carte interactive (OpenStreetMap)</h3>
+    <p>La carte de la page Contact affiche des tuiles servies par
+       <em>OpenStreetMap</em>, un service tiers susceptible de déposer ses propres
+       cookies. Conformément aux recommandations de la CNIL, <strong>cette carte ne se
+       charge qu’après votre accord</strong> (bouton «&nbsp;Accepter&nbsp;» du bandeau, ou
+       «&nbsp;Charger la carte&nbsp;» sur la page). Sans accord, la page fonctionne
+       intégralement, carte exceptée.</p>
+    <p><button class="btn btn-outline" id="ck-reset" type="button">Revoir / modifier mon choix cookies</button></p>
 
-    <h2>Services tiers</h2>
-    <p>La carte présentée sur la page contact est fournie par les serveurs publics
-       d’OpenStreetMap (fond de carte) qui peuvent enregistrer votre adresse IP
-       conformément à leur propre politique. Le lien vers Instagram, lorsque vous
-       l’empruntez, est soumis aux pratiques de cette plateforme.</p>
+    <h3>Gérer les cookies depuis votre navigateur</h3>
+    <p>Vous pouvez à tout moment supprimer les cookies depuis les réglages de votre
+       navigateur (rubrique «&nbsp;confidentialité&nbsp;»)&nbsp;: Chrome, Firefox, Safari,
+       Edge. La suppression du cookie <code>hl_consent</code> fait réapparaître le
+       bandeau de choix.</p>
 
-    <h2>Vos droits (RGPD)</h2>
-    <p>Vous disposez d’un droit d’accès, de rectification et de suppression des
-       données vous concernant. Pour l’exercer, écrivez à
-       {{ S.get('contact_email') or 'l’adresse indiquée sur la page contact' }}
-       ou via le <a class="lnk" href="{{ url_for('contact') }}">formulaire</a>.</p>
+    <h2>Vos droits (RGPD, art. 15 à 22)</h2>
+    <p>Vous disposez des droits d’<strong>accès</strong>, de <strong>rectification</strong>,
+       d’<strong>effacement</strong>, de <strong>limitation</strong>, d’<strong>opposition</strong>
+       et de <strong>portabilité</strong> de vos données. Pour les exercer, écrivez à
+       {{ S.get('contact_email') or 'l’adresse indiquée sur la page contact' }} ou utilisez le
+       <a class="lnk" href="{{ url_for('contact') }}">formulaire</a>.</p>
+    <p>Si vous estimez, après échange, que vos droits ne sont pas respectés, vous
+       pouvez introduire une réclamation auprès de la
+       <a class="lnk" href="https://www.cnil.fr" rel="noopener" target="_blank">CNIL</a>
+       (Commission nationale de l’informatique et des libertés).</p>
+
+    <h2>Sécurité</h2>
+    <p>Les échanges avec le site sont chiffrés dès sa mise en ligne en HTTPS.
+       Les messages reçus via le formulaire sont stockés dans la base du site,
+       accessible au seul artiste.</p>
+
+    <h2>Liens externes</h2>
+    <p>Les liens vers Instagram ou d’autres sites tiers sont de simples liens&nbsp;:
+       aucune donnée ne leur est transmise par ce site. En les suivant, vous relevez
+       de la politique de confidentialité de ces plateformes.</p>
+
+    <h2>Mise à jour</h2>
+    <p>La présente politique peut être adaptée à l’évolution du site&nbsp;; la date de
+       dernière mise à jour figure ci-dessous.</p>
+    <p class="muted small">Dernière mise à jour&nbsp;: {{ year }}.</p>
   </div>
 </section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var b = document.getElementById("ck-reset");
+  if (b) b.addEventListener("click", function () {
+    document.cookie = "hl_consent=;max-age=0;path=/;samesite=lax";
+    location.reload();
+  });
+});
+</script>
 {% endblock %}

@@ -1,0 +1,85 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}L’atelier{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>L’atelier</h1>
+    <p class="admin-sub">Les photos affichées sur la page publique
+       «&nbsp;L’atelier&nbsp;»&nbsp;: ajoutez-en autant que vous voulez,
+       remplacez-les ou réordonnez-les.</p>
+  </div>
+  <a class="btn-primary" href="{{ url_for('atelier') }}" target="_blank" rel="noopener">Voir la page ↗</a>
+</div>
+
+<div class="admin-section">
+  <h2>Ajouter une photo</h2>
+  <form method="post" enctype="multipart/form-data" class="form-card">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="upload">
+    <div class="field">
+      <label for="at-image">Image (JPG, PNG ou WebP — 26&nbsp;Mo maximum)</label>
+      <input id="at-image" name="image" type="file" accept=".jpg,.jpeg,.png,.webp" required>
+    </div>
+    <p><button class="btn-primary" type="submit">Ajouter la photo</button></p>
+  </form>
+</div>
+
+{% if photos %}
+<div class="table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th class="col-order">Ordre</th>
+        <th colspan="2">Photo</th>
+        <th>Remplacer l’image</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in photos %}
+      <tr>
+        <td class="col-order">
+          <form method="post" class="inline">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <input type="hidden" name="action" value="move">
+            <input type="hidden" name="id" value="{{ a.id }}">
+            <button class="icon-btn" name="dir" value="up" title="Monter" {{ 'disabled' if loop.first }} aria-label="Monter la photo n°{{ loop.index }}">▲</button>
+            <button class="icon-btn" name="dir" value="down" title="Descendre" {{ 'disabled' if loop.last }} aria-label="Descendre la photo n°{{ loop.index }}">▼</button>
+          </form>
+        </td>
+        <td class="col-thumb">
+          <img src="/uploads/atelier/{{ a.folder }}/medium.webp" alt="" width="72" loading="lazy">
+        </td>
+        <td class="col-title">
+          <span class="row-title">Photo de l’atelier — n°{{ loop.index }}</span>
+          <span class="row-meta">{{ a.img_w }}×{{ a.img_h }} px</span>
+        </td>
+        <td>
+          <form method="post" enctype="multipart/form-data" class="inline">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <input type="hidden" name="action" value="replace">
+            <input type="hidden" name="id" value="{{ a.id }}">
+            <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp" required
+                   aria-label="Nouvelle image pour la photo n°{{ loop.index }}">
+            <button class="btn-tiny" type="submit">Remplacer</button>
+          </form>
+        </td>
+        <td class="col-actions">
+          <form method="post" class="inline"
+                onsubmit="return confirm('Supprimer définitivement cette photo ?')">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="id" value="{{ a.id }}">
+            <button class="btn-tiny btn-danger" type="submit">Supprimer</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="admin-empty">Aucune photo pour l’instant — ajoutez la première ci-dessus.</p>
+{% endif %}
+{% endblock %}

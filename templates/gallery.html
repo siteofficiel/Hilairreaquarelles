@@ -12,14 +12,14 @@
   </div>
 </header>
 
-{% if categories %}
-<div class="container filter-bar reveal" role="group" aria-label="Filtrer les œuvres">
+<div class="container filter-bar reveal" role="group" aria-label="Trier les œuvres">
   <button class="filter-btn is-active" data-filter="*">Toutes</button>
+  <button class="filter-btn" data-filter="tn:Colorée">Colorées</button>
+  <button class="filter-btn" data-filter="tn:Terne">Ternes</button>
   {% for c in categories %}
   <button class="filter-btn" data-filter="{{ c }}">{{ c }}</button>
   {% endfor %}
 </div>
-{% endif %}
 
 <section class="section gallery-section">
   <div class="container">
@@ -34,6 +34,43 @@
   </div>
 </section>
 
+{% if vif %}
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">Sur le vif</p>
+        <h2 class="h2">Peintes devant le sujet</h2>
+      </div>
+    </div>
+    <aside class="vif-def reveal">
+      <p class="vif-def-title">Qu’est-ce qu’une aquarelle «&nbsp;sur le vif&nbsp;»&nbsp;?</p>
+      <p>Peinte directement <strong>devant le sujet</strong>, en une séance, sans photographie
+         ni retour en atelier — on dit aussi <em>«&nbsp;sur le motif&nbsp;»</em>. La lumière du
+         moment, la marée, le vent&nbsp;: tout décide du rythme, et l’eau est saisie sur
+         place, dans l’instant.</p>
+    </aside>
+    <p class="atelier-note reveal">Une sélection d’aquarelles réalisées par Hilaire sur le
+      vif — cliquez pour agrandir, puis naviguez avec les flèches du clavier.</p>
+    <div class="atelier-grid" id="atelier-grid" data-cap="Aquarelle sur le vif">
+      {%- for p in vif %}
+      <figure class="atelier-item reveal">
+        <span class="vif-badge" aria-hidden="true">sur le vif</span>
+        <button type="button" class="atelier-btn"
+                data-full="/uploads/atelier/{{ p.folder }}/medium.webp"
+                aria-label="Agrandir l’aquarelle {{ loop.index }} sur {{ vif|length }}">
+          <img loading="lazy" decoding="async"
+               src="/uploads/atelier/{{ p.folder }}/medium.webp"
+               alt="Aquarelle sur le vif — {{ loop.index }}"
+               width="{{ p.img_w }}" height="{{ p.img_h }}">
+        </button>
+      </figure>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <section class="section contact-invitation">
   <div class="container narrow center reveal">
     <h2 class="h2">Une aquarelle vous touche&nbsp;?</h2>
@@ -43,6 +80,4 @@
 </section>
 {% endblock %}
 
-{% block scripts %}
-<script src="/static/js/gallery.js" defer></script>
-{% endblock %}
+

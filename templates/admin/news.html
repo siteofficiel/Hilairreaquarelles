@@ -25,7 +25,7 @@
       {% for n in items %}
       <tr class="{{ 'row-hidden' if not n.published }}">
         <td class="col-thumb">
-          {% if n.cover %}<img src="/uploads/news/{{ n.cover }}/small.jpg" alt="" width="72" loading="lazy">
+          {% if n.cover %}<img src="/uploads/news/{{ n.cover }}/medium.webp" alt="" width="72" loading="lazy">
           {% else %}<span class="thumb-empty">—</span>{% endif %}
         </td>
         <td class="col-title">

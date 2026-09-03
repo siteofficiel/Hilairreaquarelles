@@ -1,0 +1,73 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Sur le vif{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Sur le vif</h1>
+    <p class="admin-sub">Les aquarelles peintes devant le sujet, affichées dans
+       la galerie (rubrique «&nbsp;Sur le vif&nbsp;»).</p>
+  </div>
+  <a class="btn-primary" href="{{ url_for('gallery') }}" target="_blank" rel="noopener">Voir la galerie ↗</a>
+</div>
+
+<div class="admin-section">
+  <h2>Ajouter une aquarelle sur le vif</h2>
+  <form method="post" enctype="multipart/form-data" class="form-card">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="upload">
+    <div class="field">
+      <label for="vif-image">Image (JPG, PNG ou WebP — 26&nbsp;Mo maximum)</label>
+      <input id="vif-image" name="image" type="file" accept=".jpg,.jpeg,.png,.webp" required>
+    </div>
+    <p><button class="btn-primary" type="submit">Ajouter à la galerie</button></p>
+  </form>
+</div>
+
+{% if items %}
+<div class="table-wrap">
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th class="col-order">Ordre</th>
+        <th colspan="2">Aquarelle</th>
+        <th class="col-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in items %}
+      <tr>
+        <td class="col-order">
+          <form method="post" class="inline">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <input type="hidden" name="action" value="move">
+            <input type="hidden" name="id" value="{{ a.id }}">
+            <button class="icon-btn" name="dir" value="up" title="Monter" {{ 'disabled' if loop.first }} aria-label="Monter l’aquarelle n°{{ loop.index }}">▲</button>
+            <button class="icon-btn" name="dir" value="down" title="Descendre" {{ 'disabled' if loop.last }} aria-label="Descendre l’aquarelle n°{{ loop.index }}">▼</button>
+          </form>
+        </td>
+        <td class="col-thumb">
+          <img src="/uploads/atelier/{{ a.folder }}/medium.webp" alt="" width="72" loading="lazy">
+        </td>
+        <td class="col-title">
+          <span class="row-title">Aquarelle sur le vif</span>
+          <span class="row-meta">n°{{ loop.index }} · {{ a.img_w }}×{{ a.img_h }} px</span>
+        </td>
+        <td class="col-actions">
+          <form method="post" class="inline"
+                onsubmit="return confirm('Supprimer définitivement cette aquarelle ?')">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="id" value="{{ a.id }}">
+            <button class="btn-tiny btn-danger" type="submit">Supprimer</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="admin-empty">Aucune aquarelle sur le vif pour l’instant.</p>
+{% endif %}
+{% endblock %}
