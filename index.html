@@ -1607,7 +1607,9 @@ textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--teal);
     #faf8f3;
     padding-top:4.6rem;padding-bottom:2rem;overflow-y:auto;overscroll-behavior:contain;}
   body.nav-open .site-header{background:none!important;box-shadow:none!important;
-    border-image:none!important;border-bottom-color:transparent!important;}
+    border-image:none!important;border-bottom-color:transparent!important;
+    backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+    filter:none!important;}
   .site-nav ul{gap:.55rem;}
   .site-nav ul a:not(.nav-close){display:inline-flex;align-items:center;justify-content:center;
     min-height:52px;padding:.7rem 1.5rem;font-weight:500;color:var(--ink);}
@@ -1636,6 +1638,16 @@ textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--teal);
   .cookie-txt{font-size:.85rem;}
   .cookie-actions .btn{width:100%;}
 }
+
+
+/* ═══════════ MENU JAMAIS COUPÉ + CRÉDIT WEB&GO ═══════════ */
+@media (max-width:900px){
+  .site-nav{align-items:flex-start;}
+  .site-nav ul{margin:auto 0;width:100%;padding-bottom:1.2rem;}
+}
+.footer-legal .footer-credit{margin-top:.5rem;}
+.footer-credit a{color:#9fd8d2;border-bottom:1px solid rgba(159,216,210,.4);}
+.footer-credit a:hover{border-bottom-color:#9fd8d2;}
 
 /* conformité cookies & porte carte */
 .cookie-bar{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);z-index:160;
@@ -1737,6 +1749,7 @@ cursor:text;border-radius:2px}
     <p>© <span id="year"></span> Hilaire Legentil · SIREN 927 753 780 —
        Aquarelles originales, photographies et textes protégés. —
        <a href="#/confidentialite">Confidentialité &amp; mentions légales</a></p>
+    <p class="footer-credit">Site réalisé par <a href="http://webetgo.fr" target="_blank" rel="noopener">Web&amp;Go</a></p>
   </div>
 </footer>
 <aside class="cookie-bar" id="cookie-bar" role="region" aria-label="Gestion des cookies" hidden>
