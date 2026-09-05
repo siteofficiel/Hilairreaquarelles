@@ -1732,7 +1732,13 @@ function processImage(file,maxSide,cb){
       var w=img.width,h=img.height,r=Math.min(1,maxSide/Math.max(w,h));
       var c=document.createElement("canvas");
       c.width=Math.max(1,Math.round(w*r));c.height=Math.max(1,Math.round(h*r));
-      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      var ctx=c.getContext("2d");
+      ctx.drawImage(img,0,0,c.width,c.height);
+      var txt="Hilaire Legentil",fs=Math.max(18,Math.round(c.width*0.040)),
+      pad=Math.max(8,Math.round(c.width*0.020));
+      ctx.font="italic "+fs+"px Georgia,serif";ctx.textAlign="right";ctx.textBaseline="alphabetic";
+      ctx.fillStyle="rgba(10,25,30,.47)";ctx.fillText(txt,c.width-pad+2,c.height-pad+2);
+      ctx.fillStyle="rgba(255,255,255,.69)";ctx.fillText(txt,c.width-pad,c.height-pad);
       var uri;
       try{uri=c.toDataURL("image/webp",.82);
         if(uri.indexOf("image/webp")<0)uri=c.toDataURL("image/jpeg",.85);}

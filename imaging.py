@@ -62,6 +62,45 @@ def _save_variant(im, width, jquality, wquality, outdir, base, want_jpeg=True):
         pass  # WebP indisponible : le JPEG reste utilisable
 
 
+
+# ------------------------------------------------------------- filigrane
+# Signature apposée sur chaque image publiée (protection contre le plagiat).
+WATERMARK_TEXT = "Hilaire Legentil"
+_FONT_CANDIDATES = [
+    os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                 "static", "fonts", "CormorantGaramond-Italic.ttf"),
+    "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+]
+
+
+def apply_watermark(im):
+    """Appose la signature de l'artiste, discret, en bas à droite."""
+    from PIL import ImageDraw, ImageFont
+    w, h = im.size
+    size = max(18, round(w * 0.040))
+    font = None
+    for p in _FONT_CANDIDATES:
+        try:
+            font = ImageFont.truetype(p, size)
+            break
+        except Exception:
+            continue
+    if font is None:
+        font = ImageFont.load_default()
+    overlay = Image.new("RGBA", im.size, (0, 0, 0, 0))
+    d = ImageDraw.Draw(overlay)
+    pad = max(6, round(w * 0.018))
+    bbox = d.textbbox((0, 0), WATERMARK_TEXT, font=font)
+    tw, th = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    x = w - tw - pad - bbox[0]
+    y = h - th - pad - bbox[1]
+    d.text((x + 2, y + 2), WATERMARK_TEXT, font=font, fill=(10, 25, 30, 120))
+    d.text((x, y), WATERMARK_TEXT, font=font, fill=(255, 255, 255, 175))
+    from PIL import Image as _I
+    return _I.alpha_composite(im.convert("RGBA"), overlay).convert("RGB")
+
+
 def store_image(stream, filename, target_root, base_name=None):
     """Sauvegarde une image dans target_root/base_name/ avec tous ses dérivés.
 
@@ -73,6 +112,8 @@ def store_image(stream, filename, target_root, base_name=None):
         im = im.convert("RGB")
     elif im.mode == "L":
         im = im.convert("RGB")
+
+    im = apply_watermark(im)
 
     base = base_name or uuid.uuid4().hex[:12]
     outdir = os.path.join(target_root, base)

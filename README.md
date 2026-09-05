@@ -62,6 +62,8 @@ Depuis l'administration, Hilaire peut, sans toucher au code :
 - changer son mot de passe.
 
 Les images envoyées sont automatiquement vérifiées (format, taille),
+**signées du nom de l'artiste « Hilaire Legentil »** (signature italique en bas à droite,
+protection contre le plagiat — appliqué aussi aux images déjà publiées),
 ré-encodées proprement (métadonnées retirées) et enregistrées en une seule
 taille légère — 1280 pixels de large, en WebP (tous les navigateurs récents).
 **L'œuvre n'est jamais retouchée** : ni recadrage, ni correction de couleur.
