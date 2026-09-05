@@ -1837,3 +1837,42 @@ textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--teal);
   .btn,.filter-btn,.icon-btn,.btn-tiny,.hl-lb-btn,.hl-lb-close,
   .nav-toggle{min-height:48px;min-width:48px;}
 }
+
+/* ═══════════ MENU MOBILE OPAQUE + AUDIT TÉLÉPHONE ═══════════ */
+@media (max-width:900px){
+  .site-nav{background:
+    radial-gradient(70% 40% at 15% 6%,rgba(26,157,154,.10),transparent 60%),
+    radial-gradient(60% 35% at 88% 18%,rgba(74,148,201,.10),transparent 60%),
+    radial-gradient(75% 45% at 50% 100%,rgba(201,162,94,.12),transparent 65%),
+    #faf8f3;
+    padding-top:4.6rem;padding-bottom:2rem;overflow-y:auto;overscroll-behavior:contain;}
+  body.nav-open .site-header{background:none!important;box-shadow:none!important;
+    border-image:none!important;border-bottom-color:transparent!important;}
+  .site-nav ul{gap:.55rem;}
+  .site-nav ul a:not(.nav-close){display:inline-flex;align-items:center;justify-content:center;
+    min-height:52px;padding:.7rem 1.5rem;font-weight:500;color:var(--ink);}
+  .nav-close{top:calc(1rem + env(safe-area-inset-top,0px));right:.9rem;
+    min-width:52px;min-height:52px;display:flex;align-items:center;justify-content:center;}
+  body.nav-open{overflow:hidden;}
+}
+/* textes : aucun débordement, même pour les mots longs */
+.work-title,.news-title,.tl-title,.page-title,.page-sub,.h2,.h3,.hero-title,.hero-sub,
+.big-quote,.mini-quote,.footer-list a,.vif-def,.atelier-note{overflow-wrap:break-word;}
+/* visionneuse : calibrée pour les téléphones (avec encoches) */
+@media (max-width:600px){
+  .hl-lightbox figure{max-width:96vw;}
+  .hl-lightbox img{max-height:62vh;}
+  .hl-lightbox figcaption{font-size:.78rem;padding:0 .5rem;}
+  .hl-lb-prev{left:calc(6px + env(safe-area-inset-left,0px));}
+  .hl-lb-next{right:calc(6px + env(safe-area-inset-right,0px));}
+  .hl-lb-close{top:calc(8px + env(safe-area-inset-top,0px));right:calc(8px + env(safe-area-inset-right,0px));}
+  .mat-figure{max-height:64vh;object-fit:contain;}
+}
+/* très petits écrans : tailles et bandeau cookies calés */
+@media (max-width:380px){
+  .hero-title{font-size:clamp(2.3rem,11vw,2.9rem);}
+  .hero-sub{font-size:1rem;}
+  .label{font-size:.68rem;letter-spacing:.16em;}
+  .cookie-txt{font-size:.85rem;}
+  .cookie-actions .btn{width:100%;}
+}
