@@ -193,3 +193,32 @@ Pour éviter de télécharger puis re-déposer le fichier à la main :
 
 La page unique (`…/#/admin`) offre le même panneau « Publication GitHub » :
 le jeton y est mémorisé uniquement dans le navigateur.
+
+## Galerie, carrousels & événements
+
+- la rubrique s'appelle « Galerie » (les aquarelles) et « Événements » (ex-actualités) ;
+- adresses : `/galerie` et `/evenements` — les anciennes adresses
+  (`/aquarelles`, `/actualites`) sont redirigées automatiquement (301) ;
+- la page d'accueil propose une sélection d'œuvres à feuilleter (défilement
+  horizontal, flèches, tactile) et un bouton « Découvrir la galerie » ;
+- chaque œuvre peut recevoir jusqu'à 5 images complémentaires : carrousel sur
+  la page de l'œuvre (flèches, points-miniatures cliquables, balayage tactile,
+  flèches du clavier) ;
+- visionneuse plein écran : bouton ⤢ ou clic sur l'image — l'aquarelle est
+  affichée entière, jamais recadrée (Échap pour fermer) ;
+- fiche œuvre : « Œuvre précédente / suivante » + retour à la galerie ;
+- champs Sujet et Ambiance modifiables dans l'administration ;
+- événements triés : les rendez-vous à venir d'abord (badge « à venir »),
+  puis les passés ; sur l'accueil, les prochains événements sont prioritaires ;
+- événements : champs Heure et Lieu (facultatifs) dans l'administration,
+  affichés avec la date ;
+- page L'artiste : section « Mon univers » (nuage de mots) et les quatre
+  piliers (sujet, ambiance, technique, composition) ;
+- page L'atelier : présentation du matériel (palette, pinceaux, mélanges,
+  supports, esquisses, aquarelle & gouache) ;
+- Google Analytics : coller votre ID (G-…) dans Réglages — aucun script
+  chargé tant que le champ est vide ;
+- lien Facebook facultatif dans Réglages (s'affiche avec Instagram) ;
+- réseaux sociaux discrets : pied de page, page Contacts et page L'artiste ;
+- SEO : balises Open Graph (og:title, og:description, og:image par page),
+  sitemap.xml et robots.txt mis à jour avec les nouvelles adresses.

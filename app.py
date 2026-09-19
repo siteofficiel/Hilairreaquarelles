@@ -5,6 +5,8 @@ Site public (galerie, actualités, contact, carte) + espace administrateur
 """
 import os
 import sys
+import json
+import base64
 from datetime import date
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -13,8 +15,8 @@ VENDOR = os.path.join(BASE_DIR, "vendor")
 if VENDOR not in sys.path:
     sys.path.insert(0, VENDOR)
 
-from flask import (Flask, abort, flash, redirect, render_template, request,
-                   send_from_directory, session, url_for)
+from flask import (Flask, abort, flash, jsonify, redirect, render_template,
+                   request, send_from_directory, session, url_for)
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import auth
@@ -28,6 +30,78 @@ app.config["MAX_CONTENT_LENGTH"] = 30 * 1024 * 1024
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 12  # 12 h
+
+# --------------------------------------------- notifications navigateur
+# Web Push (VAPID) : la clé privée est générée localement si absente,
+# jamais publiée. Si le module n'est pas installé, tout se désactive proprement.
+PUSH_ENABLED = False
+VAPID_PUB = ""
+_VAPID_PRIV = os.path.join(BASE_DIR, "data", "vapid_private.pem")
+_VAPID_OBJ = None
+try:
+    from py_vapid import Vapid02
+    from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+    from pywebpush import webpush, WebPushException
+    if not os.path.exists(_VAPID_PRIV):
+        _v = Vapid02()
+        _v.generate_keys()
+        _v.save_key(_VAPID_PRIV)
+    _VAPID_OBJ = Vapid02.from_pem(open(_VAPID_PRIV, "rb").read())
+    VAPID_PUB = base64.urlsafe_b64encode(
+        _VAPID_OBJ.public_key.public_bytes(Encoding.X962, PublicFormat.UncompressedPoint)
+    ).rstrip(b"=").decode()
+    PUSH_ENABLED = True
+except Exception:
+    PUSH_ENABLED = False
+
+
+def push_send_all(title, body, url="/galerie"):
+    """Envoie une notification Web Push à tous les abonnés du site.
+    Retourne (envoyées, échecs, abonnements obsolètes nettoyés)."""
+    if not PUSH_ENABLED:
+        return 0, 0, 0
+    conn = db.connect()
+    subs_rows = conn.execute("SELECT * FROM push_subs").fetchall()
+    conn.close()
+    sent = failed = gone = 0
+    gone_ids = []
+    for row in subs_rows:
+        info = {"endpoint": row["endpoint"],
+                "keys": {"p256dh": row["p256dh"], "auth": row["auth"]}}
+        try:
+            webpush(info, data=json.dumps({"title": title, "body": body,
+                                           "url": url}),
+                    vapid_private_key=_VAPID_OBJ,
+                    vapid_claims={"sub": "mailto:hilaire.legentil@free.fr"},
+                    timeout=12)
+            sent += 1
+        except WebPushException as e:
+            st = e.response.status_code if getattr(e, "response", None) is not None else 0
+            if st in (404, 410):          # abonnement expiré côté navigateur
+                gone += 1
+                gone_ids.append(row["id"])
+            else:
+                failed += 1
+        except Exception:
+            failed += 1
+    if gone_ids:
+        conn = db.connect()
+        conn.executemany("DELETE FROM push_subs WHERE id=?",
+                         [(i,) for i in gone_ids])
+        conn.commit()
+        conn.close()
+    return sent, failed, gone
+
+
+def _push_new_work():
+    """Notification automatique : une nouvelle aquarelle est en ligne."""
+    try:
+        sent, _failed, _gone = push_send_all(
+            "Nouvelle aquarelle en ligne",
+            "Une nouvelle aquarelle vient d'être ajoutée à la galerie.")
+        return sent
+    except Exception:
+        return 0
 
 SECRET_FILE = os.path.join(db.DATA_DIR, "secret_key")
 os.makedirs(db.DATA_DIR, exist_ok=True)
@@ -68,6 +142,7 @@ def paras(value):
 @app.context_processor
 def inject_globals():
     s = db.get_settings()
+    hl_works = get_works()
     return {
         "SITE": SITE,
         "S": s,
@@ -76,6 +151,9 @@ def inject_globals():
         "year": date.today().year,
         "map_center": [49.4894, -1.5048],   # Yvetot-Bocage (Normandie)
         "map_radius": 75000,                # 75 km
+        "hl_slugs": ",".join(w["slug"] for w in hl_works),
+        "hl_total": len(hl_works),
+        "vapid_pub": VAPID_PUB,
     }
 
 
@@ -136,11 +214,14 @@ def get_news_item(slug):
 @app.route("/")
 def home():
     works = get_works()
-    cand = [w for w in works if w["chroma"]]
-    vivid = max(cand, key=lambda w: w["chroma"]) if cand else None
-    mute = min(cand, key=lambda w: w["chroma"]) if cand else None
-    return render_template("index.html", works=works[:6], news=get_news(limit=3),
-                           hero_works=works[:5], vivid=vivid, mute=mute)
+    items = get_news()
+    today = db.now_iso()[:10]
+    upcoming = sorted([n for n in items if (n["event_date"] or "")[:10] >= today],
+                      key=lambda n: n["event_date"] or "")
+    past = sorted([n for n in items if (n["event_date"] or "")[:10] < today],
+                  key=lambda n: n["event_date"] or "", reverse=True)
+    return render_template("index.html", works=works[:6], news=(upcoming + past)[:3],
+                           hero_works=works[:5], flip=works[:10])
 
 
 @app.route("/artiste")
@@ -158,21 +239,35 @@ def atelier():
     return render_template("atelier.html", photos=photos)
 
 
-@app.route("/aquarelles")
+@app.route("/galerie")
 def gallery():
     works = get_works()
     cats = []
     for w in works:
         if w["category"] and w["category"] not in cats:
             cats.append(w["category"])
+    def _tallies(key):
+        out = {}
+        for w in works:
+            v = (w[key] or "").strip()
+            if v:
+                out[v] = out.get(v, 0) + 1
+        return list(out.items())
+    sujets = _tallies("sujet")
+    ambiances = _tallies("ambiance")
+    techs = _tallies("technique")
+    years = _tallies("year")
+    years.sort(key=lambda p: p[0], reverse=True)
     conn = db.connect()
     vif = conn.execute("SELECT folder, img_w, img_h FROM atelier "
                        "WHERE kind='vif' ORDER BY position, id").fetchall()
     conn.close()
-    return render_template("gallery.html", works=works, categories=cats, vif=vif)
+    return render_template("gallery.html", works=works, categories=cats,
+                           sujets=sujets, ambiances=ambiances, techs=techs,
+                           years=years, vif=vif)
 
 
-@app.route("/aquarelles/<slug>")
+@app.route("/galerie/<slug>")
 def work(slug):
     works = get_works()
     row = next((w for w in works if w["slug"] == slug), None)
@@ -181,22 +276,54 @@ def work(slug):
     idx = works.index(row)
     prev = works[idx - 1] if idx > 0 else (works[-1] if works else None)
     nxt = works[idx + 1] if idx < len(works) - 1 else (works[0] if works else None)
+    conn = db.connect()
+    imgs = conn.execute("SELECT image FROM works_images WHERE work_id=? "
+                        "ORDER BY position, id", (row["id"],)).fetchall()
+    conn.close()
     return render_template("work.html", w=row, prev=prev, next=nxt,
-                           index=idx + 1, total=len(works))
+                           index=idx + 1, total=len(works), imgs=imgs)
 
 
-@app.route("/actualites")
+@app.route("/evenements")
 def news_list():
-    return render_template("news.html", items=get_news())
+    items = get_news()
+    today = db.now_iso()[:10]
+    upcoming = sorted([n for n in items if (n["event_date"] or "")[:10] >= today],
+                      key=lambda n: n["event_date"] or "")
+    past = sorted([n for n in items if (n["event_date"] or "")[:10] < today],
+                  key=lambda n: n["event_date"] or "", reverse=True)
+    return render_template("news.html", items=upcoming + past, upcoming=upcoming,
+                           past=past)
 
 
-@app.route("/actualites/<slug>")
+@app.route("/evenements/<slug>")
 def news_item(slug):
     row, images = get_news_item(slug)
     if row is None or (not row["published"] and not auth.current_admin()):
         abort(404)
     others = [n for n in get_news(limit=4) if n["id"] != row["id"]][:3]
     return render_template("news_item.html", n=row, images=images, others=others)
+
+
+# ------------------------------------------- anciennes adresses (301)
+@app.route("/aquarelles")
+def legacy_gallery():
+    return redirect(url_for("gallery"), code=301)
+
+
+@app.route("/aquarelles/<slug>")
+def legacy_work(slug):
+    return redirect(url_for("work", slug=slug), code=301)
+
+
+@app.route("/actualites")
+def legacy_news():
+    return redirect(url_for("news_list"), code=301)
+
+
+@app.route("/actualites/<slug>")
+def legacy_news_item(slug):
+    return redirect(url_for("news_item", slug=slug), code=301)
 
 
 @app.route("/contact")
@@ -349,6 +476,46 @@ def require_admin(f):
             return redirect(url_for("admin_login"))
         return f(*args, **kwargs)
     return wrapper
+
+
+# --------------------------------------------- service worker & abonnements
+@app.route("/sw.js")
+def service_worker():
+    resp = app.send_static_file("sw.js")
+    resp.headers["Content-Type"] = "application/javascript; charset=utf-8"
+    resp.headers["Service-Worker-Allowed"] = "/"
+    resp.headers["Cache-Control"] = "no-cache"
+    return resp
+
+
+@app.route("/push/subscribe", methods=["POST"])
+def push_subscribe():
+    d = request.get_json(silent=True) or {}
+    keys = d.get("keys") or {}
+    ep = (d.get("endpoint") or "").strip()
+    if not ep.startswith("https://") or not keys.get("p256dh") or not keys.get("auth"):
+        return jsonify({"ok": False}), 400
+    conn = db.connect()
+    conn.execute(
+        "INSERT INTO push_subs(endpoint,p256dh,auth,created_at) VALUES(?,?,?,?) "
+        "ON CONFLICT(endpoint) DO UPDATE SET p256dh=excluded.p256dh, "
+        "auth=excluded.auth",
+        (ep, keys["p256dh"], keys["auth"], db.now_iso()))
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True})
+
+
+@app.route("/push/unsubscribe", methods=["POST"])
+def push_unsubscribe():
+    d = request.get_json(silent=True) or {}
+    ep = (d.get("endpoint") or "").strip()
+    if ep:
+        conn = db.connect()
+        conn.execute("DELETE FROM push_subs WHERE endpoint=?", (ep,))
+        conn.commit()
+        conn.close()
+    return jsonify({"ok": True})
 
 
 @app.route("/admin/login", methods=["GET", "POST"])
@@ -521,13 +688,23 @@ def admin_work_new():
         data["slug"] = unique_slug(conn, "works", slugify(data["title"], "aquarelle"))
         conn.execute(
             "INSERT INTO works(title,slug,description,category,technique,dimensions,"
-            "year,folder,img_w,img_h,position,published,tonality,chroma,created_at) "
+            "sujet,ambiance,year,folder,img_w,img_h,position,published,"
+            "tonality,chroma,created_at) "
             "VALUES(:title,:slug,:description,:category,:technique,:dimensions,"
-            ":year,:folder,:img_w,:img_h,:position,:published,:tonality,:chroma,:created_at)",
+            ":sujet,:ambiance,:year,:folder,:img_w,:img_h,:position,:published,"
+            ":tonality,:chroma,:created_at)",
             {**data, "position": pos, "created_at": db.now_iso()})
+        nid = conn.execute(
+            "SELECT last_insert_rowid() i").fetchone()["i"]
+        save_work_images(conn, nid, request)
         conn.commit()
         conn.close()
-        flash("Œuvre ajoutée à la galerie.", "ok")
+        if data.get("published") == 1:
+            _n = _push_new_work()
+            flash(("Œuvre ajoutée à la galerie — notification envoyée à %d abonné(s)."
+                   % _n) if _n else "Œuvre ajoutée à la galerie.", "ok")
+        else:
+            flash("Œuvre ajoutée à la galerie.", "ok")
         return redirect(url_for("admin_works"))
 
     empty = {"title": "", "description": "", "category": "", "technique": "",
@@ -547,15 +724,67 @@ def admin_work_edit(wid):
         if not auth.csrf_ok(request):
             abort(400)
         action = request.form.get("action")
+        if action == "img_add":
+            conn = db.connect()
+            save_work_images(conn, wid, request)
+            conn.commit(); conn.close()
+            flash("Image ajoutée à l’œuvre.", "ok")
+            return redirect(url_for("admin_work_edit", wid=wid))
+        if action == "img_move":
+            delta = -1 if request.form.get("dir") == "up" else 1
+            conn = db.connect()
+            ids = [r["id"] for r in conn.execute(
+                "SELECT id FROM works_images WHERE work_id=? ORDER BY position, id",
+                (wid,))]
+            try:
+                iid = int(request.form.get("iid", "0") or 0)
+            except ValueError:
+                iid = 0
+            if iid in ids:
+                i = ids.index(iid)
+                j = max(0, min(len(ids) - 1, i + delta))
+                if i != j:
+                    ids[i], ids[j] = ids[j], ids[i]
+                    for k, rid in enumerate(ids, 1):
+                        conn.execute("UPDATE works_images SET position=? WHERE id=?",
+                                     (k, rid))
+            conn.commit(); conn.close()
+            return redirect(url_for("admin_work_edit", wid=wid))
+        if action == "img_del":
+            conn = db.connect()
+            rowi = conn.execute("SELECT * FROM works_images WHERE id=? AND work_id=?",
+                                (request.form.get("iid", "0") or 0, wid)).fetchone()
+            if rowi:
+                imaging.delete_image_folder(WORKS_DIR, rowi["image"])
+                conn.execute("DELETE FROM works_images WHERE id=?", (rowi["id"],))
+                for k, r in enumerate(conn.execute(
+                        "SELECT id FROM works_images WHERE work_id=? "
+                        "ORDER BY position, id", (wid,)), 1):
+                    conn.execute("UPDATE works_images SET position=? WHERE id=?",
+                                 (k, r["id"]))
+            conn.commit(); conn.close()
+            flash("Image retirée.", "ok")
+            return redirect(url_for("admin_work_edit", wid=wid))
         if action == "toggle":
             conn = db.connect()
             conn.execute("UPDATE works SET published = 1 - published WHERE id=?", (wid,))
+            now_pub = conn.execute("SELECT published p FROM works WHERE id=?",
+                                   (wid,)).fetchone()["p"]
             conn.commit(); conn.close()
-            flash("Visibilité de l'œuvre mise à jour.", "ok")
+            if now_pub == 1:
+                _n = _push_new_work()
+                flash(("Œuvre rendue visible — notification envoyée à %d abonné(s)."
+                       % _n) if _n else "Visibilité de l'œuvre mise à jour.", "ok")
+            else:
+                flash("Visibilité de l'œuvre mise à jour.", "ok")
             return redirect(url_for("admin_works"))
         if action == "delete":
             imaging.delete_image_folder(WORKS_DIR, w["folder"])
             conn = db.connect()
+            for r in conn.execute("SELECT image FROM works_images WHERE work_id=?",
+                                  (wid,)).fetchall():
+                imaging.delete_image_folder(WORKS_DIR, r["image"])
+            conn.execute("DELETE FROM works_images WHERE work_id=?", (wid,))
             conn.execute("DELETE FROM works WHERE id=?", (wid,))
             conn.commit(); conn.close()
             flash("Œuvre supprimée.", "ok")
@@ -607,14 +836,24 @@ def admin_work_edit(wid):
         conn.execute(
             "UPDATE works SET title=:title, slug=:slug, description=:description, "
             "category=:category, technique=:technique, dimensions=:dimensions, "
+            "sujet=:sujet, ambiance=:ambiance, "
             "year=:year, folder=:folder, img_w=:img_w, img_h=:img_h, published=:published, "
             "tonality=:tonality, chroma=:chroma WHERE id=:id",
             {**data, "id": wid})
         conn.commit(); conn.close()
-        flash("Œuvre mise à jour.", "ok")
+        if data["published"] == 1 and w["published"] == 0:
+            _n = _push_new_work()
+            flash(("Œuvre mise à jour — notification envoyée à %d abonné(s)."
+                   % _n) if _n else "Œuvre mise à jour.", "ok")
+        else:
+            flash("Œuvre mise à jour.", "ok")
         return redirect(url_for("admin_works"))
 
-    return render_template("admin/work_edit.html", w=w, new=False)
+    conn = db.connect()
+    wimgs = conn.execute("SELECT * FROM works_images WHERE work_id=? "
+                         "ORDER BY position, id", (wid,)).fetchall()
+    conn.close()
+    return render_template("admin/work_edit.html", w=w, new=False, wimgs=wimgs)
 
 
 def validate_work_form(request):
@@ -624,6 +863,8 @@ def validate_work_form(request):
         "category": clean(request.form.get("category", ""), 80),
         "technique": clean(request.form.get("technique", ""), 120),
         "dimensions": clean(request.form.get("dimensions", ""), 60),
+        "sujet": clean(request.form.get("sujet", ""), 160),
+        "ambiance": clean(request.form.get("ambiance", ""), 160),
         "year": clean(request.form.get("year", ""), 20),
         "published": 1 if request.form.get("published") else 0,
         "folder": None, "img_w": 0, "img_h": 0, "tonality": "", "chroma": 0,
@@ -638,6 +879,23 @@ def validate_work_form(request):
 
 
 # ---------------------------------------------------------- actualités
+
+def save_work_images(conn, wid, request):
+    """Ajoute des images complémentaires (max 5 par œuvre)."""
+    for f in request.files.getlist("images_add"):
+        if not f or not f.filename:
+            continue
+        n = conn.execute("SELECT COUNT(*) c FROM works_images WHERE work_id=?",
+                         (wid,)).fetchone()["c"]
+        if n >= 5:
+            break
+        try:
+            folder, _, _ = imaging.store_image(f, f.filename, WORKS_DIR)
+        except Exception:
+            continue
+        conn.execute("INSERT INTO works_images(work_id,image,position) VALUES(?,?,?)",
+                     (wid, folder, n + 1))
+
 
 @app.route("/admin/actualites")
 @require_admin
@@ -665,14 +923,26 @@ def admin_news_new():
         conn = db.connect()
         data["slug"] = unique_slug(conn, "news", slugify(data["title"], "actualite"))
         conn.execute(
-            "INSERT INTO news(title,slug,event_date,body,link,cover,published,position,"
-            "created_at) VALUES(:title,:slug,:event_date,:body,:link,:cover,:published,"
-            ":position,:created_at)",
+            "INSERT INTO news(title,slug,event_date,event_time,place,body,link,cover,"
+            "published,position,created_at) "
+            "VALUES(:title,:slug,:event_date,:event_time,:place,:body,:link,:cover,"
+            ":published,:position,:created_at)",
             {**data, "position": 0, "created_at": db.now_iso()})
         nid = conn.execute("SELECT last_insert_rowid() i").fetchone()["i"]
         save_news_images(conn, nid, request)
         conn.commit(); conn.close()
-        flash("Actualité publiée." if data["published"] else "Actualité enregistrée (masquée).", "ok")
+        if data["published"] == 1:
+            _d = (data["event_date"] or "")[:10]
+            _titre = ("Nouvel événement à venir"
+                      if len(_d) == 10 and _d >= db.now_iso()[:10] else "Nouvel événement")
+            try:
+                _n = push_send_all(_titre, data["title"], url="/evenements")[0]
+            except Exception:
+                _n = 0
+            flash(("Événement publié — notification envoyée à %d abonné(s)."
+                   % _n) if _n else "Événement publié.", "ok")
+        else:
+            flash("Événement enregistré (masqué).", "ok")
         return redirect(url_for("admin_news"))
     empty = {"title": "", "event_date": "", "body": "", "link": "", "cover": "",
              "published": 1}
@@ -740,7 +1010,8 @@ def admin_news_edit(nid):
         if data["cover"] != n["cover"] and n["cover"]:
             imaging.delete_image_folder(NEWS_DIR, n["cover"])
         conn.execute(
-            "UPDATE news SET title=:title, slug=:slug, event_date=:event_date, body=:body,"
+            "UPDATE news SET title=:title, slug=:slug, event_date=:event_date, "
+            "event_time=:event_time, place=:place, body=:body, "
             "link=:link, cover=:cover, published=:published WHERE id=:id",
             {**data, "id": nid})
         save_news_images(conn, nid, request)
@@ -766,6 +1037,8 @@ def validate_news_form(request):
     data = {
         "title": clean(request.form.get("title", ""), 200),
         "event_date": clean(request.form.get("event_date", ""), 20),
+        "event_time": clean(request.form.get("event_time", ""), 40),
+        "place": clean(request.form.get("place", ""), 200),
         "body": clean(request.form.get("body", ""), 20000),
         "link": clean(request.form.get("link", ""), 300),
         "published": 1 if request.form.get("published") else 0,
@@ -977,16 +1250,80 @@ def _gh_call(method, url, token, payload=None):
         return e.code, {"message": detail or str(e.reason)}
 
 
-@app.route("/admin/reglages", methods=["GET", "POST"])
-@require_admin
-def admin_settings():
-    keys = [
+SETTING_GROUPS = [
+    ("Accueil — grand bandeau", [
+        ("hero_baseline", "Petite ligne au-dessus du nom"),
+        ("hero_title", "Nom affiché en grand"),
+        ("hero_sub", "Ligne sous le nom"),
         ("home_intro", "Phrase d'accroche de la page d'accueil"),
-        ("artist_intro", "Présentation — page L'artiste (premier paragraphe)"),
+    ]),
+    ("Page « La démarche de l'artiste »", [
+        ("artist_intro", "Premier paragraphe (Parcours)"),
+        ("regard_art", "Encadré « En un regard » — Art"),
+        ("regard_sujet", "Encadré « En un regard » — Sujet"),
+        ("regard_univers", "Encadré « En un regard » — Univers"),
+        ("regard_support", "Encadré « En un regard » — Support"),
+        ("regard_region", "Encadré « En un regard » — Région"),
+    ]),
+    ("Sous-titres des pages", [
+        ("gallery_sub", "Page Galerie — sous-titre"),
+        ("events_sub", "Page Événements — sous-titre"),
+        ("contact_sub", "Page Contacts — sous-titre"),
+        ("atelier_sub", "Page Cahier technique — sous-titre"),
+    ]),
+    ("Coordonnées & réseaux", [
         ("contact_phone", "Téléphone affiché sur le site"),
         ("contact_email", "Adresse e-mail affichée sur le site"),
         ("instagram", "Compte Instagram (sans @)"),
-    ]
+        ("facebook", "Page Facebook — adresse complète (facultatif)"),
+    ]),
+    ("Pied de page", [
+        ("footer_job", "Métier (première ligne)"),
+        ("footer_tag", "Deuxième ligne"),
+    ]),
+    ("Mesure d'audience", [
+        ("ga_id", "ID Google Analytics (ex. G-XXXXXXXXXX — vide = désactivé)"),
+    ]),
+]
+
+
+@app.route("/admin/notifications", methods=["GET", "POST"])
+@require_admin
+def admin_notifications():
+    conn = db.connect()
+    n_subs = conn.execute("SELECT COUNT(*) c FROM push_subs").fetchone()["c"]
+    last = conn.execute("SELECT created_at FROM push_subs "
+                        "ORDER BY id DESC LIMIT 1").fetchone()
+    conn.close()
+    if request.method == "POST":
+        if not auth.csrf_ok(request):
+            abort(400)
+        title = (request.form.get("title") or "").strip() or "Nouvelle aquarelle en ligne"
+        body = (request.form.get("body") or "").strip() or \
+            "Une nouvelle aquarelle vient d'être ajoutée à la galerie."
+        if not PUSH_ENABLED:
+            flash("Les notifications navigateur ne sont pas actives sur ce serveur "
+                  "(module pywebpush absent).", "error")
+        elif not n_subs:
+            flash("Aucun abonné pour le moment — les visiteurs s'inscrivent depuis "
+                  "le bouton « M'alerter » en bas du site.", "error")
+        else:
+            sent, failed, gone = push_send_all(title, body)
+            msg = "Notification envoyée à %d abonné(s)." % sent
+            if gone:
+                msg += " %d abonnement(s) obsolète(s) retiré(s)." % gone
+            if failed:
+                msg += " %d échec(s) temporaire(s)." % failed
+            flash(msg, "ok" if sent else "error")
+        return redirect(url_for("admin_notifications"))
+    return render_template("admin/notifications.html", n_subs=n_subs,
+                           last=last, push_enabled=PUSH_ENABLED)
+
+
+@app.route("/admin/reglages", methods=["GET", "POST"])
+@require_admin
+def admin_settings():
+    keys = [k for _, items in SETTING_GROUPS for k, _ in items]
     if request.method == "POST":
         if not auth.csrf_ok(request):
             abort(400)
@@ -1007,12 +1344,49 @@ def admin_settings():
                 auth.set_password(auth.current_admin(), new)
                 flash("Mot de passe mis à jour.", "ok")
             return redirect(url_for("admin_settings"))
-        for key, _ in keys:
+        for key in keys:
             db.set_setting(key, clean(request.form.get(key, ""), 2000))
         flash("Réglages enregistrés.", "ok")
         return redirect(url_for("admin_settings"))
     s = db.get_settings()
-    return render_template("admin/settings.html", keys=keys, s=s)
+    return render_template("admin/settings.html", groups=SETTING_GROUPS, s=s)
+
+
+@app.route("/admin/accueil", methods=["GET", "POST"])
+@require_admin
+def admin_homepage():
+    """Carrousel de la page d'accueil : 5 photos remplaçables."""
+    import subprocess, sys
+    from PIL import Image
+    if request.method == "POST":
+        if not auth.csrf_ok(request):
+            abort(400)
+        slot = request.form.get("slot", "")
+        up = request.files.get("image")
+        if slot not in ("1", "2", "3", "4", "5"):
+            flash("Emplacement inconnu.", "error")
+            return redirect(url_for("admin_homepage"))
+        if not up or not up.filename:
+            flash("Choisissez d'abord une image.", "error")
+            return redirect(url_for("admin_homepage"))
+        try:
+            im = Image.open(up.stream).convert("RGB")
+        except Exception:
+            flash("Image illisible ou trop lourde (26 Mo maximum).", "error")
+            return redirect(url_for("admin_homepage"))
+        if im.width > 1600:
+            im = im.resize((1600, round(im.height * 1600 / im.width)), Image.LANCZOS)
+        path = os.path.join(BASE_DIR, "static", "img", "carousel", "c%s.webp" % slot)
+        im.save(path, "WEBP", quality=80, method=6)
+        r = subprocess.run([sys.executable, "build_standalone.py"],
+                           cwd=BASE_DIR, capture_output=True, text=True)
+        if r.returncode == 0:
+            flash("Image %s du carrousel mise à jour." % slot, "ok")
+        else:
+            flash("Image mise à jour — la version « fichier unique » sera "
+                  "régénérée à la prochaine publication.", "ok")
+        return redirect(url_for("admin_homepage"))
+    return render_template("admin/homepage.html")
 
 
 # ------------------------------------------------- publication GitHub
@@ -1038,6 +1412,39 @@ def time_now():
 
 
 db.init_db()
+
+SETTING_DEFAULTS = {
+    "hero_baseline": "Aquarelles — mer & paysage",
+    "hero_title": "Hilaire Legentil",
+    "hero_sub": "Artiste auteur",
+    "home_intro": "Onirique résumerait assez bien mon approche de l’aquarelle.",
+    "artist_intro": "Derrière ces paysages, ces couleurs et ces formes en mouvement, "
+                    "il y a une énergie, quelque chose de profond qui me bouleverse.",
+    "regard_art": "Aquarelle",
+    "regard_sujet": "Mer & paysage",
+    "regard_univers": "calme · onirique · puissance",
+    "regard_support": "Papier 100 % coton",
+    "regard_region": "Normandie — Yvetot-Bocage (Manche)",
+    "gallery_sub": "Aquarelles — mer & paysage, sur papier 100 % coton",
+    "events_sub": "J’espère que cette nouvelle saison d’exposition vous inspirera, "
+                  "vous permettra d’accéder à l’univers sensible du paysage et de l’aquarelle.",
+    "contact_sub": "Et nous aurons peut-être le plaisir d’échanger, "
+                   "c’est toujours un moment d’humanité privilégié.",
+    "atelier_sub": "Les étapes d’une aquarelle · Des aquarelles montées sur châssis · "
+                   "Fabrication des cadres",
+    "footer_job": "Artiste auteur",
+    "footer_tag": "Aquarelles — mer & paysage",
+}
+
+
+def _ensure_setting_defaults():
+    current = db.get_settings()
+    for k, v in SETTING_DEFAULTS.items():
+        if k not in current:
+            db.set_setting(k, v)
+
+
+_ensure_setting_defaults()
 
 
 def ensure_admin():

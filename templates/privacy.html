@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Politique de confidentialité & cookies — Hilaire Legentil{% endblock %}
-{% block desc %}Politique de confidentialité, cookies et données personnelles du site d’Hilaire Legentil, artiste aquarelliste (RGPD).{% endblock %}
+{% block desc %}Politique de confidentialité, cookies et données personnelles du site d’Hilaire Legentil, artiste auteur (RGPD).{% endblock %}
 
 {% block content %}
 <header class="page-head">
@@ -14,7 +14,7 @@
   <div class="container article legal-body reveal">
 
     <h2>Responsable du traitement</h2>
-    <p>Hilaire Legentil — entrepreneur individuel, SIREN 927&nbsp;753&nbsp;780,
+    <p>Hilaire Legentil — artiste auteur, SIREN 927&nbsp;753&nbsp;780,
        Yvetot-Bocage (Manche, Normandie).
        Contact pour toute question relative à vos données&nbsp;:
        <a class="lnk" href="mailto:{{ S.get('contact_email') or 'voir la page contact' }}">{{ S.get('contact_email') or 'page contact' }}</a>.</p>
@@ -31,7 +31,7 @@
           d’anticipation CNIL pour les demandes de contact).</li>
       <li><strong>Destinataires</strong>&nbsp;: Hilaire Legentil uniquement. Aucune cession,
           location ou vente à des tiers.</li>
-      <li><strong>Durée</strong>&nbsp;: le temps du traitement de la demande, puis suppression.</li>
+      <li><strong>Durée</strong>&nbsp;: le temps du traitement de la demande, puis suppression au plus tard 12&nbsp;mois après réception.</li>
     </ul>
 
     <h2 id="cookies">Cookies et traceurs</h2>
@@ -57,8 +57,22 @@
               (strictement nécessaire pour enregistrer votre décision).</td>
           <td data-l="Durée">6 mois</td>
         </tr>
+        <tr>
+          <td data-l="Cookie"><code>_ga*</code></td>
+          <td data-l="Finalité">Mesure d’audience — <strong>uniquement si l’artiste l’active</strong>, et
+              seulement après votre accord (bouton «&nbsp;Accepter&nbsp;»). Adresse IP anonymisée,
+              aucun profilage ni revente de données.</td>
+          <td data-l="Durée">13 mois maximum</td>
+        </tr>
       </tbody>
     </table>
+
+    <h3>Mesure d’audience (si activée)</h3>
+    <p>Si l’artiste active une mesure d’audience (Google Analytics), celle-ci
+       <strong>ne se charge qu’après votre accord</strong> exprimé via le bandeau — jamais avant,
+       conformément aux recommandations de la CNIL. L’adresse IP est anonymisée, les données
+       ne servent qu’à compter les visites de façon globale. Votre refus ne dégrade en rien
+       la navigation&nbsp;: tout fonctionne, carte exceptée.</p>
 
     <h3>Carte interactive (OpenStreetMap)</h3>
     <p>La carte de la page Contact affiche des tuiles servies par
@@ -68,6 +82,13 @@
        «&nbsp;Charger la carte&nbsp;» sur la page). Sans accord, la page fonctionne
        intégralement, carte exceptée.</p>
     <p><button class="btn btn-outline" id="ck-reset" type="button">Revoir / modifier mon choix cookies</button></p>
+
+    <h3>Notifications des nouvelles aquarelles</h3>
+    <p>Si vous le demandez (bouton «&nbsp;M'alerter des nouvelles aquarelles&nbsp;» en
+       bas de page), votre navigateur mémorise votre accord et le site ne conserve
+       qu'un identifiant technique anonyme de notification — aucune donnée
+       personnelle (ni nom, ni adresse e-mail). Vous pouvez retirer cet accord à
+       tout moment depuis les réglages de votre navigateur.</p>
 
     <h3>Gérer les cookies depuis votre navigateur</h3>
     <p>Vous pouvez à tout moment supprimer les cookies depuis les réglages de votre

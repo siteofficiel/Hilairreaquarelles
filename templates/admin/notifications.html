@@ -1,0 +1,63 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Notifications — nouvelles aquarelles</h1>
+    <p class="admin-sub">Prévenez vos visiteurs directement dans leur navigateur dès
+       qu'une nouvelle aquarelle est en ligne. Ils s'inscrivent eux-mêmes, en un clic,
+       grâce au bouton «&nbsp;M'alerter des nouvelles aquarelles&nbsp;» en bas de
+       chaque page du site.</p>
+  </div>
+</div>
+
+<section class="admin-section">
+  <h2>Qui sera prévenu</h2>
+  <p><strong>{{ n_subs }}</strong> abonné{{ 's' if n_subs > 1 }} à ce jour.</p>
+  {% if last %}
+  <p class="admin-sub">Dernière inscription : {{ last['created_at'] }}.</p>
+  {% else %}
+  <p class="admin-sub">Aucune inscription pour l'instant — elles arriveront
+     naturellement avec les visites du site.</p>
+  {% endif %}
+  {% if not push_enabled %}
+  <p class="admin-sub">Le module d'envoi de notifications n'est pas installé sur ce
+     serveur (pywebpush) — l'inscription des visiteurs reviendra automatiquement
+     dès qu'il le sera.</p>
+  {% endif %}
+</section>
+
+<form method="post" class="form-card">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <section class="set-group">
+    <h2>Envoyer une notification</h2>
+    <div class="set-fields">
+      <div class="field field-wide">
+        <label for="n-title">Titre</label>
+        <input id="n-title" name="title" type="text"
+               value="Nouvelle aquarelle en ligne">
+      </div>
+      <div class="field field-wide">
+        <label for="n-body">Message</label>
+        <textarea id="n-body" name="body" rows="3">Une nouvelle aquarelle vient d'être ajoutée à la galerie.</textarea>
+      </div>
+    </div>
+  </section>
+  <div class="form-actions">
+    <button class="btn-primary" type="submit">Envoyer à tous les abonnés</button>
+  </div>
+</form>
+
+<section class="admin-section">
+  <h2>Bon à savoir</h2>
+  <ul>
+    <li>Une notification part aussi <strong>automatiquement</strong> dès que vous
+        rendez une œuvre visible dans «&nbsp;Mes œuvres&nbsp;» — vous n'avez rien
+        à faire.</li>
+    <li>En cliquant sur la notification, le visiteur arrive directement sur la galerie.</li>
+    <li>Chaque visiteur reste maître de son choix&nbsp;: il peut couper les alertes à
+        tout moment depuis les réglages de son navigateur.</li>
+  </ul>
+</section>
+{% endblock %}

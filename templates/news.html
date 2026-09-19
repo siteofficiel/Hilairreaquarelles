@@ -1,36 +1,51 @@
 {% extends "base.html" %}
 {% from "_macros.html" import picture %}
-{% block title %}Actualités & expositions — Hilaire Legentil, aquarelliste{% endblock %}
-{% block desc %}Expositions, salons et actualités d’Hilaire Legentil, artiste aquarelliste : Barfleur, Saint-Vaast-la-Hougue et la Normandie.{% endblock %}
+{% block title %}Événements & expositions — Hilaire Legentil, artiste auteur{% endblock %}
+{% block desc %}Expositions, salons et actualités d’Hilaire Legentil, artiste auteur : Barfleur, Saint-Vaast-la-Hougue et la Normandie.{% endblock %}
+
+{% macro news_row(n, is_upcoming) %}
+<a class="news-row reveal" href="{{ url_for('news_item', slug=n.slug) }}">
+  {% if n.cover %}
+  <span class="news-thumb">{{ picture('news', n.cover, n.title, sizes='(max-width:760px) 34vw, 220px') }}</span>
+  {% endif %}
+  <span class="news-body">
+    {% if n.event_date %}<span class="news-date">{{ n.event_date|date_fr }}{% if n.event_time %} · {{ n.event_time }}{% endif %}{% if n.place %} · {{ n.place }}{% endif %}{% if is_upcoming %} <span class="evt-badge">à venir</span>{% endif %}</span>{% endif %}
+    <span class="news-title">{{ n.title }}</span>
+    {% set extraits = n.body|paras %}
+    {% if extraits %}<span class="news-excerpt">{{ extraits[0][:160] }}{% if extraits[0]|length > 160 %}…{% endif %}</span>{% endif %}
+  </span>
+  <span class="news-arrow" aria-hidden="true">→</span>
+</a>
+{% endmacro %}
 
 {% block content %}
 <header class="page-head">
   <div class="container reveal">
-    <p class="label">Actualités</p>
-    <h1 class="page-title">Expositions &amp; nouvelles</h1>
-    <p class="page-sub">Où voir les aquarelles d’Hilaire Legentil</p>
+    <p class="label">Événements</p>
+    <h1 class="page-title">Événements &amp; expositions</h1>
+    <p class="page-sub">{{ S.get('events_sub', 'J’espère que cette nouvelle saison d’exposition vous inspirera, vous permettra d’accéder à l’univers sensible du paysage et de l’aquarelle.') }}</p>
   </div>
 </header>
 
 <section class="section">
   <div class="container">
     {% if items %}
-    <div class="news-rows news-page">
-      {% for n in items %}
-      <a class="news-row reveal" href="{{ url_for('news_item', slug=n.slug) }}">
-        {% if n.cover %}
-        <span class="news-thumb">{{ picture('news', n.cover, n.title, sizes='(max-width:760px) 34vw, 220px') }}</span>
+      {% if upcoming %}
+      <p class="label evt-label reveal">À venir</p>
+      <div class="news-rows news-page">
+        {% for n in upcoming %}{{ news_row(n, true) }}{% endfor %}
+      </div>
+      {% endif %}
+      {% if past %}
+        {% if upcoming %}
+        <div class="evt-divider reveal" role="separator"><span>Événements passés</span></div>
+        {% else %}
+        <p class="label evt-label reveal">Événements passés</p>
         {% endif %}
-        <span class="news-body">
-          {% if n.event_date %}<span class="news-date">{{ n.event_date|date_fr }}</span>{% endif %}
-          <span class="news-title">{{ n.title }}</span>
-          {% set extraits = n.body|paras %}
-          {% if extraits %}<span class="news-excerpt">{{ extraits[0][:160] }}{% if extraits[0]|length > 160 %}…{% endif %}</span>{% endif %}
-        </span>
-        <span class="news-arrow" aria-hidden="true">→</span>
-      </a>
-      {% endfor %}
-    </div>
+      <div class="news-rows news-page">
+        {% for n in past %}{{ news_row(n, false) }}{% endfor %}
+      </div>
+      {% endif %}
     {% else %}
     <p class="muted">Aucune actualité pour le moment. Les expositions seront annoncées ici.</p>
     {% endif %}
@@ -39,9 +54,11 @@
 
 <section class="section contact-invitation">
   <div class="container narrow center reveal">
-    <h2 class="h2">Vous organisez une exposition&nbsp;?</h2>
-    <p class="lead">Hilaire expose volontiers&nbsp;: galerie, salon, lieu d’exception — contactez-le pour en discuter.</p>
-    <p class="invitation-cta"><a class="btn" href="{{ url_for('contact') }}">Proposer une exposition</a></p>
+    <h2 class="h2">Exposition et vente</h2>
+    <p class="lead">Aquarelles sur commandes.</p>
+    <p class="invitation-cta"><a class="btn" href="{{ url_for('contact') }}">Contacter l’artiste</a></p>
   </div>
 </section>
 {% endblock %}
+
+

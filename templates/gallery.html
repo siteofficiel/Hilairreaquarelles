@@ -1,25 +1,62 @@
 {% extends "base.html" %}
 {% from "_macros.html" import work_card %}
-{% block title %}Les aquarelles — galerie d’Hilaire Legentil, aquarelliste{% endblock %}
+{% block title %}Galerie — les aquarelles d’Hilaire Legentil{% endblock %}
 {% block desc %}Galerie des aquarelles originales d’Hilaire Legentil : mer, paysages et rivages de Normandie, peints sur papier 100 % coton.{% endblock %}
+
+{% macro dd_arrow() -%}
+<svg class="hl-dd-arr" width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+{%- endmacro %}
+
+{% macro dd_group(g, lab, all_label, pairs, dots=false, total=works|length) -%}
+<div class="hl-dd" data-g="{{ g }}">
+  <button type="button" class="hl-dd-btn" aria-expanded="false" aria-haspopup="listbox">
+    <span class="hl-dd-lab">{{ lab }}</span>
+    <span class="hl-dd-val">Tous</span>
+    {{ dd_arrow() }}
+  </button>
+  <div class="hl-dd-menu" role="listbox" aria-label="{{ lab }}">
+    <button type="button" class="hl-dd-opt is-sel" role="option" aria-selected="true" data-v="" data-l="Tous">{{ all_label }}<span class="hl-dd-n">{{ total }}</span></button>
+    {%- for v, n in pairs %}<button type="button" class="hl-dd-opt" role="option" aria-selected="false" data-v="{{ v }}" data-l="{{ v }}"{{ ' data-dot="' ~ v ~ '"' if dots }}>{{ v }}<span class="hl-dd-n">{{ n }}</span></button>{% endfor %}
+  </div>
+</div>
+{%- endmacro %}
 
 {% block content %}
 <header class="page-head">
   <div class="container reveal">
-    <p class="label">La galerie</p>
-    <h1 class="page-title">Les aquarelles</h1>
-    <p class="page-sub">Mer &amp; paysage — aquarelles originales sur papier 100&nbsp;% coton</p>
+    <p class="label">Galerie</p>
+    <h1 class="page-title">La galerie</h1>
+    <p class="page-sub">{{ S.get('gallery_sub', 'Aquarelles — mer & paysage, sur papier 100 % coton') }}</p>
   </div>
 </header>
 
-<div class="container filter-bar reveal" role="group" aria-label="Trier les œuvres">
-  <button class="filter-btn is-active" data-filter="*">Toutes</button>
-  <button class="filter-btn" data-filter="tn:Colorée">Colorées</button>
-  <button class="filter-btn" data-filter="tn:Terne">Ternes</button>
-  {% for c in categories %}
-  <button class="filter-btn" data-filter="{{ c }}">{{ c }}</button>
-  {% endfor %}
+{% if works %}
+<div class="container hl-filters reveal" id="hl-filters">
+  <div class="hl-fbar" role="group" aria-label="Filtrer et trier les œuvres">
+    {% if sujets %}{{ dd_group('sujet', 'Sujet', 'Tous les sujets', sujets) }}{% endif %}
+    {% if ambiances %}{{ dd_group('ambiance', 'Ambiance', 'Toutes les ambiances', ambiances, dots=true) }}{% endif %}
+    {% if techs %}{{ dd_group('technique', 'Technique', 'Toutes les techniques', techs) }}{% endif %}
+    {% if years %}{{ dd_group('annee', 'Année', 'Toutes les années', years) }}{% endif %}
+    <div class="hl-dd hl-dd-sort" data-g="sort">
+      <button type="button" class="hl-dd-btn" aria-expanded="false" aria-haspopup="listbox">
+        <span class="hl-dd-lab">Trier</span>
+        <span class="hl-dd-val">Ordre de la galerie</span>
+        {{ dd_arrow() }}
+      </button>
+      <div class="hl-dd-menu" role="listbox" aria-label="Trier les œuvres">
+        <button type="button" class="hl-dd-opt is-sel" role="option" aria-selected="true" data-v="gallery" data-l="Ordre de la galerie">Ordre de la galerie</button>
+        <button type="button" class="hl-dd-opt" role="option" aria-selected="false" data-v="recent" data-l="Plus récentes">Plus récentes d’abord</button>
+        <button type="button" class="hl-dd-opt" role="option" aria-selected="false" data-v="old" data-l="Plus anciennes">Plus anciennes d’abord</button>
+      </div>
+    </div>
+  </div>
+  <div class="hl-fstatus">
+    <p class="hl-fcount" id="gallery-count" aria-live="polite">{{ works|length }} œuvre{{ 's' if works|length > 1 }}</p>
+    <div class="hl-fchips" id="hl-chips"></div>
+    <button type="button" class="hl-freset" id="hl-reset" hidden>Réinitialiser</button>
+  </div>
 </div>
+{% endif %}
 
 <section class="section gallery-section">
   <div class="container">
@@ -27,7 +64,6 @@
     <div class="gallery-grid" id="gallery-grid">
       {% for w in works %}{{ work_card(w, loop.index0) }}{% endfor %}
     </div>
-    <p class="gallery-count reveal" id="gallery-count">{{ works|length }} œuvre{{ 's' if works|length > 1 }}</p>
     {% else %}
     <p class="muted">La galerie sera bientôt en ligne. Merci de revenir très vite.</p>
     {% endif %}
@@ -40,18 +76,15 @@
     <div class="section-head reveal">
       <div>
         <p class="label">Sur le vif</p>
-        <h2 class="h2">Peintes devant le sujet</h2>
+        <h2 class="h2">Un carnet de notes de couleurs et de formes</h2>
       </div>
     </div>
     <aside class="vif-def reveal">
-      <p class="vif-def-title">Qu’est-ce qu’une aquarelle «&nbsp;sur le vif&nbsp;»&nbsp;?</p>
-      <p>Peinte directement <strong>devant le sujet</strong>, en une séance, sans photographie
-         ni retour en atelier — on dit aussi <em>«&nbsp;sur le motif&nbsp;»</em>. La lumière du
-         moment, la marée, le vent&nbsp;: tout décide du rythme, et l’eau est saisie sur
-         place, dans l’instant.</p>
+      <p>Je compose mes aquarelles à partir de matériaux multiples&nbsp;: observation
+         et croquis sur le vif, photos formant un carnet de notes de couleurs
+         et de formes.</p>
     </aside>
-    <p class="atelier-note reveal">Une sélection d’aquarelles réalisées par Hilaire sur le
-      vif — cliquez pour agrandir, puis naviguez avec les flèches du clavier.</p>
+    <p class="atelier-note reveal">Cliquez pour agrandir.</p>
     <div class="atelier-grid" id="atelier-grid" data-cap="Aquarelle sur le vif">
       {%- for p in vif %}
       <figure class="atelier-item reveal">
@@ -73,9 +106,9 @@
 
 <section class="section contact-invitation">
   <div class="container narrow center reveal">
-    <h2 class="h2">Une aquarelle vous touche&nbsp;?</h2>
-    <p class="lead">Pour toute information sur une œuvre, écrivez à Hilaire&nbsp;: disponibilité, format, acquisition.</p>
-    <p class="invitation-cta"><a class="btn" href="{{ url_for('contact') }}">Demander des informations</a></p>
+    <h2 class="h2">Exposition et vente</h2>
+    <p class="lead">Aquarelles sur commandes.</p>
+    <p class="invitation-cta"><a class="btn" href="{{ url_for('contact') }}">Contacter l’artiste</a></p>
   </div>
 </section>
 {% endblock %}

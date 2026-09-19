@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block title %}Mentions légales — Hilaire Legentil{% endblock %}
-{% block desc %}Mentions légales du site d’Hilaire Legentil, artiste aquarelliste : éditeur, hébergement, propriété intellectuelle.{% endblock %}
+{% block desc %}Mentions légales du site d’Hilaire Legentil, artiste auteur : éditeur, hébergement, propriété intellectuelle.{% endblock %}
 
 {% block content %}
 <header class="page-head">
@@ -14,7 +14,7 @@
   <div class="container article legal-body reveal">
     <h2>Éditeur du site</h2>
     <p>Le présent site est édité par&nbsp;:<br>
-       <strong>Hilaire Legentil</strong> — entrepreneur individuel<br>
+       <strong>Hilaire Legentil</strong> — artiste auteur<br>
        Yvetot-Bocage, 50700 Valognes, Manche (Normandie), France<br>
        SIREN&nbsp;: 927&nbsp;753&nbsp;780<br>
        Téléphone&nbsp;: {{ S.get('contact_phone') or 'sur demande' }}<br>
@@ -37,7 +37,7 @@
        textes et éléments graphiques présentés sur ce site est la propriété
        exclusive d’Hilaire Legentil, sauf mention contraire. Toute reproduction,
        représentation ou diffusion, totale ou partielle, sans autorisation
-       écale préalable est interdite et constitue une contrefaçon
+       écrite préalable est interdite et constitue une contrefaçon
        (code de la propriété intellectuelle).</p>
 
     <h2>Crédits</h2>
@@ -51,6 +51,11 @@
        <a class="lnk" href="{{ url_for('privacy') }}">politique de confidentialité</a>
        sont réalisés conformément au Règlement (UE) 2016/679 (RGPD) et à la loi
        Informatique et Libertés.</p>
+
+    <h2>Vente et commandes</h2>
+    <p>Ce site ne réalise aucune vente et n’encaisse aucun paiement en ligne.
+       Les commandes d’œuvres et les demandes de renseignements se concluent
+       directement avec l’artiste, via la page contact, le téléphone ou le courriel.</p>
 
     <h2>Contact</h2>
     <p>Via la <a class="lnk" href="{{ url_for('contact') }}">page contact</a>.</p>

@@ -13,7 +13,10 @@
 
 {% macro work_card(w, i=0) -%}
 <a class="work {{ span_class(w, i) }}" href="{{ url_for('work', slug=w.slug) }}"
-   data-tn="{{ w.tonality or '' }}" aria-label="{{ w.title }} — voir l'œuvre">
+   data-tn="{{ w.tonality or '' }}" data-sujet="{{ w.sujet or '' }}"
+   data-amb="{{ w.ambiance or '' }}" data-tech="{{ w.technique or '' }}"
+   data-year="{{ w.year or '' }}"
+   aria-label="{{ w.title }} — voir l'œuvre">
   <span class="work-frame">
     {{ picture('works', w.folder, 'Aquarelle — ' ~ (w.title or 'Sans titre') ~ (' — ' ~ w.category if w.category),
                sizes='(max-width:700px) 92vw, (max-width:1100px) 46vw, 32vw', cls='work-img') }}

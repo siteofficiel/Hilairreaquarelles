@@ -5,7 +5,8 @@
 <div class="admin-page-head">
   <div>
     <h1>Bonjour Hilaire</h1>
-    <p class="admin-sub">Mettez la clé GitHub une fois, puis publiez les photos directement.</p>
+    <p class="admin-sub">Tout le site se gère d'ici — sans aucune compétence
+       technique. Suivez le guide ci-dessous, de haut en bas.</p>
   </div>
 </div>
 
@@ -87,6 +88,44 @@
          vérifiez l’étape&nbsp;4 et que le bon dépôt est sélectionné.</p>
     </details>
   </div>
+</div>
+
+<div class="guide-grid">
+  <a class="guide-card" href="{{ url_for('admin_works') }}">
+    <span class="guide-num">1</span>
+    <span class="guide-title">Mes œuvres</span>
+    <span class="guide-txt">Ajouter, modifier ou retirer les aquarelles de la galerie : photo, titre, année, sujet, ambiance.</span>
+  </a>
+  <a class="guide-card" href="{{ url_for('admin_news') }}">
+    <span class="guide-num">2</span>
+    <span class="guide-title">Événements &amp; expositions</span>
+    <span class="guide-txt">Annoncer une exposition passée ou à venir, avec date, heure et lieu.</span>
+  </a>
+  <a class="guide-card" href="{{ url_for('admin_atelier') }}">
+    <span class="guide-num">3</span>
+    <span class="guide-title">Photos — atelier &amp; sur le vif</span>
+    <span class="guide-txt">L'album photo de l'atelier et les aquarelles peintes sur le vif.</span>
+  </a>
+  <a class="guide-card" href="{{ url_for('admin_homepage') }}">
+    <span class="guide-num">4</span>
+    <span class="guide-title">Accueil — le carrousel</span>
+    <span class="guide-txt">Les cinq photos qui défilent sous le nom, sur la page d'accueil.</span>
+  </a>
+  <a class="guide-card" href="{{ url_for('admin_settings') }}">
+    <span class="guide-num">5</span>
+    <span class="guide-title">Tous les textes du site</span>
+    <span class="guide-txt">Le bandeau d'accueil, l'encadré « En un regard », les sous-titres, vos coordonnées et réseaux.</span>
+  </a>
+  <a class="guide-card" href="{{ url_for('admin_messages') }}">
+    <span class="guide-num">6</span>
+    <span class="guide-title">Messages reçus</span>
+    <span class="guide-txt">Les demandes envoyées depuis la page contact.</span>
+  </a>
+  <a class="guide-card" href="{{ url_for('admin_notifications') }}">
+    <span class="guide-num">7</span>
+    <span class="guide-title">Notifications</span>
+    <span class="guide-txt">Prévenir les visiteurs dans leur navigateur à chaque nouvelle aquarelle en ligne.</span>
+  </a>
 </div>
 
 <div class="stat-grid">

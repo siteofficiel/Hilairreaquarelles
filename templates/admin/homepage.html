@@ -1,0 +1,28 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Accueil — carrousel{% endblock %}
+
+{% block content %}
+<div class="admin-page-head">
+  <div>
+    <h1>Photos de l'accueil</h1>
+    <p class="admin-sub">Ces cinq photos défilent sur la page d'accueil, juste
+        sous le nom. Remplacez n'importe laquelle en quelques secondes.</p>
+  </div>
+</div>
+
+<div class="car-grid">
+  {% for n in range(1, 6) %}
+  <form method="post" enctype="multipart/form-data" class="car-slot">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="slot" value="{{ n }}">
+    <img src="{{ url_for('static', filename='img/carousel/c%d.webp' % n) }}?v={{ range(1, 100) | random }}" alt="Photo {{ n }} du carrousel">
+    <p class="car-num">Photo {{ n }}</p>
+    <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp" required>
+    <button class="btn-primary" type="submit">Remplacer</button>
+  </form>
+  {% endfor %}
+</div>
+<p class="admin-sub">Conseil : des photos au format paysage (plus larges que
+   hautes) rendent le mieux. La photo est recadrée automatiquement pour
+   s'harmoniser avec les autres.</p>
+{% endblock %}

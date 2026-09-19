@@ -1,15 +1,14 @@
 {% extends "base.html" %}
 {% from "_macros.html" import picture %}
 
-{% block title %}Contact — Hilaire Legentil, aquarelliste · Yvetot-Bocage{% endblock %}
-{% block desc %}Contactez Hilaire Legentil, artiste aquarelliste à Yvetot-Bocage en Normandie : information sur une œuvre, commande, demande spécifique ou exposition.{% endblock %}
+{% block title %}Contact — Hilaire Legentil, artiste auteur · Yvetot-Bocage{% endblock %}
+{% block desc %}Contact d’Hilaire Legentil, artiste auteur, Yvetot-Bocage (Manche). Exposition et vente, aquarelles sur commandes.{% endblock %}
 
 {% block content %}
 <header class="page-head">
   <div class="container reveal">
-    <p class="label">Contact</p>
-    <h1 class="page-title">Écrire à Hilaire</h1>
-    <p class="page-sub">Une réponse personnelle, sans engagement</p>
+    <h1 class="page-title">Contacts</h1>
+    <p class="page-sub">{{ S.get('contact_sub', 'Et nous aurons peut-être le plaisir d’échanger, c’est toujours un moment d’humanité privilégié.') }}</p>
   </div>
 </header>
 
@@ -79,12 +78,16 @@
         <button class="btn btn-full" type="submit">Envoyer le message</button>
         <p class="form-note">Les champs suivis d’un <span class="req">*</span> sont indispensables
           pour pouvoir vous répondre.</p>
+        <p class="form-note">Vos informations servent uniquement à répondre à votre demande&nbsp;;
+          elles sont destinées au seul artiste et supprimées au plus tard 12&nbsp;mois après
+          réception. Vous disposez de droits d’accès, de rectification et d’effacement —
+          voir la <a class="lnk" href="{{ url_for('privacy') }}">politique de confidentialité</a>.</p>
       </form>
     </div>
 
     <aside class="contact-aside reveal">
       <div class="contact-card">
-        <h2 class="h3">En direct</h2>
+        <h2 class="h3">Contacts</h2>
         <ul class="contact-list">
           {% if S.get('contact_phone') %}
           <li><span>Téléphone</span><a class="lnk" href="tel:{{ S.get('contact_phone')|replace(' ','') }}">{{ S.get('contact_phone') }}</a></li>
@@ -101,11 +104,7 @@
 
       <div class="contact-card" id="demande-specifique">
         <h2 class="h3">Demande spécifique</h2>
-        <p class="small">
-          Tableau sur demande, projet particulier, renseignement sur une œuvre,
-          exposition ou collaboration&nbsp;: décrivez simplement votre projet,
-          Hilaire vous répond personnellement.
-        </p>
+        <p class="small">Aquarelles sur commandes.</p>
         <p class="small"><a class="lnk" href="#f-category">Utilisez le formulaire en choisissant
           «&nbsp;Une demande spécifique&nbsp;»</a>.</p>
       </div>
@@ -118,13 +117,12 @@
     <div class="section-head reveal">
       <div>
         <p class="label">La région</p>
-        <h2 class="h2">Autour d’Yvetot-Bocage</h2>
+        <h2 class="h2">Pour un court séjour dans le Cotentin</h2>
       </div>
     </div>
     <p class="map-note reveal">
-      Hilaire travaille dans le Cotentin, à Yvetot-Bocage (Manche). La zone
-      entourée correspond à un rayon d’environ 75&nbsp;km — de la côte Ouest au
-      pays de Caux, au cœur de la Normandie maritime.
+      Yvetot-Bocage (Manche). La zone entourée correspond à un rayon d’environ
+      75&nbsp;km.
     </p>
     <div class="map-wrap reveal" id="map-wrap">
       <div id="map" hidden role="application" aria-label="Carte interactive : zone d’environ 75 kilomètres autour d’Yvetot-Bocage en Normandie"></div>

@@ -1,25 +1,46 @@
 {% extends "base.html" %}
-{% block title %}L’artiste — Hilaire Legentil, aquarelliste en Normandie{% endblock %}
-{% block desc %}Parcours et démarche d’Hilaire Legentil, artiste aquarelliste : la mer et le paysage, l’aquarelle sur papier 100 % coton, entre Yvetot-Bocage et les rivages de la Manche.{% endblock %}
+{% block title %}La démarche de l’artiste — Hilaire Legentil, artiste auteur{% endblock %}
+{% block ogimg %}static/img/portrait.jpg{% endblock %}
+{% block desc %}Parcours et démarche d’Hilaire Legentil, artiste auteur : l’aquarelle sur papier 100 % coton.{% endblock %}
 
 {% block content %}
 <header class="page-head">
   <div class="container reveal">
-    <p class="label">L’artiste</p>
+    <p class="label">La démarche de l’artiste</p>
     <h1 class="page-title">Hilaire Legentil</h1>
-    <p class="page-sub">Artiste aquarelliste · Aquarelles — mer &amp; paysage</p>
+    <p class="page-sub">Artiste auteur</p>
   </div>
 </header>
 
 <section class="section artist-intro">
   <div class="container two-col">
     <div class="artist-text reveal">
+      <p class="label">Quelques mots</p>
+      <h2 class="h2">Parcours</h2>
       <p class="lead">{{ S.get('artist_intro') }}</p>
       <p>
-        Sa signature tient en quelques mots imprimés sur sa carte&nbsp;:
-        <em>«&nbsp;Aquarelles — mer &amp; paysage&nbsp;»</em>. De la pointe de Barfleur
-        aux horizons bocagers du Cotentin, il peint ce qu’il regarde&nbsp;: la mer,
-        les ciels, la terre — des paysages apaisés, d’une tonalité douce.
+        Je dessine et je peins depuis mon plus jeune âge, mes parents n’étaient pas
+        artistes, ils tenaient une boutique de tissu sur les marchés. Ma maman, très
+        demandée par les clients pour ses conseils, sans le savoir, m’a finalement
+        éveillé à l’association des couleurs.
+      </p>
+      <p>
+        Ayant suivi un parcours technique, je n’ai pas fait d’école d’arts, puis,
+        à 25 ans j’ai pris quelques cours avec Kasuo Iwamura (Valognes).
+      </p>
+      <p>
+        Avec mon épouse, nous avons ensuite élevé nos enfants puis déménagé à Paris
+        pour le travail. Pendant ces 25 ans, j’ai rarement repris les pinceaux mais
+        j’ai continué à fréquenter les galeries d’arts et les musées.
+      </p>
+      <p>
+        Le confinement a eu raison de beaucoup de nos certitudes. À ce moment,
+        l’aquarelle s’est imposée à moi comme une nécessité. J’ai eu l’immense
+        privilège de rencontrer Alain Meyer, professeur expérimenté avec qui j’ai
+        commencé des cours en visio pendant le confinement&nbsp;! Pendant 2 ans, il a
+        été mon maître, il m’a transmis le bagage technique et la méthode que je
+        recherchais. L’aquarelle est très exigeante et ne s’improvise pas. La
+        technique est incontournable pour se libérer et s’exprimer.
       </p>
     </div>
     <aside class="artist-aside reveal">
@@ -29,12 +50,20 @@
              loading="lazy" decoding="async">
         <figcaption>Hilaire Legentil</figcaption>
       </figure>
+      {% if S.get('instagram') or S.get('facebook') %}
+      <p class="artist-socials">
+        Suivre l’artiste —
+        {% if S.get('instagram') %}<a href="https://www.instagram.com/{{ S.get('instagram') }}/" rel="me noopener" target="_blank">Instagram</a>{% endif %}
+        {% if S.get('facebook') %}<a href="{{ S.get('facebook') }}" rel="me noopener" target="_blank">Facebook</a>{% endif %}
+      </p>
+      {% endif %}
       <div class="fact-card">
         <h2 class="fact-title">En un regard</h2>
         <dl class="fact-list">
-          <div><dt>Art</dt><dd>Aquarelle</dd></div>
-          <div><dt>Sujets</dt><dd>Mer &amp; paysage</dd></div>
-          <div><dt>Support</dt><dd>Papier 100&nbsp;% coton</dd></div>
+          <div><dt>Art</dt><dd>{{ S.get('regard_art', 'Aquarelle') }}</dd></div>
+          <div><dt>Sujet</dt><dd>{{ S.get('regard_sujet', 'Mer & paysage') }}</dd></div>
+          <div><dt>Univers</dt><dd>{{ S.get('regard_univers', 'calme · onirique · puissance') }}</dd></div>
+          <div><dt>Support</dt><dd>{{ S.get('regard_support', 'Papier 100 % coton') }}</dd></div>
           <div><dt>Région</dt><dd>Normandie — Yvetot-Bocage (Manche)</dd></div>
         </dl>
       </div>
@@ -42,65 +71,173 @@
   </div>
 </section>
 
-<section class="section wash-band">
-  <div class="container narrow center reveal">
-    <blockquote class="big-quote">
-      Peindre, c’est voyager&nbsp;; peindre, c’est méditer.
-      J’ai choisi d’être paysagiste car la nature m’apaise et me recentre.
-      <cite>Hilaire Legentil</cite>
-    </blockquote>
+<section class="section tint-sky">
+  <div class="container narrow reveal">
+    <h2 class="h2">Traduire quelque chose de profond</h2>
+    <p>
+      L’«&nbsp;art figuratif&nbsp;» que je pratique n’est pas copier le sujet, ce qui a peu
+      d’intérêt en effet. J’essaie modestement de synthétiser, de trouver le chemin
+      qui fera voyager le regardant. L’abstrait ou le figuratif pour moi ne font pas
+      débat, l’essentiel étant de faire rêver.
+    </p>
+    <p>
+      Peindre, c’est voyager, peindre c’est aussi une façon de pouvoir méditer.
+      J’ai choisi d’être paysagiste marine car la mer, les ports, la côte et les
+      nuages m’apaisent et me recentrent. Onirique résumerait assez bien mon approche
+      de l’aquarelle. Derrière ces paysages, ces couleurs et ces formes en mouvement,
+      il y a une énergie, quelque chose de profond qui me bouleverse. Un ciel
+      ombrageux, une vague verte éclairée dans un soleil d’hiver, un vol planant de
+      Goéland engendrent une impression que j’aime explorer et faire grandir en moi.
+      C’est probablement cela que je tente de traduire et de partager.
+    </p>
   </div>
 </section>
 
 <section class="section">
-  <div class="container two-col">
-    <div class="artist-text reveal">
-      <p class="label">La démarche</p>
-      <h2 class="h2">Ce que l’eau<br>emporte, ce qu’elle laisse</h2>
-      <p>
-        C’est pendant les confinements que la passion de l’aquarelle s’est imposée.
-        Depuis, Hilaire Legentil peint régulièrement, sur papier 100&nbsp;% coton,
-        une matière qu’il aime pour la <em>tonalité douce</em> qu’elle apporte aux
-        couleurs.
-      </p>
-      <p>
-        Paysagiste, il cherche dans la nature ce qui l’apaise et le recentre&nbsp;:
-        la mer et ses marées, les rivages de la Manche, les lumières changeantes
-        du Cotentin. L’aquarelle, vive et sans repentir, convient à ces visions
-        fugitives&nbsp;: l’eau décide, l’artiste guide.
-      </p>
-      <p>
-        Selon la lumière et l’humeur du paysage, ses aquarelles assument deux
-        registres&nbsp;: des couleurs franches, parfois presque vives, puis
-        soudain des gammes ternes et douces, proches du papier. Ce va-et-vient
-        fait partie du propos — la <a class="lnk" href="{{ url_for('gallery') }}">galerie</a>
-        permet de suivre l’une ou l’autre tonalité.
-      </p>
+  <div class="container narrow reveal">
+    <h2 class="h2">La technique</h2>
+    <p>
+      Je compose mes aquarelles à partir de matériaux multiples&nbsp;: observation et
+      croquis sur le vif, photos formant un carnet de notes de couleurs et de formes.
+      Pour pouvoir exprimer ce qui m’a ému dans un paysage, j’adapte le sujet&nbsp;:
+      je supprime un élément, ajuste une ligne d’horizon, complète un élément
+      important au premier plan…
+    </p>
+    <p>
+      Mes aquarelles sont sur papier 100&nbsp;% coton, cette matière apporte une tonalité
+      douce à la couleur et permet des superpositions qui n’altèrent pas les lavis.
+    </p>
+    <p>
+      Ma couleur de prédilection est le bleu&nbsp;: en particulier l’Outremer qui apporte
+      une granulation si belle sur le papier. Pour la mer, j’associe des bleus tirant
+      sur le vert (Bleu Winsor, Bleu de prusse) que je mélange en quantité variable à
+      des terres ou à des verts (vert d’eau). Ces couleurs forment la trame de mes
+      compositions.
+    </p>
+    <p>
+      J’utilise assez régulièrement le Marron de Pérylène (plus transparent que le
+      rouge indien et tirant sur le gris). Associé au bleu d’Indanthrène, il forme de
+      magnifiques violets pour les nuages sombres.
+    </p>
+    <p>
+      Les gris enfin, le gris chaud pour le sable humide et le gris froid très utile
+      pour contrôler la profondeur du paysage.
+    </p>
+  </div>
+</section>
+
+<section class="section tint-sand">
+  <div class="container narrow reveal">
+    <h2 class="h2">L’expo</h2>
+    <p>
+      J’espère que cette nouvelle saison d’exposition vous inspirera, vous permettra
+      d’accéder à l’univers sensible du paysage et de l’aquarelle. Et nous aurons
+      peut-être le plaisir d’échanger, c’est toujours un moment d’humanité privilégié.
+    </p>
+    <p>
+      Pour un court séjour dans le Cotentin, ou habitant cette région, je souhaite
+      aussi de tout cœur que cette exposition vous donne envie — quel que soit
+      votre parcours, de peindre, d’utiliser vos mains ou votre corps pour exprimer
+      ce qui vibre en vous (peinture, sculpture, chant, danse, méditation…).
+    </p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow reveal">
+    <h2 class="h2">L’art comme thérapie.</h2>
+    <p>
+      Plusieurs études ont démontré que le fait d’être exposé à l’art présentait des
+      vertus pour la santé mentale&nbsp;! Une étude londonienne parle même de baisse de
+      mortalité, une autre du Japon met en avant la réduction de l’anxiété et de la
+      pression artérielle. L’OMS a enfin validé l’effet thérapeutique de l’art sur le
+      cerveau et le bien-être. On parle aujourd’hui de «&nbsp;muséothérapie&nbsp;», et de
+      prendre soin de soi par la culture.
+    </p>
+    <p>
+      Je suis parfois surpris de constater nombre de personnes sans formation, sans
+      aptitude apparente, sans parcours dans les arts, se révèlent pleines de
+      ressources et de talent dans la pratique artistique.
+    </p>
+    <p class="lead center">À vos pinceaux</p>
+  </div>
+</section>
+
+<section class="section tint-sage">
+  <div class="container reveal">
+    <h2 class="h2">La société&nbsp;: Marine Normandie aquarelle</h2>
+    <div class="rel-grid">
+      <div class="rel-card reveal"><h3 class="h3">Exposition et vente</h3></div>
+      <div class="rel-card reveal"><h3 class="h3">Aquarelles sur commandes</h3></div>
     </div>
-    <div class="artist-text reveal">
-      <p class="label">La matière</p>
-      <h2 class="h2">Le papier,<br>l’eau, la couleur</h2>
-      <p>
-        Chaque aquarelle est réalisée sur un papier 100&nbsp;% coton, choisi pour
-        sa douceur et sa longévité. Le coton absorbe l’eau lentement&nbsp;: les
-        couleurs se posent en transparences successives, les ciels gardent la
-        trace du geste.
-      </p>
-      <p>
-        Les œuvres présentées sur ce site sont des aquarelles originales.
-        Pour toute information sur une pièce, sa disponibilité ou un projet,
-        <a class="lnk" href="{{ url_for('contact') }}">écrivez à Hilaire</a>.
-      </p>
+    <div class="fact-card">
+      <dl class="fact-list">
+        <div><dt>Non commercial</dt><dd>Marine Normandie Aquarelle</dd></div>
+        <div><dt>SIRET</dt><dd>927753780 00018</dd></div>
+        <div><dt>Activité</dt><dd>création artistique relevant des arts plastiques, artiste auteur</dd></div>
+        <div><dt>Adresse</dt><dd>50700 YVETOT-BOCAGE</dd></div>
+        <div><dt>Création</dt><dd>01/04/2024</dd></div>
+        {% if S.get('instagram') %}
+        <div><dt>Instagram</dt><dd><a href="https://www.instagram.com/{{ S.get('instagram') }}/" rel="me noopener" target="_blank">Instagram</a></dd></div>
+        {% endif %}
+      </dl>
     </div>
   </div>
 </section>
 
-<section class="section section-expos tint-sage">
+<section class="section wash-band">
+  <div class="container narrow center reveal">
+    <h2 class="h2">Carnet d’inspiration</h2>
+    <blockquote class="big-quote">
+      …Sons et paysages côtiers nous transportent et nous bercent depuis l’enfance.
+      Loin du tumulte du monde, nous sommes aptes à aimer et chérir ceux qui nous
+      sont les plus chers…
+    </blockquote>
+    <blockquote class="big-quote">
+      La nature, le paysage détiennent cette faculté de pouvoir nous apaiser,
+      nous recentrer…
+    </blockquote>
+    <blockquote class="big-quote">
+      S’inquiéter n’effacera pas les problèmes de demain, cela ne fera qu’enlever
+      la paix d’aujourd’hui…
+      <cite><a href="https://www.atmosphere-citation.com/author/atmo" target="_blank" rel="noopener">atmosphere-citation.com</a></cite>
+    </blockquote>
+    <div class="poem-card">
+      <p>…Alors dans ma mémoire, je cherche les moments où je suis là…</p>
+      <span class="poem-gap" aria-hidden="true"></span>
+      <p>…Cri des goélands…<br>
+        Ressac de la mer — bruit sourd — sur le sable…<br>
+        “Piû” des gravelots…<br>
+        Marée basse… [pause]…marée basse…</p>
+      <span class="poem-gap" aria-hidden="true"></span>
+      <p>Parfums d’herbes de dunes…<br>
+        Cri d’enfants au loin, jouant sur la plage…<br>
+        Pieds nus dans le sable…<br>
+        Survol d’oies<br>
+        grève froide…</p>
+      <span class="poem-gap" aria-hidden="true"></span>
+      <p>Ânes au silence du champ…<br>
+        Peupliers, vent des arbres…<br>
+        Cimes immobiles…</p>
+      <span class="poem-gap" aria-hidden="true"></span>
+      <p>Odeurs du quai…<br>
+        Portes à flots…<br>
+        Terrasse à la mer…<br>
+        Terrasse tête à tête…</p>
+      <span class="poem-gap" aria-hidden="true"></span>
+      <p>Nuages, lointain…<br>
+        Percer le mystère, aller plus loin…<br>
+        S’y baigner, le rejoindre…&nbsp;»</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section-expos">
   <div class="container">
     <div class="section-head reveal">
       <div>
-        <p class="label">Expositions</p>
-        <h2 class="h2">Rencontrer les aquarelles</h2>
+        <p class="label">Événements</p>
+        <h2 class="h2">Expositions</h2>
       </div>
       <a class="link-arrow" href="{{ url_for('news_list') }}">Toutes les actualités</a>
     </div>
@@ -126,8 +263,8 @@
 
 <section class="section contact-invitation">
   <div class="container narrow center reveal">
-    <h2 class="h2">Un projet, une demande particulière&nbsp;?</h2>
-    <p class="lead">Hilaire étudie toute demande&nbsp;: aquarelle sur commande, projet, exposition.</p>
+    <h2 class="h2">Exposition et vente</h2>
+    <p class="lead">Aquarelles sur commandes.</p>
     <p class="invitation-cta">
       <a class="btn" href="{{ url_for('contact') }}">Contacter l’artiste</a>
     </p>

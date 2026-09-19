@@ -1,10 +1,10 @@
 {% extends "admin/base_admin.html" %}
-{% block title %}{{ 'Écrire une actualité' if new else 'Modifier l’actualité' }}{% endblock %}
+{% block title %}{{ 'Ajouter un événement' if new else 'Modifier l’événement' }}{% endblock %}
 
 {% block content %}
 <div class="admin-page-head">
   <div>
-    <h1>{{ 'Écrire une actualité' if new else 'Modifier l’actualité' }}</h1>
+    <h1>{{ 'Ajouter un événement' if new else 'Modifier l’événement' }}</h1>
     <p class="admin-sub">Le titre et le texte suffisent. Vous pourrez toujours
         compléter ou corriger plus tard.</p>
   </div>
@@ -27,6 +27,16 @@
              value="{{ n.event_date or '' }}" placeholder="2025-07-21">
     </div>
     <div class="field">
+      <label for="n-time">Heure <span class="opt">(facultatif — ex. 14 h 30 – 18 h)</span></label>
+      <input id="n-time" name="event_time" type="text" maxlength="40"
+             value="{{ n.event_time or '' }}" placeholder="14 h 30 – 18 h">
+    </div>
+    <div class="field">
+      <label for="n-place">Lieu <span class="opt">(facultatif)</span></label>
+      <input id="n-place" name="place" type="text" maxlength="200"
+             value="{{ n.place or '' }}" placeholder="Salle polyvalente, Barfleur">
+    </div>
+    <div class="field">
       <label for="n-link">Lien externe <span class="opt">(facultatif)</span></label>
       <input id="n-link" name="link" type="url" maxlength="300"
              value="{{ n.link or '' }}" placeholder="https://…">
@@ -34,7 +44,7 @@
   </div>
 
   <div class="field">
-    <label for="n-body">Texte de l’actualité</label>
+    <label for="n-body">Texte de l’événement</label>
     <textarea id="n-body" name="body" rows="9" maxlength="20000"
               placeholder="Décrivez l’événement : lieu, dates, horaires, partenaires…">{{ n.body or '' }}</textarea>
     <p class="field-help">Laissez une ligne vide entre les paragraphes.</p>
@@ -64,7 +74,7 @@
     <div class="gallery-manage">
       {% for img in images %}
       <figure class="gm-item">
-        <img src="/uploads/news/{{ img.image }}/small.jpg" alt="Image de l’actualité">
+        <img src="/uploads/news/{{ img.image }}/small.jpg" alt="Image de l’événement">
         <button class="btn-tiny btn-danger" type="submit" name="delete_image"
                 value="{{ img.id }}">Retirer</button>
       </figure>
@@ -81,7 +91,7 @@
   </label>
 
   <div class="form-actions">
-    <button class="btn-primary" type="submit">{{ 'Publier l’actualité' if new else 'Enregistrer les modifications' }}</button>
+    <button class="btn-primary" type="submit">{{ 'Publier l’événement' if new else 'Enregistrer les modifications' }}</button>
     <a class="btn-secondary" href="{{ url_for('admin_news') }}">Annuler</a>
   </div>
 </form>

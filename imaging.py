@@ -170,7 +170,7 @@ def chroma_of_image(path):
 
 
 def compute_tonality(variant_dir):
-    """('Colorée'|'Terne', vivacité) mesurés sur les dérivés d'une œuvre."""
+    """('Contraste coloré'|'Doux', vivacité) mesurés sur les dérivés d'une œuvre."""
     for name in ("medium.webp", "medium.jpg", "xlarge.webp"):
         p = os.path.join(variant_dir, name)
         if os.path.exists(p):
@@ -178,5 +178,5 @@ def compute_tonality(variant_dir):
                 c = chroma_of_image(p)
             except Exception:
                 return "", 0.0
-            return ("Colorée" if c >= TONALITY_THRESHOLD else "Terne"), round(c, 1)
+            return ("Contraste coloré" if c >= TONALITY_THRESHOLD else "Doux"), round(c, 1)
     return "", 0.0

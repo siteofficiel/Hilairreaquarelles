@@ -2,12 +2,13 @@
 {% from "_macros.html" import picture %}
 
 {% block title %}{{ n.title }} — actualité d’Hilaire Legentil{% endblock %}
-{% block desc %}{{ n.title }}{% if n.event_date %} — {{ n.event_date|date_fr }}{% endif %}. Actualité et expositions d’Hilaire Legentil, artiste aquarelliste.{% endblock %}
+{% block ogimg %}uploads/news/{{ n.cover }}/medium.webp{% endblock %}
+{% block desc %}{{ n.title }}{% if n.event_date %} — {{ n.event_date|date_fr }}{% endif %}. Actualité et expositions d’Hilaire Legentil, artiste auteur.{% endblock %}
 
 {% block content %}
 <header class="page-head">
   <div class="container reveal">
-    <p class="label">{% if n.event_date %}{{ n.event_date|date_fr }}{% else %}Actualité{% endif %}</p>
+    <p class="label">{% if n.event_date %}{{ n.event_date|date_fr }}{% if n.event_time %} — {{ n.event_time }}{% endif %}{% if n.place %} — {{ n.place }}{% endif %}{% else %}Événement{% endif %}</p>
     <h1 class="page-title">{{ n.title }}</h1>
   </div>
 </header>

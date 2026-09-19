@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}Hilaire Legentil — Artiste aquarelliste · Aquarelles mer &amp; paysage{% endblock %}</title>
-<meta name="description" content="{% block desc %}Hilaire Legentil, artiste aquarelliste à Yvetot-Bocage en Normandie. Aquarelles de mer et de paysage, peintes sur papier 100 % coton.{% endblock %}">
+<title>{% block title %}Hilaire Legentil — Artiste auteur · Aquarelles — mer &amp; paysage{% endblock %}</title>
+<meta name="description" content="{% block desc %}Hilaire LEGENTIL, artiste auteur. Aquarelles — mer &amp; paysage, sur papier 100 % coton.{% endblock %}">
 {% if SITE.domain %}<link rel="canonical" href="{{ SITE.domain }}{{ request.path }}">{% endif %}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Hilaire Legentil — Aquarelles">
@@ -17,9 +17,11 @@
 <link rel="stylesheet" href="/static/css/main.css">
 {% block head %}{% endblock %}
 {% if SITE.domain %}<meta property="og:url" content="{{ SITE.domain }}{{ request.path }}">{% endif %}
+<meta property="og:image" content="{{ request.host_url }}{% block ogimg %}static/img/favicon.svg{% endblock %}">
 </head>
 <body class="pg-{{ request.endpoint or 'home' }}">
 <a class="skip-link" href="#contenu">Aller au contenu</a>
+<div id="hl-wdata" data-works="{{ hl_slugs }}" data-total="{{ hl_total }}" data-galerie="{{ url_for('gallery') }}" data-ga="{{ S.get('ga_id', '') }}" hidden></div>
 
 <header class="site-header" id="site-header">
   <div class="header-inner">
@@ -30,11 +32,11 @@
     <nav class="site-nav" id="site-nav" aria-label="Navigation principale">
       <ul>
         <li><a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>Accueil</a></li>
-        <li><a href="{{ url_for('artist') }}" {% if request.endpoint == 'artist' %}aria-current="page"{% endif %}>L’artiste</a></li>
+        <li><a href="{{ url_for('artist') }}" {% if request.endpoint == 'artist' %}aria-current="page"{% endif %}>La démarche de l’artiste</a></li>
         <li><a href="{{ url_for('atelier') }}" {% if request.endpoint == 'atelier' %}aria-current="page"{% endif %}>L’atelier</a></li>
-        <li><a href="{{ url_for('gallery') }}" {% if request.endpoint in ('gallery','work') %}aria-current="page"{% endif %}>Aquarelles</a></li>
-        <li><a href="{{ url_for('news_list') }}" {% if request.endpoint in ('news_list','news_item') %}aria-current="page"{% endif %}>Actualités</a></li>
-        <li><a href="{{ url_for('contact') }}" {% if request.endpoint == 'contact' %}aria-current="page"{% endif %}>Contact</a></li>
+        <li><a href="{{ url_for('gallery') }}" {% if request.endpoint in ('gallery','work') %}aria-current="page"{% endif %}>Galerie</a></li>
+        <li><a href="{{ url_for('news_list') }}" {% if request.endpoint in ('news_list','news_item') %}aria-current="page"{% endif %}>Événements</a></li>
+        <li><a href="{{ url_for('contact') }}" {% if request.endpoint == 'contact' %}aria-current="page"{% endif %}>Contacts</a></li>
       </ul>
       <a class="nav-close" href="#site-header" aria-label="Fermer le menu">✕</a>
     </nav>
@@ -53,25 +55,35 @@
   <div class="footer-inner">
     <div class="footer-col footer-id">
       <p class="brand-name">Hilaire&nbsp;Legentil</p>
-      <p class="footer-baseline">Artiste aquarelliste<br>Aquarelles — mer &amp; paysage</p>
+      <p class="footer-baseline">{{ S.get('footer_job', 'Artiste auteur') }}<br>{{ S.get('footer_tag', 'Aquarelles — mer & paysage') }}</p>
       <p class="footer-loc">Yvetot-Bocage · Normandie</p>
+      {% if vapid_pub %}
+      <div class="hl-bell-wrap" id="hl-bell-wrap" hidden>
+        <button type="button" class="hl-bell-btn" id="hl-bell" data-vapid="{{ vapid_pub }}">
+          <svg width="15" height="16" viewBox="0 0 15 16" aria-hidden="true"><path d="M7.5 1.5c-2.3 0-4 1.7-4 3.8v2.4l-1.3 2.6c-.2.5.1 1 .7 1h9.2c.6 0 .9-.5.7-1L11.5 7.7V5.3c0-2.1-1.7-3.8-4-3.8z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 12.8a1.6 1.6 0 0 0 3 0" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          <span class="hl-bell-txt">M'alerter des nouvelles aquarelles</span>
+        </button>
+        <p class="hl-bell-state" id="hl-bell-state" role="status"></p>
+      </div>
+      {% endif %}
     </div>
     <div class="footer-col">
-      <h2 class="footer-title">Contact</h2>
+      <h2 class="footer-title">Contacts</h2>
       <ul class="footer-list">
         {% if S.get('contact_phone') %}<li><a href="tel:{{ S.get('contact_phone','')|replace(' ','') }}">{{ S.get('contact_phone') }}</a></li>{% endif %}
         {% if S.get('contact_email') %}<li><a href="mailto:{{ S.get('contact_email') }}">{{ S.get('contact_email') }}</a></li>{% endif %}
         {% if S.get('instagram') %}<li><a href="https://www.instagram.com/{{ S.get('instagram') }}/" rel="me noopener" target="_blank">Instagram — {{ S.get('instagram') }}</a></li>{% endif %}
+        {% if S.get('facebook') %}<li><a href="{{ S.get('facebook') }}" rel="me noopener" target="_blank">Facebook</a></li>{% endif %}
         <li><a href="{{ url_for('contact') }}">Formulaire de contact</a></li>
       </ul>
     </div>
     <div class="footer-col">
       <h2 class="footer-title">Le site</h2>
       <ul class="footer-list">
-        <li><a href="{{ url_for('artist') }}">L’artiste</a></li>
+        <li><a href="{{ url_for('artist') }}">La démarche de l’artiste</a></li>
         <li><a href="{{ url_for('atelier') }}">L’atelier</a></li>
-        <li><a href="{{ url_for('gallery') }}">Les aquarelles</a></li>
-        <li><a href="{{ url_for('news_list') }}">Actualités &amp; expositions</a></li>
+        <li><a href="{{ url_for('gallery') }}">La galerie</a></li>
+        <li><a href="{{ url_for('news_list') }}">Événements &amp; expositions</a></li>
         <li><a href="{{ url_for('specific_request') }}">Demande spécifique</a></li>
         <li><a href="{{ url_for('admin_login') }}" rel="nofollow">✎ Espace administrateur</a></li>
       </ul>
@@ -98,7 +110,7 @@
 <aside class="cookie-bar" id="cookie-bar" role="region" aria-label="Gestion des cookies">
   <div class="cookie-inner">
     <p class="cookie-txt">Ce site ne dépose qu’un cookie <strong>technique</strong>, nécessaire à son fonctionnement.
-       La carte de la page Contact (tuiles OpenStreetMap) ne se charge qu’avec votre accord.
+       La carte de la page Contact (tuiles OpenStreetMap) ne se charge qu’avec votre accord{% if S.get('ga_id') %}, de même que la mesure d’audience anonymisée{% endif %}.
        <a class="lnk" href="{{ url_for('privacy') }}#cookies">En savoir plus</a></p>
     <p class="cookie-actions">
       <button class="btn" id="ck-accept" type="button">Accepter</button>

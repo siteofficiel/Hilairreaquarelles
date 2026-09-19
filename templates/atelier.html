@@ -1,26 +1,191 @@
 {% extends "base.html" %}
-{% block title %}L’atelier — Hilaire Legentil, aquarelliste{% endblock %}
-{% block desc %}L’atelier d’Hilaire Legentil : la palette de couleurs où naissent ses aquarelles, entre papier 100 % coton et pigments.{% endblock %}
+{% block title %}L’atelier — Hilaire Legentil, artiste auteur{% endblock %}
+{% block desc %}Cahier technique — les étapes d’une aquarelle, des aquarelles montées sur châssis, fabrication des cadres.{% endblock %}
 
 {% block content %}
 <header class="page-head">
   <div class="container reveal">
     <p class="label">L’atelier</p>
-    <h1 class="page-title">Dans l’atelier</h1>
-    <p class="page-sub">Le lieu où naissent les aquarelles</p>
+    <h1 class="page-title">Cahier technique</h1>
+    <p class="page-sub">{{ S.get('atelier_sub', 'Les étapes d’une aquarelle · Des aquarelles montées sur châssis · Fabrication des cadres') }}</p>
   </div>
 </header>
+
+<section class="section tint-sky">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">Cahier technique</p>
+        <h2 class="h2">Les étapes d’une aquarelle</h2>
+      </div>
+    </div>
+    <p class="lead reveal">L’aquarelle est très exigeante et ne s’improvise pas.
+      La technique est un prérequis indispensable pour libérer le geste et s’exprimer.</p>
+
+    <h3 class="h3 reveal">Avant de commencer</h3>
+    <div class="rel-grid">
+      <div class="tech-card reveal">
+        <h4>Composition / dessin&nbsp;:</h4>
+        <ul class="tech-list">
+          <li>Point de focal fixé avant de peindre</li>
+          <li>2 narrations, 2 niveaux de lecture&nbsp;: 1 paysage et 2 les personnages</li>
+          <li>Dynamique de la composition</li>
+          <li>Choisir un format</li>
+          <li>Déplacer le cadre sur le sujet</li>
+          <li>Respecter le dessin (proportions, horizontales, verticales et point de fuite)</li>
+        </ul>
+      </div>
+      <div class="tech-card reveal">
+        <h4>Couleurs&nbsp;:</h4>
+        <ul class="tech-list">
+          <li>Contraste couleurs chaudes et froides</li>
+          <li>Harmonie colorée</li>
+          <li>Le choix des couleurs doit traduire l’émotion éprouvée face au sujet</li>
+          <li>Préparer les couleurs avant de peindre (faire de la place sur sa palette)</li>
+          <li>Pigments (granuleux, lisses, crémeux..)</li>
+        </ul>
+      </div>
+      <div class="tech-card reveal">
+        <h4>Valeurs&nbsp;:</h4>
+        <ul class="tech-list">
+          <li>Contraste des valeur équilibré</li>
+          <li>Réserver blancs</li>
+          <li>Zones laissées claires</li>
+          <li>Drawing gum</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="h3 reveal" style="margin-top:2.4rem">Durant l’exécution</h3>
+    <div class="rel-grid">
+      <div class="tech-card reveal">
+        <h4>Lavis&nbsp;:</h4>
+        <ul class="tech-list">
+          <li>Liaison des premiers lavis</li>
+          <li>Pureté des lavis durant l’exécution</li>
+          <li>Laisser les imperfections, jouer avec, les utiliser a bon escient</li>
+          <li>Éclaircir les lavis pour la profondeur (plus légers et plus bleus pour les lointains)</li>
+        </ul>
+      </div>
+      <div class="tech-card reveal">
+        <h4>Différentes techniques de pinceaux.</h4>
+        <p style="font-size:.93rem;color:var(--muted);margin:0 0 .8rem">
+          Varier les techniques et les effets dynamise la composition et contribue
+          à la qualité visuelle&nbsp;:</p>
+        <ul class="chip-list">
+          <li class="chip">Gros Pinceau lavis petit gris</li>
+          <li class="chip">Pinceau synthétique détail</li>
+          <li class="chip">Humide sur humide</li>
+          <li class="chip">Humide sur sec</li>
+          <li class="chip">Moucheté</li>
+          <li class="chip">Pinceau sec</li>
+          <li class="chip">Rouler le pinceaux</li>
+          <li class="chip">Pinceau écrasé en touches verticales</li>
+          <li class="chip">Filé Pinceau fin</li>
+          <li class="chip">Pinceau éventail</li>
+          <li class="chip">Retraits</li>
+          <li class="chip">Incliner la toile pour déplacer les pigments</li>
+          <li class="chip">Coulures</li>
+          <li class="chip">Auréoles</li>
+          <li class="chip">Vaporisateur</li>
+        </ul>
+      </div>
+      <div class="tech-card reveal">
+        <h4>Ajuster&nbsp;:</h4>
+        <ul class="tech-list">
+          <li>Vérifier la carte des formes de près et de loin (ajuster la peinture)</li>
+          <li>Placer les détails à la fin en fonction du chemin visuel</li>
+          <li>Glacis pour rehausser le contraste chaud / froid</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow reveal">
+    <p class="label">Cahier technique</p>
+    <h2 class="h2">Des aquarelles montées sur châssis</h2>
+    <p>
+      Traditionnellement, les aquarelles sont protégées par un sous verre et un cadre.
+    </p>
+    <p>
+      Certaines aquarelles au sein de cette exposition ont été réalisées différemment&nbsp;:
+      le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat.
+      Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté
+      des couleurs.
+    </p>
+    <h3 class="h3">Montage du papier&nbsp;:</h3>
+    <p>
+      Après plusieurs minutes dans l’eau, le papier est agrafé sur le châssis.
+      En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant
+      l’exécution de l’aquarelle.
+    </p>
+    <p>
+      Le papier sur châssis est aussi un choix de l’artiste&nbsp;: un papier coton frangé
+      monté sur du bois confère à l’aquarelle une qualité esthétique d’"objet artisanal".
+    </p>
+  </div>
+</section>
+
+<section class="section tint-sand">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">Des aquarelles "locales"&nbsp;!</p>
+        <h2 class="h2">Fabrication des cadres</h2>
+      </div>
+    </div>
+    <p class="lead reveal">
+      Les châssis en bois sont confectionnés dans la Manche par le peintre avec du bois
+      issus de forêts (européennes) durables.
+    </p>
+    <div class="fact-card reveal" style="max-width:44em">
+      <ul class="tech-list">
+        <li>La peinture utilisée est fabriquée en France.</li>
+        <li>Le papier 100&nbsp;% coton est fabriqué en Italie</li>
+        <li>Le fixatif pour aquarelle est fabriqué en Allemagne et le vernis final est
+            fabriqué en Italie.</li>
+      </ul>
+    </div>
+    <div class="step-grid">
+      <div class="step-card reveal"><p class="step-num">01</p>
+        <p>À l’aide de baguettes «&nbsp;quart de rond&nbsp;», d’une boîte à onglets, d’une scie
+           et de colle à bois, je réalise un cadre bois.</p></div>
+      <div class="step-card reveal"><p class="step-num">02</p>
+        <p>La feuille de papier en coton découpée à la dimension, est trempée dans
+           l’eau pendant 4 minutes.</p></div>
+      <div class="step-card reveal"><p class="step-num">03</p>
+        <p>Excédent d’eau de la feuille enlevé en l’accrochant 10 minutes sur un
+           fil à linge.</p></div>
+      <div class="step-card reveal"><p class="step-num">04</p>
+        <p>Feuille positionnée, tendue puis agrafée sur le cadre.</p></div>
+      <div class="step-card reveal"><p class="step-num">05</p>
+        <p>Après séchage 1 heure. Le papier sec est tendu sur le châssis.
+           L’aquarelle réalisée, un premier spray pour fixer les pigments suivi d’un
+           vernis mat protègent l’aquarelle de l’humidité.</p></div>
+      <div class="step-card reveal"><p class="step-num">06</p>
+        <p>Le cadre peint et verni pour être encadré.</p></div>
+    </div>
+    <p class="tech-note reveal">
+      Attention cette protection préserve l’œuvre de quelques gouttes d’eau voire de
+      postillons&nbsp;! Le papier restera vulnérable aux coups et au détrempage.
+    </p>
+    <blockquote class="big-quote reveal" style="margin-top:2.6rem">
+      L’aquarelle est un fabuleux moyen d’évasion.
+      Alors, à vos outils&nbsp;! À vos pinceaux&nbsp;!
+    </blockquote>
+  </div>
+</section>
 
 <section class="section">
   <div class="container">
     <div class="section-head reveal">
       <div>
-        <p class="label">L’atelier</p>
-        <h2 class="h2">L’atelier en photos</h2>
+        <h2 class="h2">L’atelier</h2>
       </div>
     </div>
-    <p class="atelier-note reveal">L’atelier d’Hilaire en photos — la palette et le lieu où
-      naissent les aquarelles. Cliquez pour agrandir.</p>
+    <p class="atelier-note reveal">Cliquez pour agrandir.</p>
     <div class="atelier-grid{% if photos|length == 1 %} atelier-one{% endif %}"
          id="atelier-grid" data-cap="L’atelier">
       {%- for p in photos %}
@@ -41,8 +206,8 @@
 
 <section class="section wash-band">
   <div class="container narrow center reveal">
-    <h2 class="h2">Envie de voir le résultat&nbsp;?</h2>
-    <p class="lead">Les aquarelles nées de cette palette — et quelques-unes peintes sur le vif.</p>
+    <h2 class="h2">Exposition et vente</h2>
+    <p class="lead">Aquarelles sur commandes.</p>
     <p class="invitation-cta">
       <a class="btn" href="{{ url_for('gallery') }}">Découvrir les aquarelles</a>
     </p>

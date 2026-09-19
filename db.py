@@ -71,6 +71,14 @@ CREATE TABLE IF NOT EXISTS messages (
     body TEXT NOT NULL,
     ip TEXT DEFAULT ''
 );
+
+CREATE TABLE IF NOT EXISTS push_subs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    endpoint TEXT UNIQUE NOT NULL,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))
+);
 """
 
 

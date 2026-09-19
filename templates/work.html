@@ -2,7 +2,8 @@
 {% from "_macros.html" import picture %}
 
 {% block title %}{{ w.title }} — aquarelle d’Hilaire Legentil{% endblock %}
-{% block desc %}« {{ w.title }} », aquarelle originale d’Hilaire Legentil{{ (' — ' ~ w.category) if w.category }}{{ (' — ' ~ w.year) if w.year }}. Mer & paysage, papier 100 % coton.{% endblock %}
+{% block ogimg %}uploads/works/{{ w.folder }}/medium.webp{% endblock %}
+{% block desc %}« {{ w.title }} », aquarelle d’Hilaire Legentil sur papier 100 % coton{{ (' — ' ~ w.year) if w.year }}.{% endblock %}
 
 {% block head %}
 <script type="application/ld+json">
@@ -12,7 +13,7 @@
   "name": {{ w.title|tojson }},
   "artform": "Aquarelle",
   "artMedium": "Aquarelle sur papier 100 % coton",
-  "creator": {"@type": "Person", "name": "Hilaire Legentil", "jobTitle": "Artiste aquarelliste"}
+  "creator": {"@type": "Person", "name": "Hilaire Legentil", "jobTitle": "Artiste auteur"}
   {% if w.year %},"dateCreated": {{ w.year|tojson }}{% endif %}
 }
 </script>
@@ -23,15 +24,27 @@
   <div class="container reveal">
     <p class="label">Aquarelle</p>
     <h1 class="page-title">{{ w.title }}</h1>
-    <p class="page-sub">{{ w.category ~ ' · ' ~ w.year if w.category and w.year else (w.category or w.year or 'Aquarelle originale') }}</p>
+    <p class="page-sub">{{ w.category ~ ' · ' ~ w.year if w.category and w.year else (w.category or w.year or 'Aquarelle') }}</p>
   </div>
 </header>
 
 <section class="section work-section">
   <div class="container work-layout">
-    <figure class="work-figure reveal">
-      {{ picture('works', w.folder, 'Aquarelle « ' ~ w.title ~ ' » d’Hilaire Legentil',
-                 sizes='(max-width:1000px) 92vw, 980px', cls='work-full-img', loading='eager') }}
+    <figure class="work-figure reveal wk-carousel" id="wk-carousel" tabindex="0" role="group" aria-roledescription="carrousel" aria-label="Images de l’œuvre — flèches pour naviguer, cliquer pour agrandir">
+      <div class="wk-track" id="wk-track">
+        {{ picture('works', w.folder, 'Aquarelle « ' ~ w.title ~ ' » d’Hilaire Legentil',
+                   sizes='(max-width:1000px) 92vw, 980px', cls='wk-img', loading='eager') }}
+        {%- for im in imgs %}
+        {{ picture('works', im.image, 'Aquarelle (vue complémentaire) — ' ~ w.title,
+                   sizes='(max-width:1000px) 92vw, 980px', cls='wk-img') }}
+        {%- endfor %}
+      </div>
+      <button class="wk-zoom" type="button" aria-label="Agrandir l’image">⤢</button>
+      {% if imgs %}
+      <button class="wk-btn wk-prev" type="button" aria-label="Image précédente">‹</button>
+      <button class="wk-btn wk-next" type="button" aria-label="Image suivante">›</button>
+      <span class="wk-dots" id="wk-dots"></span>
+      {% endif %}
       {% if w.img_w and w.img_h %}
       <figcaption class="work-tech">Aquarelle sur papier 100&nbsp;% coton{% if w.dimensions %} — {{ w.dimensions }}{% endif %}</figcaption>
       {% endif %}
@@ -43,6 +56,8 @@
         {% if w.tonality %}<div><dt>Tonalité</dt><dd>{{ w.tonality }}</dd></div>{% endif %}
         {% if w.technique %}<div><dt>Technique</dt><dd>{{ w.technique }}</dd></div>{% endif %}
         {% if w.dimensions %}<div><dt>Format</dt><dd>{{ w.dimensions }}</dd></div>{% endif %}
+        {% if w.sujet %}<div><dt>Sujet</dt><dd>{{ w.sujet }}</dd></div>{% endif %}
+        {% if w.ambiance %}<div><dt>Ambiance</dt><dd>{{ w.ambiance }}</dd></div>{% endif %}
         {% if w.year %}<div><dt>Année</dt><dd>{{ w.year }}</dd></div>{% endif %}
       </dl>
 
@@ -78,7 +93,7 @@
 <section class="section next-teaser reveal">
   <div class="container teaser-inner">
     <div>
-      <p class="label">À voir ensuite</p>
+      <p class="label">Œuvre suivante</p>
       <h2 class="h3">{{ next.title }}</h2>
       <a class="link-arrow" href="{{ url_for('work', slug=next.slug) }}">Voir l’œuvre suivante</a>
     </div>

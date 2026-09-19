@@ -5,30 +5,33 @@
 <div class="admin-page-head">
   <div>
     <h1>Réglages du site</h1>
-    <p class="admin-sub">Ces informations apparaissent sur les pages du site.
-        Modifiez-les ici, sans toucher au code.</p>
+    <p class="admin-sub">Tous les textes du site se modifient ici — aucune
+        connaissance technique n'est nécessaire. Enregistrez, le site est à jour
+        immédiatement.</p>
   </div>
 </div>
 
 <form method="post" class="form-card">
   <input type="hidden" name="csrf" value="{{ csrf }}">
-
-  {% for key, label in keys %}
-  <div class="field{% if key in ('home_intro','artist_intro') %} field-wide{% endif %}">
-    <label for="s-{{ key }}">{{ label }}</label>
-    {% if key in ('home_intro', 'artist_intro') %}
-    <textarea id="s-{{ key }}" name="{{ key }}" rows="4">{{ s.get(key, '') }}</textarea>
-    {% elif key == 'instagram' %}
-    <input id="s-{{ key }}" name="{{ key }}" type="text" value="{{ s.get(key, '') }}"
-           placeholder="hilaire_aquarelles">
-    {% else %}
-    <input id="s-{{ key }}" name="{{ key }}" type="text" value="{{ s.get(key, '') }}">
-    {% endif %}
-  </div>
+  {% for group_title, items in groups %}
+  <section class="set-group">
+    <h2>{{ group_title }}</h2>
+    <div class="set-fields">
+      {% for key, label in items %}
+      <div class="field{% if key in ('home_intro','artist_intro','events_sub','contact_sub','atelier_sub') %} field-wide{% endif %}">
+        <label for="s-{{ key }}">{{ label }}</label>
+        {% if key in ('home_intro', 'artist_intro') %}
+        <textarea id="s-{{ key }}" name="{{ key }}" rows="3">{{ s.get(key, '') }}</textarea>
+        {% else %}
+        <input id="s-{{ key }}" name="{{ key }}" type="text" value="{{ s.get(key, '') }}">
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </section>
   {% endfor %}
-
   <div class="form-actions">
-    <button class="btn-primary" type="submit">Enregistrer les réglages</button>
+    <button class="btn-primary" type="submit">Enregistrer tous les réglages</button>
   </div>
 </form>
 
@@ -52,6 +55,4 @@
     </div>
   </form>
 </section>
-
-
 {% endblock %}
