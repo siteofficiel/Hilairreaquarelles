@@ -526,8 +526,8 @@ window.hlMapMount = function () {
   if (!car) return;
   var imgs = [].slice.call(car.querySelectorAll(".hc-img"));
   if (!imgs.length) return;
-  var prev = car.querySelector(".hc-prev"), next = car.querySelector(".hc-next");
-  var dots = car.querySelector(".hc-dots");
+  var prev = car.querySelector(".wk-prev"), next = car.querySelector(".wk-next");
+  var dots = car.querySelector(".wk-dots");
   var i = 0, timer = null, hovering = false;
   function show(k) {
     i = (k + imgs.length) % imgs.length;
