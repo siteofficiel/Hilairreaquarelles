@@ -271,25 +271,63 @@ window.hlGaLoad = function () {
   gtag("config", id, { anonymize_ip: true });
 };
 
-/* ═══════════ Conformité cookies — choix mémorisé 6 mois ═══════════ */
+/* ═══════════ Conformité cookies — choix par catégorie, preuve datée, 6 mois ═══════════ */
 function hlConsent() {
-  var m = document.cookie.match(/(?:^|;\s*)hl_consent=(oui|non)/);
-  return m ? m[1] : null;
+  var m = document.cookie.match(/(?:^|;\s*)hl_consent=([^;]+)/);
+  var v = m ? decodeURIComponent(m[1]) : "";
+  if (v === "oui") return { done: true, map: true, ga: true, off: true };
+  if (v === "non") return { done: true, map: false, ga: false, off: true };
+  try {
+    var j = JSON.parse(v);
+    if (j && j.done) return { done: true, map: !!j.map, ga: !!j.ga, off: !!j.off };
+  } catch (e) {}
+  return { done: false, map: false, ga: false, off: false };
 }
-function hlSetConsent(v) {
-  document.cookie = "hl_consent=" + v + ";max-age=15552000;path=/;samesite=lax";
+function hlSaveConsent(map, ga, off) {
+  var val = encodeURIComponent(JSON.stringify({ done: true, map: !!map, ga: !!ga, off: !!off, ts: Date.now() }));
+  document.cookie = "hl_consent=" + val + ";max-age=15552000;path=/;samesite=lax";
+}
+function hlGaOn() {
+  var d = document.getElementById("hl-wdata");
+  return !!(d && (d.getAttribute("data-ga") || "").trim());
+}
+function hlApplyConsent() {
+  var c = hlConsent();
   var bar = document.getElementById("cookie-bar");
-  if (bar) bar.hidden = true;
-  if (v === "oui") { window.hlMapMount(); window.hlGaLoad(); }
+  /* bandeau masqué dès qu'un choix existe — sauf nouvelle finalité jamais arbitrée */
+  if (bar) bar.hidden = !(!c.done || (hlGaOn() && !c.off));
+  var m = document.getElementById("ck-map"), g = document.getElementById("ck-ga");
+  if (c.done) {
+    if (m) m.checked = c.map;
+    if (g) g.checked = c.ga;
+    if (c.map && typeof window.hlMapMount === "function") window.hlMapMount();
+    if (c.ga && hlGaOn() && typeof window.hlGaLoad === "function") window.hlGaLoad();
+  }
 }
 (function () {
   var bar = document.getElementById("cookie-bar");
   if (!bar) return;
+  var gaOn = hlGaOn();
+  if (gaOn) { var grow = document.getElementById("ck-ga-row"); if (grow) grow.hidden = false; }
+  hlApplyConsent();
   var a = document.getElementById("ck-accept");
   var r = document.getElementById("ck-refuse");
-  if (a) a.addEventListener("click", function () { hlSetConsent("oui"); });
-  if (r) r.addEventListener("click", function () { hlSetConsent("non"); });
-  if (hlConsent() === "oui") window.hlGaLoad(); /* retour visiteur ayant accepté */
+  var cu = document.getElementById("ck-custom");
+  var opts = document.getElementById("cookie-opts");
+  var sv = document.getElementById("ck-save");
+  if (a) a.addEventListener("click", function () { hlSaveConsent(true, true, gaOn); hlApplyConsent(); });
+  if (r) r.addEventListener("click", function () { hlSaveConsent(false, false, gaOn); hlApplyConsent(); });
+  if (cu) cu.addEventListener("click", function () {
+    var open = !!(opts && opts.hidden);
+    if (opts) opts.hidden = !open;
+    cu.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  if (sv) sv.addEventListener("click", function () {
+    var m = document.getElementById("ck-map");
+    var g = document.getElementById("ck-ga");
+    hlSaveConsent(m ? m.checked : true, gaOn && g ? g.checked : false, gaOn);
+    hlApplyConsent();
+  });
 })();
 
 /* ═══════════ Carte : chargement uniquement après accord ═══════════ */
@@ -317,15 +355,19 @@ window.hlMapMount = function () {
   map.on("mouseout", function () { map.scrollWheelZoom.disable(); });
 };
 (function () {
+  var c = hlConsent();
   var gate = document.getElementById("map-consent");
-  if (hlConsent() === "oui") { window.hlMapMount(); return; }
+  if (c.done && c.map) { window.hlMapMount(); return; }
   if (gate) {
     gate.hidden = false;
     var b = document.getElementById("map-load");
     if (b) b.addEventListener("click", function () {
-      hlSetConsent("oui");
+      var cur = hlConsent();
+      /* « Charger la carte » = accord pour la carte SEULE (pas pour l'audience) */
+      hlSaveConsent(true, cur.done && cur.ga, cur.off);
       gate.hidden = true;
       window.hlMapMount();
+      hlApplyConsent();
     });
   }
 })();

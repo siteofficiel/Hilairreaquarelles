@@ -1502,6 +1502,21 @@ body{
   radial-gradient(60% 80% at 85% 10%,rgba(34,155,117,0.200),transparent 60%),
   #0f2e35;}
 
+/* ═══ bandeau cookies (conformité CNIL) : barre + panneau de choix ═══ */
+.cookie-bar{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);z-index:160;
+width:min(860px,94vw);background:var(--card);border:1px solid var(--hair);
+border-top:2px solid var(--teal);border-radius:4px;box-shadow:var(--sh);padding:1rem 1.3rem}
+.cookie-inner{display:flex;gap:1.4rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.cookie-main{flex:1 1 340px;min-width:0}
+.cookie-txt{margin:0;font-size:.92rem;max-width:52em;color:var(--text)}
+.cookie-actions{display:flex;gap:.8rem;margin:0;flex-wrap:wrap}
+.cookie-actions .btn{padding:.68rem 1.3rem;font-size:.74rem}
+.cookie-opts{border-top:1px solid var(--hair);margin-top:.9rem;padding-top:.9rem;width:100%}
+.ck-title{margin:0 0 .55rem;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.ck-opt{display:flex;gap:.65rem;align-items:flex-start;margin:.45rem 0;font-size:.88rem;cursor:pointer}
+.ck-opt input{margin-top:.22rem;accent-color:var(--teal);flex:none;width:16px;height:16px}
+.ck-opt.ck-tech{cursor:default;color:var(--muted)}
+
 /* ═══════════════════ RESPONSIVE+ — du 320 px au grand écran ═══════════════════ */
 /* cibles tactiles confortables (doigt ≈ 44 px) */
 @media (hover:none){

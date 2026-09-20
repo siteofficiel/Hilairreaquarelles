@@ -1800,6 +1800,12 @@ border-top:2px solid var(--teal);border-radius:4px;box-shadow:var(--sh);padding:
 .cookie-txt{margin:0;font-size:.92rem;max-width:52em;color:var(--text)}
 .cookie-actions{display:flex;gap:.8rem;margin:0}
 .cookie-actions .btn{padding:.68rem 1.3rem;font-size:.74rem}
+.cookie-main{flex:1 1 340px;min-width:0}
+.cookie-opts{border-top:1px solid var(--hair);margin-top:.9rem;padding-top:.9rem;width:100%}
+.ck-title{margin:0 0 .55rem;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.ck-opt{display:flex;gap:.65rem;align-items:flex-start;margin:.45rem 0;font-size:.88rem;cursor:pointer}
+.ck-opt input{margin-top:.22rem;accent-color:var(--teal);flex:none;width:16px;height:16px}
+.ck-opt.ck-tech{cursor:default;color:var(--muted)}
 .map-consent{min-height:300px;display:flex;align-items:center;justify-content:center;text-align:center;
 background:radial-gradient(70% 90% at 50% 110%,rgba(34,155,117,0.200),transparent 70%),var(--paper)}
 .map-consent-inner{max-width:520px;padding:2rem 1.4rem;color:var(--text)}
@@ -1950,13 +1956,26 @@ a:focus-visible,button:focus-visible{outline-color:#0a7d85}
 </footer>
 <aside class="cookie-bar" id="cookie-bar" role="region" aria-label="Gestion des cookies" hidden>
   <div class="cookie-inner">
-    <p class="cookie-txt">Ce fichier ne dépose aucun cookie. La carte de la page Contact
-       (tuiles OpenStreetMap) ne se charge qu’avec votre accord.
-       <a class="lnk" href="#/confidentialite">En savoir plus</a></p>
-    <p class="cookie-actions">
-      <button class="btn" id="ck-accept" type="button">Accepter</button>
-      <button class="btn btn-outline" id="ck-refuse" type="button">Refuser</button>
-    </p>
+    <div class="cookie-main">
+      <p class="cookie-txt">Ce fichier ne dépose aucun cookie. La carte de la page Contact
+         (tuiles OpenStreetMap) ne se charge qu’avec votre accord.<span id="ck-ga-txt"></span>
+         <a class="lnk" href="#/confidentialite">En savoir plus</a></p>
+      <p class="cookie-actions">
+        <button class="btn" id="ck-accept" type="button">Tout accepter</button>
+        <button class="btn btn-outline" id="ck-refuse" type="button">Tout refuser</button>
+        <button class="btn btn-outline" id="ck-custom" type="button" aria-expanded="false" aria-controls="cookie-opts">Personnaliser</button>
+      </p>
+    </div>
+    <div class="cookie-opts" id="cookie-opts" hidden>
+      <p class="ck-title">Choix par usage</p>
+      <label class="ck-opt ck-tech"><input type="checkbox" checked disabled>
+        <span><strong>Stockage local technique</strong> (vos choix) — indispensable, conservé dans votre navigateur, jamais transmis.</span></label>
+      <label class="ck-opt"><input type="checkbox" id="ck-map">
+        <span><strong>Carte interactive</strong> (page Contact) — tuiles OpenStreetMap, chargées seulement si vous l’acceptez.</span></label>
+      <label class="ck-opt" id="ck-ga-row" hidden><input type="checkbox" id="ck-ga">
+        <span><strong>Mesure d’audience</strong> — anonymisée, aucun profilage.</span></label>
+      <p class="cookie-actions"><button class="btn" id="ck-save" type="button">Enregistrer mes choix</button></p>
+    </div>
   </div>
 </aside>
 <script>/* @preserve
@@ -1974,7 +1993,7 @@ try{var SAVED=JSON.parse(localStorage.getItem("hl_data")||"null");
   DATA.works.forEach(function(w){if(!w.im)w.im=[];});}
 hlGaInit();}catch(e){}
 function hlGaInit(){try{
-  if(!DATA.ga||localStorage.getItem("hl_consent")!=="oui"||window.__hlGaDone)return;
+  if(!DATA.ga||window.__hlGaDone)return;var C=hlGet();if(!C.done||!C.ga)return;
   window.__hlGaDone=true;
   var s=document.createElement("script");s.async=true;
   s.src="https://www.googletagmanager.com/gtag/js?id="+encodeURIComponent(DATA.ga);
@@ -2768,17 +2787,28 @@ function initContact(){
     window.location.href=href;
   });
 }
-var mapReady=false;function hlGet(){try{return localStorage.getItem("hl_consent");}catch(e){return null;}}
-function hlSet(v){try{localStorage.setItem("hl_consent",v);}catch(e){}
-  var bar=document.getElementById("cookie-bar");if(bar)bar.hidden=true;}
+var mapReady=false;
+function hlGet(){try{var v=localStorage.getItem("hl_consent");
+  if(v==="oui")return{done:true,map:true,ga:true,off:true};
+  if(v==="non")return{done:true,map:false,ga:false,off:true};
+  var j=JSON.parse(v);if(j&&j.done)return{done:true,map:!!j.map,ga:!!j.ga,off:!!j.off};}catch(e){}
+  return{done:false,map:false,ga:false,off:false};}
+function hlSet(o){try{o.done=true;o.ts=Date.now();localStorage.setItem("hl_consent",JSON.stringify(o));}catch(e){}}
+function hlApplyConsent(){var c=hlGet();var bar=document.getElementById("cookie-bar");var gaOn=!!DATA.ga;
+  if(bar)bar.hidden=!(!c.done||(gaOn&&!c.off));
+  var m=document.getElementById("ck-map"),g=document.getElementById("ck-ga");
+  if(c.done){if(m)m.checked=c.map;if(g)g.checked=c.ga;
+    if(c.map)initMap();if(c.ga&&gaOn)hlGaInit();}}
 function initMap(){
   var el=document.getElementById("map");
   if(!el||el.dataset.mapInit||typeof L==="undefined")return;
-  if(hlGet()!=="oui"){
+  var C=hlGet();
+  if(!(C.done&&C.map)){
     var gate=document.getElementById("map-consent");
     if(gate){gate.hidden=false;
       var b=document.getElementById("map-load");
-      if(b)b.onclick=function(){hlSet("oui");gate.hidden=true;initMap();};}
+      if(b)b.onclick=function(){var c=hlGet();
+        hlSet({map:true,ga:c.done&&c.ga,off:c.off});gate.hidden=true;initMap();hlApplyConsent();};}
     return;}
   el.dataset.mapInit="1";
   el.hidden=false;
@@ -2808,7 +2838,7 @@ function pageLegal(){
   '<h2>Hébergement</h2><p>Ce fichier se consulte localement, sans serveur. La version en ligne peut être hébergée par GitHub Pages (GitHub, Inc., San Francisco, États-Unis) ou par l’hébergeur choisi par l’éditeur.</p>'+
   '<h2>Vente et commandes</h2><p>Ce site ne réalise aucune vente et n’encaisse aucun paiement en ligne. Les commandes se concluent directement avec l’artiste (contact, téléphone, courriel).</p>'+
   '<h2>Propriété intellectuelle</h2><p>Aquarelles, photographies, affiches et textes sont la propriété exclusive d’Hilaire Legentil. Toute reproduction sans autorisation écrite est interdite.</p>'+
-  '<h2>Cookies</h2><p>Ce fichier ne dépose <strong>aucun cookie</strong> et n’utilise aucun traceur. Votre choix concernant la carte est conservé uniquement dans votre navigateur (stockage local), jamais transmis. Si une mesure d’audience est activée, elle ne se charge qu’après votre accord (bouton « Accepter ») et l’adresse IP est anonymisée.</p>'+
+  '<h2>Cookies</h2><p>Ce fichier ne dépose <strong>aucun cookie</strong> et n’utilise aucun traceur. Le bandeau du premier passage offre trois choix : tout accepter, tout refuser ou personnaliser (carte, mesure d’audience). Vos choix, horodatés (preuve du consentement), sont conservés six mois uniquement dans votre navigateur, jamais transmis ; le refus ne prive d’aucune fonctionnalité hormis la carte. Si une mesure d’audience est activée, elle ne se charge qu’après votre accord et l’adresse IP est anonymisée.</p>'+
   '<h3>Notifications des nouvelles aquarelles</h3><p>Si vous les activez, elles reposent sur un identifiant technique anonyme conservé par votre navigateur — aucune donnée personnelle. Vous pouvez les couper à tout moment depuis les réglages du navigateur.</p>'+
   '<h3>Carte interactive</h3><p>Les tuiles OpenStreetMap ne sont sollicitées qu’après votre accord explicite ; sans accord, rien n’est chargé depuis ce service tiers.</p>'+
   '<p><button class="btn btn-outline" id="ck-reset" type="button">Effacer mon choix (revoir le bandeau)</button></p>'+
@@ -3280,11 +3310,19 @@ document.getElementById("footer-contact").innerHTML=
 document.getElementById("year").textContent=new Date().getFullYear();
 (function(){
   var bar=document.getElementById("cookie-bar");
-  if(bar&&hlGet()===null){bar.hidden=false;
-    if(DATA.ga){var ct=document.querySelector(".cookie-txt");
-      if(ct)ct.insertAdjacentHTML("beforeend"," Si la mesure d’audience est activée, elle ne se charge, elle aussi, qu’avec votre accord.");}
-    document.getElementById("ck-accept").onclick=function(){hlSet("oui");initMap();hlGaInit();};
-    document.getElementById("ck-refuse").onclick=function(){hlSet("non");};}
+  if(!bar)return;
+  if(DATA.ga){var t=document.getElementById("ck-ga-txt");
+    if(t)t.textContent=" La mesure d’audience anonymisée, si elle est activée, exige le même accord.";
+    var row=document.getElementById("ck-ga-row");if(row)row.hidden=false;}
+  hlApplyConsent();
+  document.getElementById("ck-accept").onclick=function(){hlSet({map:true,ga:!!DATA.ga,off:!!DATA.ga});hlApplyConsent();};
+  document.getElementById("ck-refuse").onclick=function(){hlSet({map:false,ga:false,off:!!DATA.ga});hlApplyConsent();};
+  var cu=document.getElementById("ck-custom"),opts=document.getElementById("cookie-opts");
+  if(cu)cu.onclick=function(){var open=!!(opts&&opts.hidden);if(opts)opts.hidden=!open;
+    cu.setAttribute("aria-expanded",open?"true":"false");};
+  var sv=document.getElementById("ck-save");
+  if(sv)sv.onclick=function(){var m=document.getElementById("ck-map"),g=document.getElementById("ck-ga");
+    hlSet({map:m?m.checked:true,ga:(!!DATA.ga&&g)?g.checked:false,off:!!DATA.ga});hlApplyConsent();};
 })();
 render();
 </script>

@@ -106,19 +106,33 @@
 {% endif %}
 {% endwith %}
 
-{% if request.cookies.get('hl_consent') is none %}
-<aside class="cookie-bar" id="cookie-bar" role="region" aria-label="Gestion des cookies">
+<aside class="cookie-bar" id="cookie-bar" role="region" aria-label="Gestion des cookies" hidden>
   <div class="cookie-inner">
-    <p class="cookie-txt">Ce site ne dépose qu’un cookie <strong>technique</strong>, nécessaire à son fonctionnement.
-       La carte de la page Contact (tuiles OpenStreetMap) ne se charge qu’avec votre accord{% if S.get('ga_id') %}, de même que la mesure d’audience anonymisée{% endif %}.
-       <a class="lnk" href="{{ url_for('privacy') }}#cookies">En savoir plus</a></p>
-    <p class="cookie-actions">
-      <button class="btn" id="ck-accept" type="button">Accepter</button>
-      <button class="btn btn-outline" id="ck-refuse" type="button">Refuser</button>
-    </p>
+    <div class="cookie-main">
+      <p class="cookie-txt">Ce site ne dépose qu’un cookie <strong>technique</strong>, nécessaire à son fonctionnement
+         (session, mémorisation de vos choix). La carte de la page Contact (tuiles OpenStreetMap) ne se charge
+         qu’avec votre accord.{% if S.get('ga_id') %} La mesure d’audience anonymisée exige le même accord.{% endif %}
+         <a class="lnk" href="{{ url_for('privacy') }}#cookies">En savoir plus</a></p>
+      <p class="cookie-actions">
+        <button class="btn" id="ck-accept" type="button">Tout accepter</button>
+        <button class="btn btn-outline" id="ck-refuse" type="button">Tout refuser</button>
+        <button class="btn btn-outline" id="ck-custom" type="button" aria-expanded="false" aria-controls="cookie-opts">Personnaliser</button>
+      </p>
+    </div>
+    <div class="cookie-opts" id="cookie-opts" hidden>
+      <p class="ck-title">Choix par usage</p>
+      <label class="ck-opt ck-tech"><input type="checkbox" checked disabled>
+        <span><strong>Cookie technique</strong> (session, vos choix) — indispensable, exempté de consentement.</span></label>
+      <label class="ck-opt"><input type="checkbox" id="ck-map">
+        <span><strong>Carte interactive</strong> (page Contact) — tuiles OpenStreetMap, chargées seulement si vous l’acceptez.</span></label>
+      {% if S.get('ga_id') %}
+      <label class="ck-opt"><input type="checkbox" id="ck-ga">
+        <span><strong>Mesure d’audience</strong> — anonymisée, aucun profilage.</span></label>
+      {% endif %}
+      <p class="cookie-actions"><button class="btn" id="ck-save" type="button">Enregistrer mes choix</button></p>
+    </div>
   </div>
 </aside>
-{% endif %}
 <script>if(location.hash==="#/admin")location.replace("/admin");</script>
 <script src="/static/js/app.js" defer></script>
 {% block scripts %}{% endblock %}
