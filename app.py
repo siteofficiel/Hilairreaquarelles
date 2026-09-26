@@ -17,6 +17,7 @@ if VENDOR not in sys.path:
 
 from flask import (Flask, abort, flash, jsonify, redirect, render_template,
                    request, send_from_directory, session, url_for)
+from werkzeug.exceptions import NotFound
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 import auth
@@ -416,8 +417,15 @@ def uploaded_file(area, folder, filename):
     root = {"works": WORKS_DIR, "news": NEWS_DIR, "atelier": ATELIER_DIR}.get(area)
     if root is None or "/" in folder or ".." in folder:
         abort(404)
-    return send_from_directory(os.path.join(root, folder), filename,
-                               max_age=31536000)
+    try:
+        return send_from_directory(os.path.join(root, folder), filename,
+                                   max_age=31536000)
+    except NotFound:
+        # repli : les aquarelles « sur le vif » sont stockées avec l'atelier
+        if area == "works":
+            return send_from_directory(os.path.join(ATELIER_DIR, folder), filename,
+                                       max_age=31536000)
+        raise
 
 
 # --- sitemap & robots ------------------------------------------------------

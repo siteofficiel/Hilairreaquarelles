@@ -215,3 +215,11 @@ textarea{ resize:vertical; }
 .car-num{ font-size:.82rem; font-weight:600; color:#0a7d85; margin:0; }
 .car-slot input[type=file]{ font-size:.8rem; }
 @media (max-width:640px){ .car-grid{ grid-template-columns:1fr 1fr; } }
+
+/* polices auto-hébergées (fusionnées) */
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/CormorantGaramond-400.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:400;font-display:swap;src:url('../fonts/CormorantGaramond-400i.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/CormorantGaramond-500.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('../fonts/CormorantGaramond-600.woff2') format('woff2');}
+@font-face{font-family:'Jost';font-style:normal;font-weight:400;font-display:swap;src:url('../fonts/Jost-400.woff2') format('woff2');}
+@font-face{font-family:'Jost';font-style:normal;font-weight:500;font-display:swap;src:url('../fonts/Jost-500.woff2') format('woff2');}

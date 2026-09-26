@@ -26,13 +26,17 @@ def b64(path):
 
 
 def img_uri(folder, area="works", prefer="medium"):
-    """Data URI de l'image la plus légère disponible (WebP d'abord)."""
-    root = os.path.join(BASE, "uploads", area, folder)
-    for name in (f"{prefer}.webp", f"{prefer}.jpg"):
-        p = os.path.join(root, name)
-        if os.path.exists(p):
-            mime = "image/webp" if name.endswith(".webp") else "image/jpeg"
-            return f"data:{mime};base64," + b64(p), name
+    """Data URI de l'image la plus légère disponible (WebP d'abord).
+    Repli : les aquarelles « sur le vif » sont stockées avec l'atelier."""
+    roots = [os.path.join(BASE, "uploads", area, folder)]
+    if area == "works":
+        roots.append(os.path.join(BASE, "uploads", "atelier", folder))
+    for root in roots:
+        for name in (f"{prefer}.webp", f"{prefer}.jpg"):
+            p = os.path.join(root, name)
+            if os.path.exists(p):
+                mime = "image/webp" if name.endswith(".webp") else "image/jpeg"
+                return f"data:{mime};base64," + b64(p), name
     return "", ""
 
 
@@ -130,6 +134,7 @@ def build_html():
     data_json = data_json.replace("</", "<\\/")  # sécurité balise <script>
 
     fonts = "\n".join([
+        font_face("Cormorant Garamond", "normal", 400, "CormorantGaramond-400.woff2"),
         font_face("Cormorant Garamond", "normal", 500, "CormorantGaramond-500.woff2"),
         font_face("Cormorant Garamond", "normal", 600, "CormorantGaramond-600.woff2"),
         font_face("Cormorant Garamond", "italic", 400, "CormorantGaramond-400i.woff2"),
@@ -139,6 +144,11 @@ def build_html():
 
     with open(os.path.join(BASE, "static", "css", "main.css")) as f:
         main_css = f.read()
+    # les polices sont intégrées en base64 plus bas : on retire la version URL
+    _f0 = main_css.find("/* ==POLICES")
+    if _f0 >= 0:
+        _f1 = main_css.index("/* ==FIN POLICES== */") + len("/* ==FIN POLICES== */")
+        main_css = main_css[:_f0] + main_css[_f1:].lstrip("\n")
     # la feuille fusionnée commence par la portion Leaflet
     _start = main_css.index("/* --- Leaflet")
     _end = main_css.index("/* ============================================================")
@@ -1733,8 +1743,6 @@ function pageArtist(){
   '<h2 class="h2">Carnet d’inspiration</h2>'+
   QUOTE+'<blockquote class="big-quote">…Sons et paysages côtiers nous transportent et nous bercent depuis l’enfance. Loin du tumulte du monde, nous sommes aptes à aimer et chérir ceux qui nous sont les plus chers…</blockquote>'+
   '<blockquote class="big-quote">La nature, le paysage détiennent cette faculté de pouvoir nous apaiser, nous recentrer…</blockquote>'+
-  '<blockquote class="big-quote">S’inquiéter n’effacera pas les problèmes de demain, cela ne fera qu’enlever la paix d’aujourd’hui…'+
-  '<cite><a href="https://www.atmosphere-citation.com/author/atmo" target="_blank" rel="noopener">atmosphere-citation.com</a></cite></blockquote>'+
   '<div class="poem-card">'+
   '<p>…Alors dans ma mémoire, je cherche les moments où je suis là…</p>'+
   '<span class="poem-gap" aria-hidden="true"></span>'+
@@ -1747,7 +1755,9 @@ function pageArtist(){
   '<p>Odeurs du quai…<br>Portes à flots…<br>Terrasse à la mer…<br>Terrasse tête à tête…</p>'+
   '<span class="poem-gap" aria-hidden="true"></span>'+
   '<p>Nuages, lointain…<br>Percer le mystère, aller plus loin…<br>S’y baigner, le rejoindre…&nbsp;»</p>'+
-  '</div></div></section>'+
+  '</div>'+
+  '<blockquote class="big-quote">S’inquiéter n’effacera pas les problèmes de demain, cela ne fera qu’enlever la paix d’aujourd’hui…</blockquote>'+
+  '</div></section>'+
 
   '<section class="section section-expos"><div class="container">'+
   '<div class="section-head reveal"><div><p class="label">Événements</p>'+
@@ -1968,12 +1978,11 @@ function pageAtelier(){
     '<div class="atl-toc-group"><h2 class="h3">Équipement</h2><ul>'+
     '<li><a href="#materiels">Matériels</a></li><li><a href="#palette">Palette</a></li></ul></div>'+
     '<div class="atl-toc-group"><h2 class="h3">Cahier technique</h2><ul>'+
-    '<li><a href="#montage">Montage des feuilles sur châssis</a></li>'+
     '<li><a href="#etapes">Les étapes d\u2019une aquarelle</a></li>'+
     '<li><a href="#gammes">Gammes et esquisses préparatoires</a></li>'+
     '<li><a href="#vif">Travail sur le vif</a></li></ul></div>'+
-    '<div class="atl-toc-group"><h2 class="h3">Fabrication</h2><ul>'+
-    '<li><a href="#cadres">Fabrication des cadres</a></li></ul></div>'+
+    '<div class="atl-toc-group"><h2 class="h3">Cadres</h2><ul>'+
+    '<li><a href="#cadres">Montage des feuilles sur châssis &amp; fabrication des cadres</a></li></ul></div>'+
     '</div></div></section>'+
 
     '<section class="section tint-sky" id="materiels"><div class="container">'+
@@ -1993,14 +2002,6 @@ function pageAtelier(){
     '<div class="tech-card reveal" id="palette"><h3 class="h3">Palette</h3>'+pal+'</div>'+
     '</div></div></section>'+
 
-    '<section class="section" id="montage"><div class="container narrow reveal">'+
-    '<p class="label">Cahier technique</p><h2 class="h2">Montage des feuilles sur châssis</h2>'+
-    '<p>Traditionnellement, les aquarelles sont protégées par un sous verre et un cadre.</p>'+
-    '<p>Certaines aquarelles au sein de cette exposition ont été réalisées différemment&nbsp;: le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat. Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté des couleurs.</p>'+
-    '<h3 class="h3">Montage du papier&nbsp;:</h3>'+
-    '<p>Après plusieurs minutes dans l\u2019eau, le papier est agrafé sur le châssis. En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant l\u2019exécution de l\u2019aquarelle.</p>'+
-    '<p>Le papier sur châssis est aussi un choix de l\u2019artiste&nbsp;: un papier coton frangé monté sur du bois confère à l\u2019aquarelle une qualité esthétique d\'objet artisanal.</p>'+
-    '</div></section>'+
 
     '<section class="section tint-sand" id="etapes"><div class="container">'+
     '<div class="section-head reveal"><div><p class="label">Cahier technique</p><h2 class="h2">Les étapes d\u2019une aquarelle</h2></div></div>'+
@@ -2045,17 +2046,17 @@ function pageAtelier(){
     '<section class="section tint-sand" id="cadres"><div class="container">'+
     '<div class="section-head reveal"><div><p class="label">Des aquarelles "locales"&nbsp;!</p><h2 class="h2">Fabrication des cadres</h2></div></div>'+
     '<p class="lead reveal">Les châssis en bois sont confectionnés dans la Manche par le peintre, ou réalisés par une entreprise française, avec du bois issu de forêts (européennes) durables.</p>'+
+    '<div class="narrow reveal"><h3 class="h3">Montage des feuilles sur châssis</h3>'+
+    '<p>Traditionnellement, les aquarelles sont protégées par un sous verre et un cadre.</p>'+
+    '<p>Certaines aquarelles au sein de cette exposition ont été réalisées différemment&nbsp;: le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat. Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté des couleurs.</p>'+
+    '<p>Après plusieurs minutes dans l\u2019eau, le papier est agrafé sur le châssis. En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant l\u2019exécution de l\u2019aquarelle.</p>'+
+    '<p>Le papier sur châssis est aussi un choix de l\u2019artiste&nbsp;: un papier coton frangé monté sur du bois confère à l\u2019aquarelle une qualité esthétique d\'objet artisanal.</p>'+
+    '</div>'+
     '<div class="fact-card reveal" style="max-width:44em"><ul class="tech-list tech-dash">'+
     '<li>La peinture utilisée est fabriquée en France.</li>'+
     '<li>Le papier 100&nbsp;% coton est fabriqué en Italie</li>'+
     '<li>Le fixatif pour aquarelle est fabriqué en Allemagne et le vernis final est fabriqué en Italie.</li></ul></div>'+
-    '<div class="step-grid">'+
-    '<div class="step-card reveal"><p class="step-num">01</p><p>À l\u2019aide de baguettes «&nbsp;quart de rond&nbsp;», d\u2019une boîte à onglets, d\u2019une scie et de colle à bois, je réalise un cadre bois.</p></div>'+
-    '<div class="step-card reveal"><p class="step-num">02</p><p>La feuille de papier en coton découpée à la dimension, est trempée dans l\u2019eau pendant 4 minutes.</p></div>'+
-    '<div class="step-card reveal"><p class="step-num">03</p><p>Excédent d\u2019eau de la feuille enlevé en l\u2019accrochant 10 minutes sur un fil à linge.</p></div>'+
-    '<div class="step-card reveal"><p class="step-num">04</p><p>Feuille positionnée, tendue puis agrafée sur le cadre.</p></div>'+
-    '<div class="step-card reveal"><p class="step-num">05</p><p>Après séchage 1 heure. Le papier sec est tendu sur le châssis. L\u2019aquarelle réalisée, un premier spray pour fixer les pigments suivi d\u2019un vernis mat protègent l\u2019aquarelle de l\u2019humidité.</p></div>'+
-    '<div class="step-card reveal"><p class="step-num">06</p><p>Le cadre peint et verni pour être encadré.</p></div>'+
+    '<div class="narrow reveal"><p>À l\u2019aide de baguettes «&nbsp;quart de rond&nbsp;», d\u2019une boîte à onglets, d\u2019une scie et de colle à bois, je réalise un cadre bois. La feuille de papier en coton découpée à la dimension, est trempée dans l\u2019eau pendant 4 minutes. Excédent d\u2019eau de la feuille enlevé en l\u2019accrochant 10 minutes sur un fil à linge. La feuille positionnée, tendue puis agrafée sur le cadre. Après séchage 1 heure. Le papier sec est tendu sur le châssis. L\u2019aquarelle réalisée, un premier spray pour fixer les pigments suivi d\u2019un vernis mat protègent l\u2019aquarelle de l\u2019humidité. Le cadre peint et verni pour être encadré.</p>'+
     '</div>'+
     '<p class="tech-note reveal">Attention cette protection préserve l\u2019œuvre de quelques gouttes d\u2019eau voire de postillons&nbsp;! Le papier restera vulnérable aux coups et au détrempage.</p>'+
     '<blockquote class="big-quote reveal" style="margin-top:2.6rem">Alors, à vos outils&nbsp;! À vos pinceaux&nbsp;!</blockquote>'+
@@ -2221,6 +2222,16 @@ function render(){
   closeNav();
 }
 window.addEventListener("hashchange",render);
+/* ancres internes (sommaire de l’atelier) : défiler sans changer de route */
+document.addEventListener("click",function(e){
+  var a=e.target&&e.target.closest?e.target.closest('a[href^="#"]'):null;
+  if(!a)return;
+  var h=a.getAttribute("href")||"";
+  if(h.length>1&&h.charAt(1)!=="/"){
+    var el=document.getElementById(h.slice(1));
+    if(el){e.preventDefault();
+      try{el.scrollIntoView({behavior:"smooth",block:"start"});}catch(err){el.scrollIntoView();}}}
+});
 
 /* ----------------------------------------------- interactions ---------- */
 function initReveal(){
