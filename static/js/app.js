@@ -221,6 +221,24 @@
     });
   }
 
+  /* ---- bouton de tri : chaque clic change l'ordre des œuvres ---- */
+  var sortBtn = root.querySelector("#hl-sort");
+  if (sortBtn) {
+    var SORTS = [["gallery", "Ordre de la galerie"],
+                 ["recent", "Plus récentes d'abord"],
+                 ["old", "Plus anciennes d'abord"]];
+    var sortLab = sortBtn.querySelector(".hl-sort-val");
+    sortBtn.addEventListener("click", function () {
+      var cur = 0;
+      SORTS.forEach(function (sv, k) { if (sv[0] === state.sort) cur = k; });
+      var nx = SORTS[(cur + 1) % SORTS.length];
+      state.sort = nx[0];
+      apply();
+      if (sortLab) sortLab.textContent = nx[1];
+      sortBtn.setAttribute("title", "Tri actuel : " + nx[1] + " — cliquer pour changer");
+    });
+  }
+
   apply();
 })();
 

@@ -817,6 +817,7 @@ em{ font-style:italic; }
   margin:0 auto; padding:2rem 0 2.4rem; text-align:center;
 }
 .hero-intro{ max-width:34em; font-size:1.06rem; margin:0 auto 2rem; }
+.hw-wave{ height:.8em; width:auto; vertical-align:-.06em; margin:0 .22em; }
 .hero-baseline{
   font-family:var(--sans); font-size:.8rem; font-weight:600;
   letter-spacing:.3em; text-transform:uppercase; color:var(--teal-ink);
@@ -831,6 +832,10 @@ em{ font-style:italic; }
   color:var(--teal-deep); margin-bottom:1.4rem;
 }
 .hero-intro{ max-width:34em; font-size:1.06rem; margin-bottom:2rem; }
+.section-sub{
+  font-family:var(--serif); font-style:italic; color:var(--teal-deep);
+  font-size:clamp(1rem, 2vw, 1.2rem); margin:.4rem 0 0;
+}
 .hero-cta{ display:flex; align-items:center; gap:2.2rem; flex-wrap:wrap; margin:0; }
 
 .btn{
@@ -899,6 +904,50 @@ em{ font-style:italic; }
   font-size:clamp(1.05rem, 2.2vw, 1.35rem); margin:0;
 }
 
+/* --------------------------------------------------------------- atelier */
+/* sommaire de l'atelier + ancres douces */
+html{ scroll-behavior:smooth; }
+.section[id], section[id]{ scroll-margin-top:96px; }
+.atl-toc-section{ padding-top:clamp(2rem,5vw,3.4rem); }
+.atl-toc{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1.4rem 2.2rem; padding:1.4rem 1.6rem; background:rgba(252,250,246,.9);
+  border:1px solid var(--hair); border-radius:var(--r-card);
+}
+.atl-toc .h3{ font-size:.8rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--teal-ink); margin:0 0 .6rem; }
+.atl-toc ul{ list-style:none; margin:0; padding:0; }
+.atl-toc li{ padding:.22rem 0; }
+.atl-toc a{ font-family:var(--serif); font-size:1.02rem; color:var(--text);
+  text-decoration:none; border-bottom:1px solid transparent; }
+.atl-toc a:hover{ color:var(--teal-ink); border-color:var(--teal); }
+/* palette de l'artiste : photo haute en passe-partout */
+.palette-fig{ margin:0; display:flex; justify-content:center; }
+.palette-fig img{
+  max-height:520px; width:auto; max-width:100%; object-fit:contain;
+  border:6px solid rgba(252,250,246,.95); border-radius:10px;
+  box-shadow:0 10px 30px rgba(14,42,50,.16), 0 3px 8px rgba(14,42,50,.10);
+  background:#fcfaf6;
+}
+.tech-note-txt{ font-size:.93rem; color:var(--muted); margin:0 0 .8rem; }
+.rel-grid-2{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+/* listes à tirets et alinéas (fabrication des cadres, page événements) */
+.tech-dash{ list-style:none; margin:0; padding:0; }
+.tech-dash li{ position:relative; padding:.4rem 0 .4rem 1.5rem; line-height:1.55; }
+.tech-dash li::before{ content:"—"; position:absolute; left:0; top:.4rem;
+  color:var(--teal); font-weight:600; }
+.evt-points{ font-size:1.06rem; }
+.evt-points-section{ padding-top:0; }
+/* navigation d'une œuvre à l'autre : simples boutons */
+.work-nav{ display:flex; gap:.8rem; margin-top:1.2rem; }
+.work-nav-btn{
+  flex:1; display:flex; align-items:center; justify-content:center;
+  min-height:50px; border:1px solid var(--hair); border-radius:var(--r-btn);
+  background:var(--card); color:var(--teal-ink); font-size:1.7rem; line-height:1;
+  text-decoration:none; transition:background .25s, border-color .25s, color .25s;
+}
+.work-nav-btn:hover{ background:var(--teal); border-color:var(--teal); color:#fff; }
+
 /* --------------------------------------------------------------- accueil */
 .section-artist{ background:linear-gradient(180deg, var(--paper) 0%, #f7f3eb 100%); }
 .artist-home{
@@ -956,12 +1005,22 @@ em{ font-style:italic; }
 /* ---------------------------------------------------------------- galerie */
 /* filtres pro : menus déroulants + tri automatique des œuvres */
 .hl-filters{
-  margin:-1.6rem auto 0; padding:clamp(.9rem,2.2vw,1.3rem) clamp(1rem,2.6vw,1.5rem);
+  margin:1.1rem auto 0; padding:clamp(.9rem,2.2vw,1.3rem) clamp(1rem,2.6vw,1.5rem);
   background:rgba(252,250,246,.92); border:1px solid var(--hair);
   border-radius:var(--r-card); box-shadow:var(--shadow-soft);
 }
 .hl-fbar{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)) minmax(150px,auto); gap:.6rem; }
 .hl-dd{ position:relative; min-width:0; }
+.hl-sort-btn{
+  display:flex; width:100%; min-height:48px; align-items:center; gap:.55rem; text-align:left;
+  font-family:var(--sans); background:var(--card); color:var(--text);
+  border:1px solid var(--hair); border-radius:var(--r-btn);
+  padding:.5rem .8rem; cursor:pointer;
+  transition:border-color .25s, box-shadow .25s, background .25s;
+}
+.hl-sort-btn:hover{ border-color:var(--teal); box-shadow:0 0 0 3px rgba(10,125,133,.10); }
+.hl-sort-btn:active{ transform:translateY(1px); }
+.hl-sort-btn svg{ flex:none; color:var(--teal); }
 .hl-dd-btn{
   display:flex; width:100%; min-height:48px; align-items:center; gap:.55rem; text-align:left;
   font-family:var(--sans); background:var(--card); color:var(--text);
@@ -1565,6 +1624,16 @@ border-top:2px solid var(--teal);border-radius:4px;box-shadow:var(--sh);padding:
 /* tablettes (601–1000 px) */
 @media (min-width:601px) and (max-width:1000px){
   .hero-title{font-size:clamp(3rem,9vw,5rem);}
+}
+/* PC : le titre « Aquarelles — mer & paysage » s'agrandit */
+@media (min-width:1024px){
+  .hero-baseline{font-size:clamp(1.02rem, 1vw + .55rem, 1.3rem); letter-spacing:.24em;}
+  .hw-wave{height:.9em;}
+}
+/* téléphone : « Artiste auteur » en encre foncée (contraste sur l'aquarelle) */
+@media (max-width:600px){
+  .hero-sub{color:var(--ink); text-shadow:0 1px 2px rgba(250,248,243,.97),
+    0 0 18px rgba(250,248,243,.95), 0 2px 30px rgba(250,248,243,.88);}
 }
 /* écrans larges : la galerie respire davantage */
 @media (min-width:1500px){

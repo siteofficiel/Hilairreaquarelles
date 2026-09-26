@@ -32,7 +32,7 @@
     <nav class="site-nav" id="site-nav" aria-label="Navigation principale">
       <ul>
         <li><a href="{{ url_for('home') }}" {% if request.endpoint == 'home' %}aria-current="page"{% endif %}>Accueil</a></li>
-        <li><a href="{{ url_for('artist') }}" {% if request.endpoint == 'artist' %}aria-current="page"{% endif %}>La démarche de l’artiste</a></li>
+        <li><a href="{{ url_for('artist') }}" {% if request.endpoint == 'artist' %}aria-current="page"{% endif %}>Démarche de l’artiste</a></li>
         <li><a href="{{ url_for('atelier') }}" {% if request.endpoint == 'atelier' %}aria-current="page"{% endif %}>L’atelier</a></li>
         <li><a href="{{ url_for('gallery') }}" {% if request.endpoint in ('gallery','work') %}aria-current="page"{% endif %}>Galerie</a></li>
         <li><a href="{{ url_for('news_list') }}" {% if request.endpoint in ('news_list','news_item') %}aria-current="page"{% endif %}>Événements</a></li>
@@ -80,7 +80,7 @@
     <div class="footer-col">
       <h2 class="footer-title">Le site</h2>
       <ul class="footer-list">
-        <li><a href="{{ url_for('artist') }}">La démarche de l’artiste</a></li>
+        <li><a href="{{ url_for('artist') }}">Démarche de l’artiste</a></li>
         <li><a href="{{ url_for('atelier') }}">L’atelier</a></li>
         <li><a href="{{ url_for('gallery') }}">La galerie</a></li>
         <li><a href="{{ url_for('news_list') }}">Événements &amp; expositions</a></li>

@@ -37,18 +37,12 @@
     {% if ambiances %}{{ dd_group('ambiance', 'Ambiance', 'Toutes les ambiances', ambiances, dots=true) }}{% endif %}
     {% if techs %}{{ dd_group('technique', 'Technique', 'Toutes les techniques', techs) }}{% endif %}
     {% if years %}{{ dd_group('annee', 'Année', 'Toutes les années', years) }}{% endif %}
-    <div class="hl-dd hl-dd-sort" data-g="sort">
-      <button type="button" class="hl-dd-btn" aria-expanded="false" aria-haspopup="listbox">
-        <span class="hl-dd-lab">Trier</span>
-        <span class="hl-dd-val">Ordre de la galerie</span>
-        {{ dd_arrow() }}
-      </button>
-      <div class="hl-dd-menu" role="listbox" aria-label="Trier les œuvres">
-        <button type="button" class="hl-dd-opt is-sel" role="option" aria-selected="true" data-v="gallery" data-l="Ordre de la galerie">Ordre de la galerie</button>
-        <button type="button" class="hl-dd-opt" role="option" aria-selected="false" data-v="recent" data-l="Plus récentes">Plus récentes d’abord</button>
-        <button type="button" class="hl-dd-opt" role="option" aria-selected="false" data-v="old" data-l="Plus anciennes">Plus anciennes d’abord</button>
-      </div>
-    </div>
+    <button type="button" class="hl-sort-btn" id="hl-sort"
+            title="Tri actuel : Ordre de la galerie — cliquer pour changer">
+      <span class="hl-dd-lab">Tri</span>
+      <span class="hl-sort-val" id="hl-sort-val">Ordre de la galerie</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9l5-5 5 5M13 15l5 5 5-5" transform="translate(-1 0)" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
   </div>
   <div class="hl-fstatus">
     <p class="hl-fcount" id="gallery-count" aria-live="polite">{{ works|length }} œuvre{{ 's' if works|length > 1 }}</p>
@@ -70,39 +64,6 @@
   </div>
 </section>
 
-{% if vif %}
-<section class="section">
-  <div class="container">
-    <div class="section-head reveal">
-      <div>
-        <p class="label">Sur le vif</p>
-        <h2 class="h2">Un carnet de notes de couleurs et de formes</h2>
-      </div>
-    </div>
-    <aside class="vif-def reveal">
-      <p>Je compose mes aquarelles à partir de matériaux multiples&nbsp;: observation
-         et croquis sur le vif, photos formant un carnet de notes de couleurs
-         et de formes.</p>
-    </aside>
-    <p class="atelier-note reveal">Cliquez pour agrandir.</p>
-    <div class="atelier-grid" id="atelier-grid" data-cap="Aquarelle sur le vif">
-      {%- for p in vif %}
-      <figure class="atelier-item reveal">
-        <span class="vif-badge" aria-hidden="true">sur le vif</span>
-        <button type="button" class="atelier-btn"
-                data-full="/uploads/atelier/{{ p.folder }}/medium.webp"
-                aria-label="Agrandir l’aquarelle {{ loop.index }} sur {{ vif|length }}">
-          <img loading="lazy" decoding="async"
-               src="/uploads/atelier/{{ p.folder }}/medium.webp"
-               alt="Aquarelle sur le vif — {{ loop.index }}"
-               width="{{ p.img_w }}" height="{{ p.img_h }}">
-        </button>
-      </figure>
-      {%- endfor %}
-    </div>
-  </div>
-</section>
-{% endif %}
 
 <section class="section contact-invitation">
   <div class="container narrow center reveal">

@@ -71,16 +71,12 @@
 
       <nav class="work-nav" aria-label="Navigation entre les œuvres">
         {% if prev %}
-        <a class="work-nav-link" href="{{ url_for('work', slug=prev.slug) }}">
-          <span class="wn-label">Œuvre précédente</span>
-          <span class="wn-title">{{ prev.title }}</span>
-        </a>
+        <a class="work-nav-btn" href="{{ url_for('work', slug=prev.slug) }}"
+           aria-label="Œuvre précédente : {{ prev.title }}" title="{{ prev.title }}">‹</a>
         {% endif %}
         {% if next %}
-        <a class="work-nav-link is-next" href="{{ url_for('work', slug=next.slug) }}">
-          <span class="wn-label">Œuvre suivante</span>
-          <span class="wn-title">{{ next.title }}</span>
-        </a>
+        <a class="work-nav-btn" href="{{ url_for('work', slug=next.slug) }}"
+           aria-label="Œuvre suivante : {{ next.title }}" title="{{ next.title }}">›</a>
         {% endif %}
       </nav>
 
@@ -89,20 +85,7 @@
   </div>
 </section>
 
-{% if next and next.folder %}
-<section class="section next-teaser reveal">
-  <div class="container teaser-inner">
-    <div>
-      <p class="label">Œuvre suivante</p>
-      <h2 class="h3">{{ next.title }}</h2>
-      <a class="link-arrow" href="{{ url_for('work', slug=next.slug) }}">Voir l’œuvre suivante</a>
-    </div>
-    <a class="teaser-figure" href="{{ url_for('work', slug=next.slug) }}" aria-hidden="true" tabindex="-1">
-      {{ picture('works', next.folder, '', sizes='(max-width:760px) 50vw, 300px') }}
-    </a>
-  </div>
-</section>
-{% endif %}
+
 {% endblock %}
 
 {% block scripts %}

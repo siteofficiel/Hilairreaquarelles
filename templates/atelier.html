@@ -1,17 +1,122 @@
 {% extends "base.html" %}
 {% block title %}L’atelier — Hilaire Legentil, artiste auteur{% endblock %}
-{% block desc %}Cahier technique — les étapes d’une aquarelle, des aquarelles montées sur châssis, fabrication des cadres.{% endblock %}
+{% block desc %}Cahier technique — équipement, montage des feuilles sur châssis, les étapes d’une aquarelle, travail sur le vif, fabrication des cadres.{% endblock %}
 
 {% block content %}
 <header class="page-head">
   <div class="container reveal">
     <p class="label">L’atelier</p>
     <h1 class="page-title">Cahier technique</h1>
-    <p class="page-sub">{{ S.get('atelier_sub', 'Les étapes d’une aquarelle · Des aquarelles montées sur châssis · Fabrication des cadres') }}</p>
+    <p class="page-sub">{{ S.get('atelier_sub', 'Équipement · Cahier technique · Fabrication des cadres') }}</p>
   </div>
 </header>
 
-<section class="section tint-sky">
+<section class="section atl-toc-section">
+  <div class="container narrow reveal">
+    <p class="label">Sommaire</p>
+    <div class="atl-toc">
+      <div class="atl-toc-group">
+        <h2 class="h3">Équipement</h2>
+        <ul>
+          <li><a href="#materiels">Matériels</a></li>
+          <li><a href="#palette">Palette</a></li>
+        </ul>
+      </div>
+      <div class="atl-toc-group">
+        <h2 class="h3">Cahier technique</h2>
+        <ul>
+          <li><a href="#montage">Montage des feuilles sur châssis</a></li>
+          <li><a href="#etapes">Les étapes d’une aquarelle</a></li>
+          <li><a href="#gammes">Gammes et esquisses préparatoires</a></li>
+          <li><a href="#vif">Travail sur le vif</a></li>
+        </ul>
+      </div>
+      <div class="atl-toc-group">
+        <h2 class="h3">Fabrication</h2>
+        <ul>
+          <li><a href="#cadres">Fabrication des cadres</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ================================================== ÉQUIPEMENT #}
+<section class="section tint-sky" id="materiels">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">Équipement</p>
+        <h2 class="h2">Matériels</h2>
+      </div>
+    </div>
+    <div class="rel-grid">
+      <div class="tech-card reveal">
+        <h3 class="h3">Différentes techniques de pinceaux.</h3>
+        <p class="tech-note-txt">
+          Varier les techniques et les effets dynamise la composition et contribue
+          à la qualité visuelle&nbsp;:</p>
+        <ul class="chip-list">
+          <li class="chip">Gros Pinceau lavis petit gris</li>
+          <li class="chip">Pinceau synthétique détail</li>
+          <li class="chip">Humide sur humide</li>
+          <li class="chip">Humide sur sec</li>
+          <li class="chip">Moucheté</li>
+          <li class="chip">Pinceau sec</li>
+          <li class="chip">Rouler le pinceaux</li>
+          <li class="chip">Pinceau écrasé en touches verticales</li>
+          <li class="chip">Filé Pinceau fin</li>
+          <li class="chip">Pinceau éventail</li>
+          <li class="chip">Retraits</li>
+          <li class="chip">Incliner la toile pour déplacer les pigments</li>
+          <li class="chip">Coulures</li>
+          <li class="chip">Auréoles</li>
+          <li class="chip">Vaporisateur</li>
+        </ul>
+      </div>
+      <div class="tech-card reveal" id="palette">
+        <h3 class="h3">Palette</h3>
+        {% for p in photos %}
+        <figure class="palette-fig">
+          <img loading="lazy" decoding="async"
+               src="/uploads/atelier/{{ p.folder }}/medium.webp"
+               alt="La palette d’Hilaire Legentil"
+               width="{{ p.img_w }}" height="{{ p.img_h }}">
+        </figure>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{# ================================================== CAHIER TECHNIQUE #}
+<section class="section" id="montage">
+  <div class="container narrow reveal">
+    <p class="label">Cahier technique</p>
+    <h2 class="h2">Montage des feuilles sur châssis</h2>
+    <p>
+      Traditionnellement, les aquarelles sont protégées par un sous verre et un cadre.
+    </p>
+    <p>
+      Certaines aquarelles au sein de cette exposition ont été réalisées différemment&nbsp;:
+      le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat.
+      Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté
+      des couleurs.
+    </p>
+    <h3 class="h3">Montage du papier&nbsp;:</h3>
+    <p>
+      Après plusieurs minutes dans l’eau, le papier est agrafé sur le châssis.
+      En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant
+      l’exécution de l’aquarelle.
+    </p>
+    <p>
+      Le papier sur châssis est aussi un choix de l’artiste&nbsp;: un papier coton frangé
+      monté sur du bois confère à l’aquarelle une qualité esthétique d’"objet artisanal".
+    </p>
+  </div>
+</section>
+
+<section class="section tint-sand" id="etapes">
   <div class="container">
     <div class="section-head reveal">
       <div>
@@ -57,7 +162,7 @@
     </div>
 
     <h3 class="h3 reveal" style="margin-top:2.4rem">Durant l’exécution</h3>
-    <div class="rel-grid">
+    <div class="rel-grid rel-grid-2">
       <div class="tech-card reveal">
         <h4>Lavis&nbsp;:</h4>
         <ul class="tech-list">
@@ -65,29 +170,6 @@
           <li>Pureté des lavis durant l’exécution</li>
           <li>Laisser les imperfections, jouer avec, les utiliser a bon escient</li>
           <li>Éclaircir les lavis pour la profondeur (plus légers et plus bleus pour les lointains)</li>
-        </ul>
-      </div>
-      <div class="tech-card reveal">
-        <h4>Différentes techniques de pinceaux.</h4>
-        <p style="font-size:.93rem;color:var(--muted);margin:0 0 .8rem">
-          Varier les techniques et les effets dynamise la composition et contribue
-          à la qualité visuelle&nbsp;:</p>
-        <ul class="chip-list">
-          <li class="chip">Gros Pinceau lavis petit gris</li>
-          <li class="chip">Pinceau synthétique détail</li>
-          <li class="chip">Humide sur humide</li>
-          <li class="chip">Humide sur sec</li>
-          <li class="chip">Moucheté</li>
-          <li class="chip">Pinceau sec</li>
-          <li class="chip">Rouler le pinceaux</li>
-          <li class="chip">Pinceau écrasé en touches verticales</li>
-          <li class="chip">Filé Pinceau fin</li>
-          <li class="chip">Pinceau éventail</li>
-          <li class="chip">Retraits</li>
-          <li class="chip">Incliner la toile pour déplacer les pigments</li>
-          <li class="chip">Coulures</li>
-          <li class="chip">Auréoles</li>
-          <li class="chip">Vaporisateur</li>
         </ul>
       </div>
       <div class="tech-card reveal">
@@ -102,33 +184,53 @@
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="gammes">
   <div class="container narrow reveal">
     <p class="label">Cahier technique</p>
-    <h2 class="h2">Des aquarelles montées sur châssis</h2>
-    <p>
-      Traditionnellement, les aquarelles sont protégées par un sous verre et un cadre.
-    </p>
-    <p>
-      Certaines aquarelles au sein de cette exposition ont été réalisées différemment&nbsp;:
-      le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat.
-      Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté
-      des couleurs.
-    </p>
-    <h3 class="h3">Montage du papier&nbsp;:</h3>
-    <p>
-      Après plusieurs minutes dans l’eau, le papier est agrafé sur le châssis.
-      En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant
-      l’exécution de l’aquarelle.
-    </p>
-    <p>
-      Le papier sur châssis est aussi un choix de l’artiste&nbsp;: un papier coton frangé
-      monté sur du bois confère à l’aquarelle une qualité esthétique d’"objet artisanal".
-    </p>
+    <h2 class="h2">Gammes et esquisses préparatoires</h2>
+    <p class="muted">Les gammes et esquisses préparatoires d’Hilaire seront présentées ici prochainement.</p>
   </div>
 </section>
 
-<section class="section tint-sand">
+{% if vif %}
+<section class="section tint-sky" id="vif">
+  <div class="container">
+    <div class="section-head reveal">
+      <div>
+        <p class="label">Cahier technique</p>
+        <h2 class="h2">Travail sur le vif</h2>
+      </div>
+    </div>
+    <aside class="vif-def reveal">
+      <p>Je compose mes aquarelles à partir de matériaux multiples&nbsp;: observation
+         et croquis sur le vif, photos formant un carnet de notes de couleurs
+         et de formes.</p>
+    </aside>
+    <p class="atelier-note reveal">Cliquez pour agrandir.</p>
+    <div class="atelier-grid" id="atelier-grid" data-cap="Aquarelle sur le vif">
+      {%- for p in vif %}
+      <figure class="atelier-item reveal">
+        <span class="vif-badge" aria-hidden="true">sur le vif</span>
+        <button type="button" class="atelier-btn"
+                data-full="/uploads/atelier/{{ p.folder }}/medium.webp"
+                aria-label="Agrandir l’aquarelle {{ loop.index }} sur {{ vif|length }}">
+          <img loading="lazy" decoding="async"
+               src="/uploads/atelier/{{ p.folder }}/medium.webp"
+               alt="Aquarelle sur le vif — {{ loop.index }}"
+               width="{{ p.img_w }}" height="{{ p.img_h }}">
+        </button>
+      </figure>
+      {%- endfor %}
+    </div>
+    <p class="invitation-cta reveal">
+      <a class="link-arrow" href="{{ url_for('gallery') }}">Voir les aquarelles sur le vif dans la galerie</a>
+    </p>
+  </div>
+</section>
+{% endif %}
+
+{# ================================================== FABRICATION DES CADRES #}
+<section class="section tint-sand" id="cadres">
   <div class="container">
     <div class="section-head reveal">
       <div>
@@ -137,11 +239,11 @@
       </div>
     </div>
     <p class="lead reveal">
-      Les châssis en bois sont confectionnés dans la Manche par le peintre avec du bois
-      issus de forêts (européennes) durables.
+      Les châssis en bois sont confectionnés dans la Manche par le peintre, ou réalisés
+      par une entreprise française, avec du bois issu de forêts (européennes) durables.
     </p>
     <div class="fact-card reveal" style="max-width:44em">
-      <ul class="tech-list">
+      <ul class="tech-list tech-dash">
         <li>La peinture utilisée est fabriquée en France.</li>
         <li>Le papier 100&nbsp;% coton est fabriqué en Italie</li>
         <li>Le fixatif pour aquarelle est fabriqué en Allemagne et le vernis final est
@@ -172,42 +274,13 @@
       postillons&nbsp;! Le papier restera vulnérable aux coups et au détrempage.
     </p>
     <blockquote class="big-quote reveal" style="margin-top:2.6rem">
-      L’aquarelle est un fabuleux moyen d’évasion.
       Alors, à vos outils&nbsp;! À vos pinceaux&nbsp;!
     </blockquote>
   </div>
 </section>
 
-<section class="section">
-  <div class="container">
-    <div class="section-head reveal">
-      <div>
-        <h2 class="h2">L’atelier</h2>
-      </div>
-    </div>
-    <p class="atelier-note reveal">Cliquez pour agrandir.</p>
-    <div class="atelier-grid{% if photos|length == 1 %} atelier-one{% endif %}"
-         id="atelier-grid" data-cap="L’atelier">
-      {%- for p in photos %}
-      <figure class="atelier-item reveal">
-        <button type="button" class="atelier-btn"
-                data-full="/uploads/atelier/{{ p.folder }}/medium.webp"
-                aria-label="Agrandir la photo {{ loop.index }} sur {{ photos|length }}">
-          <img loading="lazy" decoding="async"
-               src="/uploads/atelier/{{ p.folder }}/medium.webp"
-               alt="L’atelier d’Hilaire Legentil — photo {{ loop.index }}"
-               width="{{ p.img_w }}" height="{{ p.img_h }}">
-        </button>
-      </figure>
-      {%- endfor %}
-    </div>
-  </div>
-</section>
-
 <section class="section wash-band">
   <div class="container narrow center reveal">
-    <h2 class="h2">Exposition et vente</h2>
-    <p class="lead">Aquarelles sur commandes.</p>
     <p class="invitation-cta">
       <a class="btn" href="{{ url_for('gallery') }}">Découvrir les aquarelles</a>
     </p>

@@ -11,7 +11,8 @@
   </div>
 
   <div class="hero-inner">
-    <p class="hero-baseline reveal">{{ S.get('hero_baseline', 'Aquarelles — mer & paysage') }}</p>
+    {% set bl = S.get('hero_baseline', 'Aquarelles — mer & paysage') %}
+    <p class="hero-baseline reveal">{% if '—' in bl %}{{ bl.split('—')[0]|trim }} <svg class="hw-wave" viewBox="0 0 44 12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M2 8c5-7 11-7 16 0s11 7 16 0 7-5 8-3" fill="none" stroke="#0a7d85" stroke-width="2" stroke-linecap="round"/></svg> {{ bl.split('—')[1]|trim }}{% else %}{{ bl }}{% endif %}</p>
     <h1 class="hero-title reveal d1">{{ S.get('hero_title', 'Hilaire Legentil') }}</h1>
     <p class="hero-sub reveal d2">{{ S.get('hero_sub', 'Artiste auteur') }}</p>
 
@@ -29,9 +30,6 @@
 
   <div class="hero-after">
     <p class="hero-intro reveal d3">{{ S.get('home_intro') }}</p>
-    <p class="hero-cta reveal d3">
-      <a class="btn" href="{{ url_for('artist') }}">Découvrir la démarche</a>
-    </p>
   </div>
 
 </section>
@@ -86,6 +84,7 @@
       <div>
         <p class="label">Actualités</p>
         <h2 class="h2">Événements &amp; expositions</h2>
+        <p class="section-sub">Chaque année, je présente mes aquarelles dans des galeries du Cotentin.</p>
       </div>
       <a class="link-arrow" href="{{ url_for('news_list') }}">Toutes les actualités</a>
     </div>
