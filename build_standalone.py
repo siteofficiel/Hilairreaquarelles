@@ -350,7 +350,7 @@ radial-gradient(50% 100% at 85% 40%,rgba(17,89,106,.12),transparent 60%)}
 .contact-invitation{background:radial-gradient(70% 110% at 12% 0%,rgba(31,179,196,0.260),transparent 60%),radial-gradient(70% 110% at 88% 8%,rgba(34,155,117,0.260),transparent 60%),linear-gradient(180deg,var(--paper),var(--tealSoft) 320%);text-align:center}
 .invitation-cta{display:flex;gap:2.2rem;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:2.2rem}
 /* galerie — filtres pro : menus déroulants + tri automatique */
-.hl-filters{margin:-1.6rem auto 0;padding:clamp(.9rem,2.2vw,1.3rem) clamp(1rem,2.6vw,1.5rem);
+.hl-filters{margin:1.1rem auto 0;padding:clamp(.9rem,2.2vw,1.3rem) clamp(1rem,2.6vw,1.5rem);
 background:rgba(252,250,246,.92);border:1px solid var(--hair);border-radius:var(--r-card);box-shadow:var(--shs)}
 .hl-fbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(150px,auto);gap:.6rem}
 .hl-dd{position:relative;min-width:0}
@@ -1446,6 +1446,44 @@ a:focus-visible,button:focus-visible{outline-color:#0a7d85}
 .hc-carousel .wk-dot:hover{opacity:.85}
 .hc-carousel .wk-dot.on{opacity:1;border-color:#faf8f3;transform:scale(1.1)}
 @media (max-width:760px){.hero-title{margin-bottom:.8rem}.hero-sub{margin-bottom:.9rem}.hero-after{padding-top:1rem}.hc-carousel{margin-top:.75rem}.hc-carousel .wk-btn{width:42px;height:42px;font-size:1.6rem}.hc-carousel .wk-dots{gap:6px;padding:5px 7px;bottom:10px}.hc-carousel .wk-dot{width:36px;height:24px;border-radius:5px}}
+.hw-wave{height:.8em;width:auto;vertical-align:-.06em;margin:0 .22em}
+.section-sub{font-family:var(--serif);font-style:italic;color:var(--tealDeep);
+  font-size:clamp(1rem,2vw,1.2rem);margin:.4rem 0 0}
+@media (min-width:1024px){.hero-baseline{font-size:clamp(1.02rem,1vw + .55rem,1.3rem);letter-spacing:.24em}.hw-wave{height:.9em}}
+@media (max-width:600px){.hero-sub{color:var(--ink);text-shadow:0 1px 2px rgba(250,248,243,.97),
+  0 0 18px rgba(250,248,243,.95),0 2px 30px rgba(250,248,243,.88)}}
+.hl-sort-btn{display:flex;width:100%;min-height:48px;align-items:center;gap:.55rem;text-align:left;
+  font-family:var(--sans);background:var(--card);color:var(--text);border:1px solid var(--hair);
+  border-radius:var(--r-btn);padding:.5rem .8rem;cursor:pointer;transition:border-color .25s,box-shadow .25s}
+.hl-sort-btn:hover{border-color:var(--teal);box-shadow:0 0 0 3px rgba(10,125,133,.10)}
+.hl-sort-btn:active{transform:translateY(1px)}
+.hl-sort-btn svg{flex:none;color:var(--teal)}
+html{scroll-behavior:smooth}
+.section[id],section[id]{scroll-margin-top:96px}
+.atl-toc-section{padding-top:clamp(2rem,5vw,3.4rem)}
+.atl-toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.4rem 2.2rem;
+  padding:1.4rem 1.6rem;background:rgba(252,250,246,.9);border:1px solid var(--hair);border-radius:var(--r-card)}
+.atl-toc .h3{font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--tealInk);margin:0 0 .6rem}
+.atl-toc ul{list-style:none;margin:0;padding:0}
+.atl-toc li{padding:.22rem 0}
+.atl-toc a{font-family:var(--serif);font-size:1.02rem;color:var(--text);text-decoration:none;border-bottom:1px solid transparent}
+.atl-toc a:hover{color:var(--tealInk);border-color:var(--teal)}
+.palette-fig{margin:0;display:flex;justify-content:center}
+.palette-fig img{max-height:520px;width:auto;max-width:100%;object-fit:contain;
+  border:6px solid rgba(252,250,246,.95);border-radius:10px;
+  box-shadow:0 10px 30px rgba(14,42,50,.16),0 3px 8px rgba(14,42,50,.10);background:#fcfaf6}
+.tech-note-txt{font-size:.93rem;color:var(--muted);margin:0 0 .8rem}
+.rel-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tech-dash{list-style:none;margin:0;padding:0}
+.tech-dash li{position:relative;padding:.4rem 0 .4rem 1.5rem;line-height:1.55}
+.tech-dash li::before{content:"—";position:absolute;left:0;top:.4rem;color:var(--teal);font-weight:600}
+.evt-points{font-size:1.06rem}
+.evt-points-section{padding-top:0}
+.work-nav{display:flex;gap:.8rem;margin-top:1.2rem}
+.work-nav-btn{flex:1;display:flex;align-items:center;justify-content:center;min-height:50px;
+  border:1px solid var(--hair);border-radius:var(--r-btn);background:var(--card);color:var(--tealInk);
+  font-size:1.7rem;line-height:1;text-decoration:none;transition:background .25s,border-color .25s,color .25s}
+.work-nav-btn:hover{background:var(--teal);border-color:var(--teal);color:#fff}
 </style>
 </head>
 <body class="pg-home">
@@ -1459,7 +1497,7 @@ a:focus-visible,button:focus-visible{outline-color:#0a7d85}
     <nav class="site-nav" id="site-nav" aria-label="Navigation principale">
       <ul>
         <li><a href="#/accueil" data-r="accueil">Accueil</a></li>
-        <li><a href="#/artiste" data-r="artiste">La démarche de l’artiste</a></li>
+        <li><a href="#/artiste" data-r="artiste">Démarche de l’artiste</a></li>
         <li><a href="#/atelier" data-r="atelier">L’atelier</a></li>
         <li><a href="#/galerie" data-r="galerie">Galerie</a></li>
         <li><a href="#/evenements" data-r="evenements">Événements</a></li>
@@ -1486,7 +1524,7 @@ a:focus-visible,button:focus-visible{outline-color:#0a7d85}
     <div class="footer-col">
       <h2 class="footer-title">Le site</h2>
       <ul class="footer-list">
-        <li><a href="#/artiste">La démarche de l’artiste</a></li>
+        <li><a href="#/artiste">Démarche de l’artiste</a></li>
         <li><a href="#/atelier">L’atelier</a></li>
         <li><a href="#/galerie">La galerie</a></li>
         <li><a href="#/evenements">Événements &amp; expositions</a></li>
@@ -1591,6 +1629,9 @@ var CAR='<div class="hc-carousel reveal d2" id="hc-carousel" role="region" aria-
   '<button class="wk-btn wk-prev" type="button" aria-label="Image précédente">\u2039</button>'+
   '<button class="wk-btn wk-next" type="button" aria-label="Image suivante">\u203a</button>'+
   '<span class="wk-dots" id="hc-dots"></span></div>';
+function waveB(s){s=String(s||"");var p=s.split("\u2014");
+  if(p.length<2)return esc(s);
+  return esc(p[0].trim())+'<svg class="hw-wave" viewBox="0 0 44 12" aria-hidden="true"><path d="M2 8c5-7 11-7 16 0s11 7 16 0 7-5 8-3" fill="none" stroke="#0a7d85" stroke-width="2" stroke-linecap="round"/></svg>'+esc(p[1].trim());}
 function pageHome(){
   var _td=new Date().toISOString().slice(0,10);
   var _up=DATA.news.filter(function(n){return (n.rd||"")>=_td;}),
@@ -1598,13 +1639,13 @@ function pageHome(){
   var news=_up.concat(_pa).slice(0,3).map(function(n){return newsRow(n,false);}).join("");
   var fig=DATA.works[0];
   return '<section class="hero">'+WASH+
-  '<div class="hero-inner"><p class="hero-baseline reveal">'+esc(DATA.heroB)+'</p>'+
+  '<div class="hero-inner"><p class="hero-baseline reveal">'+waveB(DATA.heroB)+'</p>'+
   '<h1 class="hero-title reveal d1">'+esc(DATA.heroT)+'</h1>'+
   '<p class="hero-sub reveal d2">'+esc(DATA.heroS)+'</p>'+
   CAR+
   '</div>'+
   '<div class="hero-after"><p class="hero-intro reveal d3">'+esc(DATA.homeIntro)+'</p>'+
-  '<p class="hero-cta reveal d3"><a class="btn" href="#/artiste">Découvrir la démarche</a></p></div>'+
+  '</div>'+
   '</section>'+
   '<section class="section section-artist tint-sand"><div class="container artist-home">'+
   '<div class="reveal"><p class="label">La démarche de l’artiste</p>'+
@@ -1618,7 +1659,8 @@ function pageHome(){
   '<section class="section quote-section"><div class="container narrow center reveal">'+QUOTE+
   '<blockquote class="big-quote">Peindre, c’est voyager, peindre c’est aussi une façon de pouvoir méditer. J’ai choisi d’être paysagiste marine car la mer, les ports, la côte et les nuages m’apaisent et me recentrent.<cite>Hilaire Legentil</cite></blockquote></div></section>'+
   '<section class="section tint-sky"><div class="container"><div class="section-head reveal">'+
-  '<div><p class="label">Événements</p><h2 class="h2">Événements &amp; expositions</h2></div>'+
+  '<div><p class="label">Événements</p><h2 class="h2">Événements &amp; expositions</h2>'+
+  '<p class="section-sub">Chaque année, je présente mes aquarelles dans des galeries du Cotentin.</p></div>'+
   '<a class="link-arrow" href="#/evenements">Tous les événements</a></div>'+
   '<div class="news-rows">'+news+'</div></div></section>'+
   '<section class="section contact-invitation"><div class="container narrow reveal">'+
@@ -1671,11 +1713,13 @@ function pageArtist(){
   '<p>Mes aquarelles sont sur papier 100&nbsp;% coton, cette matière apporte une tonalité douce à la couleur et permet des superpositions qui n’altèrent pas les lavis.</p>'+
   '<p>Ma couleur de prédilection est le bleu&nbsp;: en particulier l’Outremer qui apporte une granulation si belle sur le papier. Pour la mer, j’associe des bleus tirant sur le vert (Bleu Winsor, Bleu de prusse) que je mélange en quantité variable à des terres ou à des verts (vert d’eau). Ces couleurs forment la trame de mes compositions.</p>'+
   '<p>J’utilise assez régulièrement le Marron de Pérylène (plus transparent que le rouge indien et tirant sur le gris). Associé au bleu d’Indanthrène, il forme de magnifiques violets pour les nuages sombres.</p>'+
-  '<p>Les gris enfin, le gris chaud pour le sable humide et le gris froid très utile pour contrôler la profondeur du paysage.</p></div></section>'+
+  '<p>Les gris enfin, le gris chaud pour le sable humide et le gris froid très utile pour contrôler la profondeur du paysage.</p>'+
+  '<blockquote class="big-quote reveal">L’aquarelle est un fabuleux moyen d’évasion.</blockquote></div></section>'+
 
   '<section class="section tint-sand"><div class="container narrow reveal">'+
-  '<h2 class="h2">L’expo</h2>'+
-  '<p>J’espère que cette nouvelle saison d’exposition vous inspirera, vous permettra d’accéder à l’univers sensible du paysage et de l’aquarelle. Et nous aurons peut-être le plaisir d’échanger, c’est toujours un moment d’humanité privilégié.</p>'+
+  '<h2 class="h2">Les expos</h2>'+
+  '<p>Chaque année, j’expose dans le nord Cotentin à Barfleur, Saint-Vaast, Montfarville…</p>'+
+  '<p>J’espère que vous aurez l’occasion de participer à la prochaine saison d’exposition et qu’elle vous permette d’accéder à l’univers sensible du paysage et de l’aquarelle. Et nous aurons peut-être le plaisir d’échanger, c’est toujours un moment d’humanité privilégié.</p>'+
   '<p>Pour un court séjour dans le Cotentin, ou habitant cette région, je souhaite aussi de tout cœur que cette exposition vous donne envie — quel que soit votre parcours, de peindre, d’utiliser vos mains ou votre corps pour exprimer ce qui vibre en vous (peinture, sculpture, chant, danse, méditation…).</p></div></section>'+
 
   '<section class="section"><div class="container narrow reveal">'+
@@ -1684,20 +1728,7 @@ function pageArtist(){
   '<p>Je suis parfois surpris de constater nombre de personnes sans formation, sans aptitude apparente, sans parcours dans les arts, se révèlent pleines de ressources et de talent dans la pratique artistique.</p>'+
   '<p class="lead center">À vos pinceaux</p></div></section>'+
 
-  '<section class="section tint-sage"><div class="container reveal">'+
-  '<h2 class="h2">La société&nbsp;: Marine Normandie aquarelle</h2>'+
-  '<div class="rel-grid">'+
-  '<div class="rel-card reveal"><h3 class="h3">Exposition et vente</h3></div>'+
-  '<div class="rel-card reveal"><h3 class="h3">Aquarelles sur commandes</h3></div></div>'+
-  '<div class="fact-card"><dl class="fact-list">'+
-  '<div><dt>Non commercial</dt><dd>Marine Normandie Aquarelle</dd></div>'+
-  '<div><dt>SIRET</dt><dd>927753780 00018</dd></div>'+
-  '<div><dt>Activité</dt><dd>création artistique relevant des arts plastiques, artiste auteur</dd></div>'+
-  '<div><dt>Adresse</dt><dd>50700 YVETOT-BOCAGE</dd></div>'+
-  '<div><dt>Création</dt><dd>01/04/2024</dd></div>'+
-  (DATA.instagram?'<div><dt>Instagram</dt><dd><a href="https://www.instagram.com/'+DATA.instagram+'/" rel="me noopener" target="_blank">Instagram</a></dd></div>':"")+
-  '</dl></div></div></section>'+
-
+  
   '<section class="section wash-band"><div class="container narrow center reveal">'+
   '<h2 class="h2">Carnet d’inspiration</h2>'+
   QUOTE+'<blockquote class="big-quote">…Sons et paysages côtiers nous transportent et nous bercent depuis l’enfance. Loin du tumulte du monde, nous sommes aptes à aimer et chérir ceux qui nous sont les plus chers…</blockquote>'+
@@ -1725,25 +1756,11 @@ function pageArtist(){
   '<ol class="timeline">'+tl+'</ol></div></section>'+
 
   '<section class="section contact-invitation"><div class="container narrow center reveal">'+
-  '<h2 class="h2">Exposition et vente</h2>'+
-  '<p class="lead">Aquarelles sur commandes.</p>'+
   '<p class="invitation-cta"><a class="btn" href="#/contact">Contacter l’artiste</a></p></div></section>';
 }
 
 function pageGallery(){
   var cats=[];DATA.works.forEach(function(w){if(w.c&&cats.indexOf(w.c)<0)cats.push(w.c);});
-  var vifSec=DATA.atelier.length?
-    '<section class="section"><div class="container">'+
-    '<div class="section-head reveal"><div><p class="label">Sur le vif</p><h2 class="h2">Un carnet de notes de couleurs et de formes</h2></div></div>'+
-    '<aside class="vif-def reveal">'+
-    '<p>Je compose mes aquarelles à partir de matériaux multiples&nbsp;: observation et croquis sur le vif, photos formant un carnet de notes de couleurs et de formes.</p>'+
-    '</aside>'+
-    '<p class="atelier-note reveal">Cliquez pour agrandir.</p>'+
-    '<div class="atelier-grid" id="atelier-grid" data-cap="Aquarelle sur le vif">'+
-    DATA.atelier.map(function(p,i){return '<figure class="atelier-item reveal"><span class="vif-badge" aria-hidden="true">sur le vif</span>'+
-      '<button type="button" class="atelier-btn" aria-label="Agrandir l’aquarelle '+(i+1)+' sur '+DATA.atelier.length+'">'+
-      '<img loading="lazy" decoding="async" src="'+p.i+'" alt="Aquarelle sur le vif — '+(i+1)+'"></button></figure>';}).join("")+
-    '</div></div></section>':"";
   var tall=function(key){var o={};DATA.works.forEach(function(w){var v=w[key];if(v)o[v]=(o[v]||0)+1;});return o;};
   var sj=tall("sj"),am=tall("am"),tc=tall("tc"),ys=tall("y");
   var yk=Object.keys(ys).sort(function(a,b){return a<b?1:-1;});
@@ -1754,14 +1771,10 @@ function pageGallery(){
     return '<div class="hl-dd" data-g="'+g+'"><button type="button" class="hl-dd-btn" aria-expanded="false" aria-haspopup="listbox">'+
     '<span class="hl-dd-lab">'+lab+'</span><span class="hl-dd-val">Tous</span>'+ARR+'</button>'+
     '<div class="hl-dd-menu" role="listbox" aria-label="'+lab+'">'+opts+'</div></div>';}
-  var sdd='<div class="hl-dd hl-dd-sort" data-g="sort">'+
-    '<button type="button" class="hl-dd-btn" aria-expanded="false" aria-haspopup="listbox">'+
-    '<span class="hl-dd-lab">Trier</span><span class="hl-dd-val">Ordre de la galerie</span>'+ARR+'</button>'+
-    '<div class="hl-dd-menu" role="listbox" aria-label="Trier les œuvres">'+
-    '<button type="button" class="hl-dd-opt is-sel" role="option" aria-selected="true" data-v="gallery" data-l="Ordre de la galerie">Ordre de la galerie</button>'+
-    '<button type="button" class="hl-dd-opt" role="option" aria-selected="false" data-v="recent" data-l="Plus récentes">Plus récentes d’abord</button>'+
-    '<button type="button" class="hl-dd-opt" role="option" aria-selected="false" data-v="old" data-l="Plus anciennes">Plus anciennes d’abord</button>'+
-    '</div></div>';
+  var sbtn='<button type="button" class="hl-sort-btn" id="hl-sort" title="Tri actuel : Ordre de la galerie — cliquer pour changer">'+
+    '<span class="hl-dd-lab">Tri</span><span class="hl-sort-val" id="hl-sort-val">Ordre de la galerie</span>'+
+    '<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9l5-5 5 5M13 15l5 5 5-5" transform="translate(-1 0)" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+    '</button>';
   var nW=DATA.works.length;
   var bar='<div class="container hl-filters reveal" id="hl-filters">'+
     '<div class="hl-fbar" role="group" aria-label="Filtrer et trier les œuvres">'+
@@ -1769,7 +1782,7 @@ function pageGallery(){
     (Object.keys(am).length?dd("ambiance","Ambiance","Toutes les ambiances",Object.keys(am),am,true):"")+
     (Object.keys(tc).length?dd("technique","Technique","Toutes les techniques",Object.keys(tc),tc,false):"")+
     (yk.length?dd("annee","Année","Toutes les années",yk,ys,false):"")+
-    sdd+'</div>'+
+    sbtn+'</div>'+
     '<div class="hl-fstatus"><p class="hl-fcount" id="gcount" aria-live="polite">'+nW+(nW>1?" œuvres":" œuvre")+'</p>'+
     '<div class="hl-fchips" id="hl-chips"></div>'+
     '<button type="button" class="hl-freset" id="hl-reset" hidden>Réinitialiser</button></div></div>';
@@ -1779,7 +1792,6 @@ function pageGallery(){
   bar+
   '<section class="section gallery-section"><div class="container">'+
   '<div class="gallery-grid" id="grid">'+DATA.works.map(workCard).join("")+'</div></div></section>'+
-  vifSec+
   '<section class="section contact-invitation"><div class="container narrow center reveal">'+
   '<h2 class="h2">Exposition et vente</h2>'+
   '<p class="lead">Aquarelles sur commandes.</p>'+
@@ -1795,7 +1807,7 @@ function pageWork(slug){
   var facts="";
   if(w.c)facts+='<div><dt>Catégorie</dt><dd>'+esc(w.c)+'</dd></div>';
   if(w.tn)facts+='<div><dt>Tonalité</dt><dd>'+esc(w.tn)+'</dd></div>';
-  facts+='<div><dt>Technique</dt><dd>Aquarelle sur papier 100&nbsp;% coton</dd></div>';
+  facts+='<div><dt>Technique</dt><dd>'+(w.tc?esc(w.tc):'Aquarelle sur papier 100&nbsp;% coton')+'</dd></div>';
   if(w.y)facts+='<div><dt>Année</dt><dd>'+esc(w.y)+'</dd></div>';
   if(w.sj)facts+='<div><dt>Sujet</dt><dd>'+esc(w.sj)+'</dd></div>';
   if(w.am)facts+='<div><dt>Ambiance</dt><dd>'+esc(w.am)+'</dd></div>';
@@ -1816,16 +1828,9 @@ function pageWork(slug){
   (ADMIN?'<a class="btn btn-outline btn-full" style="margin-bottom:1rem" href="#/admin">✎ Modifier titre, description…</a>':"")+
   '<a class="btn btn-full" href="#/contact?sujet='+encodeURIComponent("Demande d’information — aquarelle « "+w.t+" »")+'">Demander des informations</a>'+
   '<nav class="work-nav" aria-label="Navigation entre les œuvres">'+
-  '<a class="work-nav-link" href="#/oeuvre/'+prev.s+'"><span class="wn-label">Œuvre précédente</span>'+
-  '<span class="wn-title">'+esc(prev.t)+'</span></a>'+
-  '<a class="work-nav-link is-next" href="#/oeuvre/'+next.s+'"><span class="wn-label">Œuvre suivante</span>'+
-  '<span class="wn-title">'+esc(next.t)+'</span></a></nav>'+
+  '<a class="work-nav-btn" href="#/oeuvre/'+prev.s+'" aria-label="Œuvre précédente : '+esc(prev.t)+'" title="'+esc(prev.t)+'">‹</a>'+
+  '<a class="work-nav-btn" href="#/oeuvre/'+next.s+'" aria-label="Œuvre suivante : '+esc(next.t)+'" title="'+esc(next.t)+'">›</a></nav>'+
   '<p class="work-counter">'+(idx+1)+' / '+DATA.works.length+' — <a class="lnk" href="#/galerie">retour à la galerie</a></p></aside>'+
-  '</div></section>'+
-  '<section class="section next-teaser"><div class="container teaser-inner">'+
-  '<div class="reveal"><p class="label">Œuvre suivante</p><h2 class="h3">'+esc(next.t)+'</h2>'+
-  '<a class="link-arrow" href="#/oeuvre/'+next.s+'">Voir l’œuvre suivante</a></div>'+
-  '<a class="teaser-figure reveal" href="#/oeuvre/'+next.s+'"><img loading="lazy" src="'+next.i+'" alt=""></a>'+
   '</div></section>';
 }
 
@@ -1845,6 +1850,12 @@ function pageNews(){
   return '<header class="page-head"><div class="container reveal"><p class="label">Événements</p>'+
   '<h1 class="page-title">Événements &amp; expositions</h1>'+
   '<p class="page-sub">'+esc(DATA.eventsSub)+'</p></div></header>'+
+  '<section class="section evt-points-section"><div class="container narrow reveal"><ul class="tech-dash evt-points">'+
+  '<li>J’expose mes aquarelles l’été accompagné d’autres artistes dans des galeries du Cotentin.</li>'+
+  '<li>Les visiteurs me voient souvent peindre sur les lieux d’exposition.</li>'+
+  '<li>Mes aquarelles sont en vente (tarifs sur demande).</li>'+
+  '<li>Je réalise des aquarelles sur commande, pour cela, j’aime rencontrer les personnes à qui elles s’adressent.</li>'+
+  '</ul></div></section>'+
   (ADMIN?'<section class="section" style="padding:0 0 1rem"><div class="container adm-bar">'+
   '<a class="btn" href="#/admin">+ Ajouter un événement</a></div></section>':"")+
   '<section class="section"><div class="container">'+
@@ -1920,7 +1931,15 @@ function pageContact(q){
   '<p><button class="btn" id="map-load" type="button">Charger la carte</button></p>'+
   '</div></div>'+
   '<p class="map-credit">Carte © les contributeurs d’<a href="https://www.openstreetmap.org/copyright" rel="noopener" target="_blank">OpenStreetMap</a> — tuiles chargées en ligne si une connexion est disponible.</p></div>'+
-  '</div></section>';
+  '</div></section>'+
+
+  '<section class="section"><div class="container narrow reveal"><div class="fact-card"><dl class="fact-list">'+
+  '<div><dt>Non commercial</dt><dd>Marine Normandie Aquarelle</dd></div>'+
+  '<div><dt>SIRET</dt><dd>927753780 00018</dd></div>'+
+  '<div><dt>Activité</dt><dd>création artistique relevant des arts plastiques, artiste auteur</dd></div>'+
+  '<div><dt>Adresse</dt><dd>50700 YVETOT-BOCAGE</dd></div>'+
+  '<div><dt>Création</dt><dd>01/04/2024</dd></div>'+
+  '</dl></div></div></section>';
 }
 
 /* ------------------------------------------------------- routeur ------- */
@@ -1932,45 +1951,36 @@ function parseHash(){
   return {route:parts[0]||"accueil",q:q};
 }
 function pageAtelier(){
-  var g=DATA.photos.map(function(p,i){
-    return '<figure class="atelier-item reveal">'+
-    '<button type="button" class="atelier-btn" aria-label="Agrandir la photo '+(i+1)+' sur '+DATA.photos.length+'">'+
-    '<img loading="lazy" decoding="async" src="'+p.i+'" alt="L\u2019atelier d\u2019Hilaire Legentil — photo '+(i+1)+'"></button></figure>';
+  var pal=DATA.photos.map(function(p){
+    return '<figure class="palette-fig"><img loading="lazy" decoding="async" src="'+p.i+'" alt="La palette d\u2019Hilaire Legentil" width="'+p.w+'" height="'+p.h+'"></figure>';
   }).join("");
-  if(!g)g='<p class="muted">Les photos arriveront prochainement.</p>';
+  var vif=DATA.atelier.map(function(p,i){
+    return '<figure class="atelier-item reveal"><span class="vif-badge" aria-hidden="true">sur le vif</span>'+
+      '<button type="button" class="atelier-btn" data-full="'+p.i+'" aria-label="Agrandir l\u2019aquarelle '+(i+1)+' sur '+DATA.atelier.length+'">'+
+      '<img loading="lazy" decoding="async" src="'+p.i+'" alt="Aquarelle sur le vif — '+(i+1)+'" width="'+p.w+'" height="'+p.h+'"></button></figure>';
+  }).join("");
   return '<header class="page-head"><div class="container reveal"><p class="label">L\u2019atelier</p>'+
     '<h1 class="page-title">Cahier technique</h1>'+
     '<p class="page-sub">'+esc(DATA.atelierSub)+'</p></div></header>'+
-    
-    '<section class="section tint-sky"><div class="container">'+
-    '<div class="section-head reveal"><div><p class="label">Cahier technique</p>'+
-    '<h2 class="h2">Les étapes d’une aquarelle</h2></div></div>'+
-    '<p class="lead reveal">L’aquarelle est très exigeante et ne s’improvise pas. La technique est un prérequis indispensable pour libérer le geste et s’exprimer.</p>'+
-    '<h3 class="h3 reveal">Avant de commencer</h3>'+
+
+    '<section class="section atl-toc-section"><div class="container narrow reveal">'+
+    '<p class="label">Sommaire</p><div class="atl-toc">'+
+    '<div class="atl-toc-group"><h2 class="h3">Équipement</h2><ul>'+
+    '<li><a href="#materiels">Matériels</a></li><li><a href="#palette">Palette</a></li></ul></div>'+
+    '<div class="atl-toc-group"><h2 class="h3">Cahier technique</h2><ul>'+
+    '<li><a href="#montage">Montage des feuilles sur châssis</a></li>'+
+    '<li><a href="#etapes">Les étapes d\u2019une aquarelle</a></li>'+
+    '<li><a href="#gammes">Gammes et esquisses préparatoires</a></li>'+
+    '<li><a href="#vif">Travail sur le vif</a></li></ul></div>'+
+    '<div class="atl-toc-group"><h2 class="h3">Fabrication</h2><ul>'+
+    '<li><a href="#cadres">Fabrication des cadres</a></li></ul></div>'+
+    '</div></div></section>'+
+
+    '<section class="section tint-sky" id="materiels"><div class="container">'+
+    '<div class="section-head reveal"><div><p class="label">Équipement</p><h2 class="h2">Matériels</h2></div></div>'+
     '<div class="rel-grid">'+
-    '<div class="tech-card reveal"><h4>Composition / dessin&nbsp;:</h4><ul class="tech-list">'+
-    '<li>Point de focal fixé avant de peindre</li>'+
-    '<li>2 narrations, 2 niveaux de lecture&nbsp;: 1 paysage et 2 les personnages</li>'+
-    '<li>Dynamique de la composition</li><li>Choisir un format</li>'+
-    '<li>Déplacer le cadre sur le sujet</li>'+
-    '<li>Respecter le dessin (proportions, horizontales, verticales et point de fuite)</li></ul></div>'+
-    '<div class="tech-card reveal"><h4>Couleurs&nbsp;:</h4><ul class="tech-list">'+
-    '<li>Contraste couleurs chaudes et froides</li><li>Harmonie colorée</li>'+
-    '<li>Le choix des couleurs doit traduire l’émotion éprouvée face au sujet</li>'+
-    '<li>Préparer les couleurs avant de peindre (faire de la place sur sa palette)</li>'+
-    '<li>Pigments (granuleux, lisses, crémeux..)</li></ul></div>'+
-    '<div class="tech-card reveal"><h4>Valeurs&nbsp;:</h4><ul class="tech-list">'+
-    '<li>Contraste des valeur équilibré</li><li>Réserver blancs</li>'+
-    '<li>Zones laissées claires</li><li>Drawing gum</li></ul></div>'+
-    '</div>'+
-    '<h3 class="h3 reveal" style="margin-top:2.4rem">Durant l’exécution</h3>'+
-    '<div class="rel-grid">'+
-    '<div class="tech-card reveal"><h4>Lavis&nbsp;:</h4><ul class="tech-list">'+
-    '<li>Liaison des premiers lavis</li><li>Pureté des lavis durant l’exécution</li>'+
-    '<li>Laisser les imperfections, jouer avec, les utiliser a bon escient</li>'+
-    '<li>Éclaircir les lavis pour la profondeur (plus légers et plus bleus pour les lointains)</li></ul></div>'+
-    '<div class="tech-card reveal"><h4>Différentes techniques de pinceaux.</h4>'+
-    '<p style="font-size:.93rem;color:var(--muted);margin:0 0 .8rem">Varier les techniques et les effets dynamise la composition et contribue à la qualité visuelle&nbsp;:</p>'+
+    '<div class="tech-card reveal"><h3 class="h3">Différentes techniques de pinceaux.</h3>'+
+    '<p class="tech-note-txt">Varier les techniques et les effets dynamise la composition et contribue à la qualité visuelle&nbsp;:</p>'+
     '<ul class="chip-list">'+
     '<li class="chip">Gros Pinceau lavis petit gris</li><li class="chip">Pinceau synthétique détail</li>'+
     '<li class="chip">Humide sur humide</li><li class="chip">Humide sur sec</li>'+
@@ -1980,51 +1990,78 @@ function pageAtelier(){
     '<li class="chip">Retraits</li><li class="chip">Incliner la toile pour déplacer les pigments</li>'+
     '<li class="chip">Coulures</li><li class="chip">Auréoles</li><li class="chip">Vaporisateur</li>'+
     '</ul></div>'+
+    '<div class="tech-card reveal" id="palette"><h3 class="h3">Palette</h3>'+pal+'</div>'+
+    '</div></div></section>'+
+
+    '<section class="section" id="montage"><div class="container narrow reveal">'+
+    '<p class="label">Cahier technique</p><h2 class="h2">Montage des feuilles sur châssis</h2>'+
+    '<p>Traditionnellement, les aquarelles sont protégées par un sous verre et un cadre.</p>'+
+    '<p>Certaines aquarelles au sein de cette exposition ont été réalisées différemment&nbsp;: le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat. Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté des couleurs.</p>'+
+    '<h3 class="h3">Montage du papier&nbsp;:</h3>'+
+    '<p>Après plusieurs minutes dans l\u2019eau, le papier est agrafé sur le châssis. En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant l\u2019exécution de l\u2019aquarelle.</p>'+
+    '<p>Le papier sur châssis est aussi un choix de l\u2019artiste&nbsp;: un papier coton frangé monté sur du bois confère à l\u2019aquarelle une qualité esthétique d\'objet artisanal.</p>'+
+    '</div></section>'+
+
+    '<section class="section tint-sand" id="etapes"><div class="container">'+
+    '<div class="section-head reveal"><div><p class="label">Cahier technique</p><h2 class="h2">Les étapes d\u2019une aquarelle</h2></div></div>'+
+    '<p class="lead reveal">L\u2019aquarelle est très exigeante et ne s\u2019improvise pas. La technique est un prérequis indispensable pour libérer le geste et s\u2019exprimer.</p>'+
+    '<h3 class="h3 reveal">Avant de commencer</h3><div class="rel-grid">'+
+    '<div class="tech-card reveal"><h4>Composition / dessin&nbsp;:</h4><ul class="tech-list">'+
+    '<li>Point de focal fixé avant de peindre</li><li>2 narrations, 2 niveaux de lecture&nbsp;: 1 paysage et 2 les personnages</li>'+
+    '<li>Dynamique de la composition</li><li>Choisir un format</li><li>Déplacer le cadre sur le sujet</li>'+
+    '<li>Respecter le dessin (proportions, horizontales, verticales et point de fuite)</li></ul></div>'+
+    '<div class="tech-card reveal"><h4>Couleurs&nbsp;:</h4><ul class="tech-list">'+
+    '<li>Contraste couleurs chaudes et froides</li><li>Harmonie colorée</li>'+
+    '<li>Le choix des couleurs doit traduire l\u2019émotion éprouvée face au sujet</li>'+
+    '<li>Préparer les couleurs avant de peindre (faire de la place sur sa palette)</li>'+
+    '<li>Pigments (granuleux, lisses, crémeux..)</li></ul></div>'+
+    '<div class="tech-card reveal"><h4>Valeurs&nbsp;:</h4><ul class="tech-list">'+
+    '<li>Contraste des valeur équilibré</li><li>Réserver blancs</li><li>Zones laissées claires</li><li>Drawing gum</li></ul></div>'+
+    '</div>'+
+    '<h3 class="h3 reveal" style="margin-top:2.4rem">Durant l\u2019exécution</h3><div class="rel-grid rel-grid-2">'+
+    '<div class="tech-card reveal"><h4>Lavis&nbsp;:</h4><ul class="tech-list">'+
+    '<li>Liaison des premiers lavis</li><li>Pureté des lavis durant l\u2019exécution</li>'+
+    '<li>Laisser les imperfections, jouer avec, les utiliser a bon escient</li>'+
+    '<li>Éclaircir les lavis pour la profondeur (plus légers et plus bleus pour les lointains)</li></ul></div>'+
     '<div class="tech-card reveal"><h4>Ajuster&nbsp;:</h4><ul class="tech-list">'+
     '<li>Vérifier la carte des formes de près et de loin (ajuster la peinture)</li>'+
     '<li>Placer les détails à la fin en fonction du chemin visuel</li>'+
     '<li>Glacis pour rehausser le contraste chaud / froid</li></ul></div>'+
     '</div></div></section>'+
 
-    '<section class="section"><div class="container narrow reveal">'+
-    '<p class="label">Cahier technique</p>'+
-    '<h2 class="h2">Des aquarelles montées sur châssis</h2>'+
-    '<p>Traditionnellement, les aquarelles sont protégées par un sous verre et un cadre.</p>'+
-    '<p>Certaines aquarelles au sein de cette exposition ont été réalisées différemment&nbsp;: le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat. Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté des couleurs.</p>'+
-    '<h3 class="h3">Montage du papier&nbsp;:</h3>'+
-    '<p>Après plusieurs minutes dans l’eau, le papier est agrafé sur le châssis. En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant l’exécution de l’aquarelle.</p>'+
-    '<p>Le papier sur châssis est aussi un choix de l’artiste&nbsp;: un papier coton frangé monté sur du bois confère à l’aquarelle une qualité esthétique d\'"objet artisanal".</p>'+
+    '<section class="section" id="gammes"><div class="container narrow reveal">'+
+    '<p class="label">Cahier technique</p><h2 class="h2">Gammes et esquisses préparatoires</h2>'+
+    '<p class="muted">Les gammes et esquisses préparatoires d\u2019Hilaire seront présentées ici prochainement.</p>'+
     '</div></section>'+
 
-    '<section class="section tint-sand"><div class="container">'+
-    '<div class="section-head reveal"><div><p class="label">Des aquarelles "locales"&nbsp;!</p>'+
-    '<h2 class="h2">Fabrication des cadres</h2></div></div>'+
-    '<p class="lead reveal">Les châssis en bois sont confectionnés dans la Manche par le peintre avec du bois issus de forêts (européennes) durables.</p>'+
-    '<div class="fact-card reveal" style="max-width:44em"><ul class="tech-list">'+
+    (vif?'<section class="section tint-sky" id="vif"><div class="container">'+
+    '<div class="section-head reveal"><div><p class="label">Cahier technique</p><h2 class="h2">Travail sur le vif</h2></div></div>'+
+    '<aside class="vif-def reveal"><p>Je compose mes aquarelles à partir de matériaux multiples&nbsp;: observation et croquis sur le vif, photos formant un carnet de notes de couleurs et de formes.</p></aside>'+
+    '<p class="atelier-note reveal">Cliquez pour agrandir.</p>'+
+    '<div class="atelier-grid" id="atelier-grid" data-cap="Aquarelle sur le vif">'+vif+'</div>'+
+    '<p class="invitation-cta reveal"><a class="link-arrow" href="#/galerie">Voir les aquarelles sur le vif dans la galerie</a></p>'+
+    '</div></section>':'')+
+
+    '<section class="section tint-sand" id="cadres"><div class="container">'+
+    '<div class="section-head reveal"><div><p class="label">Des aquarelles "locales"&nbsp;!</p><h2 class="h2">Fabrication des cadres</h2></div></div>'+
+    '<p class="lead reveal">Les châssis en bois sont confectionnés dans la Manche par le peintre, ou réalisés par une entreprise française, avec du bois issu de forêts (européennes) durables.</p>'+
+    '<div class="fact-card reveal" style="max-width:44em"><ul class="tech-list tech-dash">'+
     '<li>La peinture utilisée est fabriquée en France.</li>'+
     '<li>Le papier 100&nbsp;% coton est fabriqué en Italie</li>'+
     '<li>Le fixatif pour aquarelle est fabriqué en Allemagne et le vernis final est fabriqué en Italie.</li></ul></div>'+
     '<div class="step-grid">'+
-    '<div class="step-card reveal"><p class="step-num">01</p><p>À l’aide de baguettes «&nbsp;quart de rond&nbsp;», d’une boîte à onglets, d’une scie et de colle à bois, je réalise un cadre bois.</p></div>'+
-    '<div class="step-card reveal"><p class="step-num">02</p><p>La feuille de papier en coton découpée à la dimension, est trempée dans l’eau pendant 4 minutes.</p></div>'+
-    '<div class="step-card reveal"><p class="step-num">03</p><p>Excédent d’eau de la feuille enlevé en l’accrochant 10 minutes sur un fil à linge.</p></div>'+
+    '<div class="step-card reveal"><p class="step-num">01</p><p>À l\u2019aide de baguettes «&nbsp;quart de rond&nbsp;», d\u2019une boîte à onglets, d\u2019une scie et de colle à bois, je réalise un cadre bois.</p></div>'+
+    '<div class="step-card reveal"><p class="step-num">02</p><p>La feuille de papier en coton découpée à la dimension, est trempée dans l\u2019eau pendant 4 minutes.</p></div>'+
+    '<div class="step-card reveal"><p class="step-num">03</p><p>Excédent d\u2019eau de la feuille enlevé en l\u2019accrochant 10 minutes sur un fil à linge.</p></div>'+
     '<div class="step-card reveal"><p class="step-num">04</p><p>Feuille positionnée, tendue puis agrafée sur le cadre.</p></div>'+
-    '<div class="step-card reveal"><p class="step-num">05</p><p>Après séchage 1 heure. Le papier sec est tendu sur le châssis. L’aquarelle réalisée, un premier spray pour fixer les pigments suivi d’un vernis mat protègent l’aquarelle de l’humidité.</p></div>'+
+    '<div class="step-card reveal"><p class="step-num">05</p><p>Après séchage 1 heure. Le papier sec est tendu sur le châssis. L\u2019aquarelle réalisée, un premier spray pour fixer les pigments suivi d\u2019un vernis mat protègent l\u2019aquarelle de l\u2019humidité.</p></div>'+
     '<div class="step-card reveal"><p class="step-num">06</p><p>Le cadre peint et verni pour être encadré.</p></div>'+
     '</div>'+
-    '<p class="tech-note reveal">Attention cette protection préserve l’œuvre de quelques gouttes d’eau voire de postillons&nbsp;! Le papier restera vulnérable aux coups et au détrempage.</p>'+
-    '<blockquote class="big-quote reveal" style="margin-top:2.6rem">L’aquarelle est un fabuleux moyen d’évasion. Alors, à vos outils&nbsp;! À vos pinceaux&nbsp;!</blockquote>'+
+    '<p class="tech-note reveal">Attention cette protection préserve l\u2019œuvre de quelques gouttes d\u2019eau voire de postillons&nbsp;! Le papier restera vulnérable aux coups et au détrempage.</p>'+
+    '<blockquote class="big-quote reveal" style="margin-top:2.6rem">Alors, à vos outils&nbsp;! À vos pinceaux&nbsp;!</blockquote>'+
     '</div></section>'+
 
-    '<section class="section"><div class="container">'+
-    '<div class="section-head reveal"><div><h2 class="h2">L\u2019atelier</h2></div></div>'+
-    
-'<p class="atelier-note reveal">Cliquez pour agrandir.</p>'+
-    '<div class="atelier-grid'+(DATA.photos.length===1?" atelier-one":"")+'" id="atelier-grid" data-cap="L\u2019atelier">'+g+'</div>'+
-    '</div></section>'+
     '<section class="section wash-band"><div class="container narrow center reveal">'+
-    '<h2 class="h2">Exposition et vente</h2>'+
-    '<p class="lead">Aquarelles sur commandes.</p>'+
     '<p class="invitation-cta"><a class="btn" href="#/galerie">Découvrir les aquarelles</a></p>'+
     '</div></section>';
 }
@@ -2269,6 +2306,14 @@ function initGallery(){
     if(!chip)return;select(chip.getAttribute("data-g"),"");});
   if(resetBtn)resetBtn.addEventListener("click",function(){
     GROUPS.forEach(function(g){state[g]="";syncDD(g);});apply();resetBtn.focus();});
+  var sbtn=document.getElementById("hl-sort");
+  if(sbtn){var SORTS=[["gallery","Ordre de la galerie"],["recent","Plus récentes d'abord"],["old","Plus anciennes d'abord"]];
+    var slab=document.getElementById("hl-sort-val");
+    sbtn.onclick=function(){var cur=0;
+      SORTS.forEach(function(sv,k){if(sv[0]===state.sort)cur=k;});
+      var nx=SORTS[(cur+1)%SORTS.length];state.sort=nx[0];apply();
+      if(slab)slab.textContent=nx[1];
+      sbtn.setAttribute("title","Tri actuel : "+nx[1]+" — cliquer pour changer");};}
   apply();
 }
 function initNotify(){

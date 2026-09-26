@@ -235,8 +235,10 @@ def atelier():
     photos = conn.execute(
         "SELECT folder, img_w, img_h FROM atelier "
         "WHERE kind='palette' ORDER BY position, id").fetchall()
+    vif = conn.execute("SELECT folder, img_w, img_h FROM atelier "
+                       "WHERE kind='vif' ORDER BY position, id").fetchall()
     conn.close()
-    return render_template("atelier.html", photos=photos)
+    return render_template("atelier.html", photos=photos, vif=vif)
 
 
 @app.route("/galerie")
