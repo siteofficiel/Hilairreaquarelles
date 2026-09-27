@@ -69,23 +69,24 @@
     {% endif %}
 
     <details class="gh-help">
-      <summary>📖 Comment obtenir un jeton&nbsp;? (5 minutes, pas à pas)</summary>
+      <summary>📖 Comment obtenir un jeton&nbsp;? (2 minutes, aucun dépôt à choisir)</summary>
+      <p class="admin-sub"><strong>Le plus simple — le jeton «&nbsp;classic&nbsp;»</strong>&nbsp;:</p>
       <ol>
         <li>Sur github.com, cliquez votre avatar → <strong>Settings</strong> → Developer
-            settings → Personal access tokens → <strong>Fine-grained tokens</strong> →
-            Generate new token.</li>
-        <li><strong>Nom</strong>&nbsp;: «&nbsp;Site Hilaire&nbsp;» ·
-            <strong>Expiration</strong>&nbsp;: 1 an.</li>
-        <li><strong>Repository access</strong>&nbsp;: Only select repositories →
-            sélectionnez le dépôt du site.</li>
-        <li><strong>Permissions</strong> → Repository permissions →
-            <strong>Contents&nbsp;: Read and write</strong>.</li>
-        <li>Cliquez <strong>Generate token</strong>, copiez la clé et collez-la ci-dessus.</li>
+            settings → Personal access tokens → <strong>Tokens (classic)</strong> →
+            Generate new token (classic).</li>
+        <li><strong>Note</strong>&nbsp;: «&nbsp;Site Hilaire&nbsp;» ·
+            <strong>Expiration</strong>&nbsp;: «&nbsp;No expiration&nbsp;» pour ne jamais
+            avoir à la renouveler.</li>
+        <li>Cochez uniquement la case <strong>repo</strong> (la toute première, en haut)
+            → <strong>Generate token</strong> → copiez la clé et collez-la ci-dessus.</li>
       </ol>
-      <p class="admin-sub">💡 Avec un jeton «&nbsp;classic&nbsp;», cochez simplement la case
-         <strong>repo</strong> entière. Si GitHub répond «&nbsp;Resource not accessible by
-         personal access token&nbsp;», le jeton n’a pas le droit d’écriture&nbsp;:
-         vérifiez l’étape&nbsp;4 et que le bon dépôt est sélectionné.</p>
+      <p class="admin-sub">💡 Variante «&nbsp;fine-grained&nbsp;» (plus précise, plus
+         longue)&nbsp;: Fine-grained tokens → Generate new token · laissez
+         «&nbsp;All repositories&nbsp;» coché (aucun dépôt à choisir) · Permissions →
+         Repository permissions → <strong>Contents&nbsp;: Read and write</strong>.
+         Si GitHub répond «&nbsp;Resource not accessible by personal access
+         token&nbsp;», le jeton n’a pas le droit d’écriture.</p>
     </details>
   </div>
 </div>

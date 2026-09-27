@@ -16,16 +16,9 @@
     <h1 class="hero-title reveal d1">{{ S.get('hero_title', 'Hilaire Legentil') }}</h1>
     <p class="hero-sub reveal d2">{{ S.get('hero_sub', 'Artiste auteur') }}</p>
 
-    <div class="hc-carousel reveal d2" id="hc-carousel" role="region" aria-label="Carrousel de photographies">
-      <img class="hc-img on" src="{{ url_for('static', filename='img/carousel/c1.webp') }}" alt="Photographie de l’univers d’Hilaire Legentil" decoding="async">
-      <img class="hc-img" src="{{ url_for('static', filename='img/carousel/c2.webp') }}" alt="Photographie de l’univers d’Hilaire Legentil" loading="lazy" decoding="async">
-      <img class="hc-img" src="{{ url_for('static', filename='img/carousel/c3.webp') }}" alt="Photographie de l’univers d’Hilaire Legentil" loading="lazy" decoding="async">
-      <img class="hc-img" src="{{ url_for('static', filename='img/carousel/c4.webp') }}" alt="Photographie de l’univers d’Hilaire Legentil" loading="lazy" decoding="async">
-      <img class="hc-img" src="{{ url_for('static', filename='img/carousel/c5.webp') }}" alt="Photographie de l’univers d’Hilaire Legentil" loading="lazy" decoding="async">
-      <button class="wk-btn wk-prev" type="button" aria-label="Image précédente">‹</button>
-      <button class="wk-btn wk-next" type="button" aria-label="Image suivante">›</button>
-      <span class="wk-dots" id="hc-dots"></span>
-    </div>
+    <figure class="hc-carousel reveal d2">
+      <img class="hc-img on" src="{{ url_for('static', filename='img/carousel/c1.webp') }}" alt="Photographie de l’univers d’Hilaire Legentil" decoding="async" fetchpriority="high">
+    </figure>
   </div>
 
   <div class="hero-after">

@@ -167,10 +167,6 @@ def build_html():
                    .replace("__FJOB__", S.get("footer_job", "Artiste auteur")) \
                    .replace("__FTAG__", S.get("footer_tag", "Aquarelles — mer & paysage")) \
                    .replace("__HC1__", "data:image/webp;base64," + b64(os.path.join(BASE, "static", "img", "carousel", "c1.webp"))) \
-                   .replace("__HC2__", "data:image/webp;base64," + b64(os.path.join(BASE, "static", "img", "carousel", "c2.webp"))) \
-                   .replace("__HC3__", "data:image/webp;base64," + b64(os.path.join(BASE, "static", "img", "carousel", "c3.webp"))) \
-                   .replace("__HC4__", "data:image/webp;base64," + b64(os.path.join(BASE, "static", "img", "carousel", "c4.webp"))) \
-                   .replace("__HC5__", "data:image/webp;base64," + b64(os.path.join(BASE, "static", "img", "carousel", "c5.webp"))) \
                    .replace("__DATA__", data_json)
     return html
 
@@ -1439,23 +1435,13 @@ a:focus-visible,button:focus-visible{outline-color:#0a7d85}
 .step-num{font-family:var(--sans);font-size:.72rem;letter-spacing:.22em;color:var(--teal);margin:0 0 .6rem}
 .step-card p{font-size:.93rem;color:var(--muted);margin:0}
 .tech-note{max-width:44em;margin:1.8rem auto 0;padding:1rem 1.2rem;border-left:3px solid var(--teal);background:rgba(26,157,154,.06);border-radius:0 var(--r-card) var(--r-card) 0;font-size:.92rem;color:var(--muted)}
-/* carrousel — sur l'aquarelle, sous le nom ; passe-partout, formule fluide unique */
+/* photo principale — sur l'aquarelle, sous le nom ; passe-partout ; mobile : pleine largeur, ratio natif */
 .hc-carousel{position:relative;width:min(760px,78vw);margin:clamp(1rem,2.2vw,1.6rem) auto 0;aspect-ratio:2.6/1;overflow:hidden;border:6px solid rgba(252,250,246,.95);border-radius:14px;background:#fcfaf6;box-shadow:0 10px 30px rgba(14,42,50,.18),0 3px 8px rgba(14,42,50,.10);outline:none}
 .hc-carousel:focus-visible{outline:2px solid var(--teal);outline-offset:4px}
 .hc-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;transform:scale(1);transition:opacity .9s ease,transform .9s ease}
-.hc-img.on{opacity:1;transform:scale(1.07);transition:opacity .9s ease,transform 8s linear}
+.hc-img.on{opacity:1}
 .hc-carousel::after{content:"";position:absolute;inset:auto 0 0 0;height:24%;z-index:2;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(10,40,45,.30))}
-.hc-carousel .wk-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:52px;height:52px;min-width:0;min-height:0;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(250,248,243,.55);background:rgba(10,40,45,.32);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#faf8f3;font-family:inherit;font-size:1.9rem;line-height:1;cursor:pointer;opacity:0;transition:opacity .3s ease,background .25s ease,border-color .25s ease}
-.hc-carousel:hover .wk-btn,.hc-carousel:focus-within .wk-btn{opacity:1}
-.hc-carousel .wk-btn:hover{background:rgba(10,60,66,.58);border-color:#faf8f3}
-.hc-carousel .wk-prev{left:14px}
-.hc-carousel .wk-next{right:14px}
-@media (hover:none){.hc-carousel .wk-btn{opacity:1}}
-.hc-carousel .wk-dots{position:absolute;left:50%;right:auto;transform:translateX(-50%);bottom:14px;z-index:3;display:flex;justify-content:center;gap:9px;padding:6px 9px;border-radius:999px;background:rgba(10,40,45,.34);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
-.hc-carousel .wk-dot{width:46px;height:30px;padding:0;border-radius:6px;cursor:pointer;background-size:cover;background-position:center;border:1px solid rgba(250,248,243,.40);opacity:.55;transition:opacity .25s ease,transform .25s ease,border-color .25s ease}
-.hc-carousel .wk-dot:hover{opacity:.85}
-.hc-carousel .wk-dot.on{opacity:1;border-color:#faf8f3;transform:scale(1.1)}
-@media (max-width:760px){.hero-title{margin-bottom:.8rem}.hero-sub{margin-bottom:.9rem}.hero-after{padding-top:1rem}.hc-carousel{margin-top:.75rem}.hc-carousel .wk-btn{width:42px;height:42px;font-size:1.6rem}.hc-carousel .wk-dots{gap:6px;padding:5px 7px;bottom:10px}.hc-carousel .wk-dot{width:36px;height:24px;border-radius:5px}}
+@media (max-width:760px){.hero-title{margin-bottom:.8rem}.hero-sub{margin-bottom:.9rem}.hero-after{padding-top:1rem}.hc-carousel{width:100%;aspect-ratio:2.18/1;margin-top:.9rem}}
 .hw-wave{height:.8em;width:auto;vertical-align:-.06em;margin:0 .22em}
 .section-sub{font-family:var(--serif);font-style:italic;color:var(--tealDeep);
   font-size:clamp(1rem,2vw,1.2rem);margin:.4rem 0 0}
@@ -1630,15 +1616,8 @@ var QUOTE='<svg class="quote-mark" viewBox="0 0 72 48" aria-hidden="true" xmlns=
 var WASH='<div class="hero-wash" aria-hidden="true"><img src="__WASHCARD__" alt="" decoding="async"></div>';
 
 /* ------------------------------------------------------- pages --------- */
-var CAR='<div class="hc-carousel reveal d2" id="hc-carousel" role="region" aria-label="Carrousel de photographies">'+
-  '<img class="hc-img on" src="__HC1__" alt="Photographie de l\u2019univers d\u2019Hilaire Legentil" decoding="async">'+
-  '<img class="hc-img" src="__HC2__" alt="Photographie de l\u2019univers d\u2019Hilaire Legentil" loading="lazy" decoding="async">'+
-  '<img class="hc-img" src="__HC3__" alt="Photographie de l\u2019univers d\u2019Hilaire Legentil" loading="lazy" decoding="async">'+
-  '<img class="hc-img" src="__HC4__" alt="Photographie de l\u2019univers d\u2019Hilaire Legentil" loading="lazy" decoding="async">'+
-  '<img class="hc-img" src="__HC5__" alt="Photographie de l\u2019univers d\u2019Hilaire Legentil" loading="lazy" decoding="async">'+
-  '<button class="wk-btn wk-prev" type="button" aria-label="Image précédente">\u2039</button>'+
-  '<button class="wk-btn wk-next" type="button" aria-label="Image suivante">\u203a</button>'+
-  '<span class="wk-dots" id="hc-dots"></span></div>';
+var CAR='<figure class="hc-carousel reveal d2">'+
+  '<img class="hc-img on" src="__HC1__" alt="Photographie de l\u2019univers d\u2019Hilaire Legentil" decoding="async" fetchpriority="high"></figure>';
 function waveB(s){s=String(s||"");var p=s.split("\u2014");
   if(p.length<2)return esc(s);
   return esc(p[0].trim())+'<svg class="hw-wave" viewBox="0 0 44 12" aria-hidden="true"><path d="M2 8c5-7 11-7 16 0s11 7 16 0 7-5 8-3" fill="none" stroke="#0a7d85" stroke-width="2" stroke-linecap="round"/></svg>'+esc(p[1].trim());}

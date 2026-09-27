@@ -2154,10 +2154,10 @@ a:focus-visible,button:focus-visible{outline-color:#0a7d85}
 }
 
 
-/* ═ CARROUSEL D'IMAGES — sur l'aquarelle, juste sous le nom ═ */
-/* intégré comme une empreinte montée sur papier (passe-partout) ;
-   UNE seule formule fluide — min(760px, 78vw) + ratio 2.6 — de 320px au 4K, zéro palier :
-   la largeur suit l'écran, la hauteur suit la largeur, jamais de saut de mise en page */
+/* ═ PHOTO PRINCIPALE — sur l'aquarelle, juste sous le nom ═ */
+/* intégrée comme une empreinte montée sur papier (passe-partout) ;
+   UNE seule formule fluide — min(760px, 78vw) + ratio 2.6 — du bureau au 4K, zéro palier ;
+   sur téléphone : pleine largeur au ratio natif de la photo (2.18), bien plus visible */
 .hc-carousel{
   position:relative; width:min(760px, 78vw); margin:clamp(1rem, 2.2vw, 1.6rem) auto 0;
   aspect-ratio:2.6/1; overflow:hidden;
@@ -2173,50 +2173,19 @@ a:focus-visible,button:focus-visible{outline-color:#0a7d85}
   opacity:0; transform:scale(1);
   transition:opacity .9s ease, transform .9s ease;
 }
-.hc-img.on{ opacity:1; transform:scale(1.07); transition:opacity .9s ease, transform 8s linear; }
+.hc-img.on{ opacity:1; }
 .hc-carousel::after{
   content:""; position:absolute; inset:auto 0 0 0; height:24%; z-index:2; pointer-events:none;
   background:linear-gradient(180deg, transparent, rgba(10, 40, 45, .30));
 }
-.hc-carousel .wk-btn{
-  position:absolute; top:50%; transform:translateY(-50%); z-index:3;
-  width:52px; height:52px; min-width:0; min-height:0; padding:0;
-  display:flex; align-items:center; justify-content:center;
-  border-radius:50%; border:1px solid rgba(250, 248, 243, .55);
-  background:rgba(10, 40, 45, .32); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-  color:#faf8f3; font-family:inherit; font-size:1.9rem; line-height:1; cursor:pointer;
-  opacity:0; transition:opacity .3s ease, background .25s ease, border-color .25s ease;
-}
-.hc-carousel:hover .wk-btn, .hc-carousel:focus-within .wk-btn{ opacity:1; }
-.hc-carousel .wk-btn:hover{ background:rgba(10, 60, 66, .58); border-color:#faf8f3; }
-.hc-carousel .wk-prev{ left:14px; }
-.hc-carousel .wk-next{ right:14px; }
-@media (hover:none){ .hc-carousel .wk-btn{ opacity:1; } }
-.hc-carousel .wk-dots{
-  position:absolute; left:50%; right:auto; transform:translateX(-50%); bottom:14px; z-index:3;
-  display:flex; justify-content:center; gap:9px; padding:6px 9px;
-  border-radius:999px; background:rgba(10, 40, 45, .34);
-  backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-}
-.hc-carousel .wk-dot{
-  width:46px; height:30px; padding:0; border-radius:6px; cursor:pointer;
-  background-size:cover; background-position:center;
-  border:1px solid rgba(250, 248, 243, .40); opacity:.55;
-  transition:opacity .25s ease, transform .25s ease, border-color .25s ease;
-}
-.hc-carousel .wk-dot:hover{ opacity:.85; }
-.hc-carousel .wk-dot.on{ opacity:1; border-color:#faf8f3; transform:scale(1.1); }
-/* mobile : même formule fluide (78vw) — le carrousel rétrécit tout seul ;
-   la grille du héros réserve la place exacte du titre + carrousel :
-   l'intro ne peut plus être recouverte et l'aquarelle reste entière */
+/* mobile : la photo prend toute la largeur, au ratio natif (2.18) —
+   plus grande et entièrement visible ; la grille du héros réserve
+   la place exacte du titre + photo : l'intro ne peut pas être recouverte */
 @media (max-width:760px){
   .hero-title{ margin-bottom:.8rem; }
   .hero-sub{ margin-bottom:.9rem; }
   .hero-after{ padding-top:1rem; }
-  .hc-carousel{ margin-top:.75rem; }
-  .hc-carousel .wk-btn{ width:42px; height:42px; font-size:1.6rem; }
-  .hc-carousel .wk-dots{ gap:6px; padding:5px 7px; bottom:10px; }
-  .hc-carousel .wk-dot{ width:36px; height:24px; border-radius:5px; }
+  .hc-carousel{ width:100%; aspect-ratio:2.18/1; margin-top:.9rem; }
 }
 
 

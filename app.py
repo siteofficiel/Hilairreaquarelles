@@ -566,8 +566,37 @@ def admin_home():
                 st, me = _gh_call("GET", "https://api.github.com/user", token)
                 if st == 200:
                     db.set_setting("github_token", token)
-                    flash(f"Clé vérifiée ✔ — connecté en tant que "
-                          f"{me.get('login', '?')}.", "ok")
+                    # Détection automatique du dépôt du site : celui qui contient
+                    # index.html à sa racine — rien à choisir à la main.
+                    found = ""
+                    if not db.get_settings().get("github_repo"):
+                        st2, rl = _gh_call("GET",
+                                           "https://api.github.com/user/repos"
+                                           "?per_page=100&sort=pushed", token)
+                        hits = []
+                        if st2 == 200 and isinstance(rl, list):
+                            for r in rl[:10]:
+                                if not (r.get("permissions") or {}).get("push"):
+                                    continue
+                                st3, _c = _gh_call(
+                                    "GET",
+                                    "https://api.github.com/repos/"
+                                    + r["full_name"] + "/contents/index.html",
+                                    token)
+                                if st3 == 200:
+                                    hits.append((r["full_name"],
+                                                 r.get("default_branch") or "main"))
+                        if len(hits) == 1:
+                            found, _br = hits[0]
+                            db.set_setting("github_repo", found)
+                            db.set_setting("github_branch", _br)
+                    if found:
+                        flash(f"Clé vérifiée ✔ — connecté en tant que "
+                              f"{me.get('login', '?')}. Dépôt du site trouvé "
+                              f"automatiquement : {found}.", "ok")
+                    else:
+                        flash(f"Clé vérifiée ✔ — connecté en tant que "
+                              f"{me.get('login', '?')}.", "ok")
                 else:
                     hint = {401: "clé invalide ou expirée",
                             403: "clé sans accès"}.get(st, me.get("message", ""))
@@ -1385,7 +1414,7 @@ def admin_settings():
 @app.route("/admin/accueil", methods=["GET", "POST"])
 @require_admin
 def admin_homepage():
-    """Carrousel de la page d'accueil : 5 photos remplaçables."""
+    """Photo principale de la page d'accueil (remplaçable)."""
     import subprocess, sys
     from PIL import Image
     if request.method == "POST":
@@ -1393,7 +1422,7 @@ def admin_homepage():
             abort(400)
         slot = request.form.get("slot", "")
         up = request.files.get("image")
-        if slot not in ("1", "2", "3", "4", "5"):
+        if slot != "1":
             flash("Emplacement inconnu.", "error")
             return redirect(url_for("admin_homepage"))
         if not up or not up.filename:
@@ -1411,7 +1440,7 @@ def admin_homepage():
         r = subprocess.run([sys.executable, "build_standalone.py"],
                            cwd=BASE_DIR, capture_output=True, text=True)
         if r.returncode == 0:
-            flash("Image %s du carrousel mise à jour." % slot, "ok")
+            flash("Photo de l'accueil mise à jour.", "ok")
         else:
             flash("Image mise à jour — la version « fichier unique » sera "
                   "régénérée à la prochaine publication.", "ok")
