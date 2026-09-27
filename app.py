@@ -605,23 +605,43 @@ def admin_home():
             except Exception as e:
                 flash(f"Impossible de générer la page unique : {e}", "error")
                 return redirect(url_for("admin_home"))
-            import base64 as _b64
+            import base64 as _b64, time as _time
             api = f"https://api.github.com/repos/{repo}/contents/index.html"
-            st, cur = _gh_call("GET", f"{api}?ref={branch}", token)
-            payload = {"message": "Site mis à jour depuis l'espace d'administration",
-                       "content": _b64.b64encode(html.encode()).decode(),
-                       "branch": branch}
-            if st == 200 and cur.get("sha"):
-                payload["sha"] = cur["sha"]
-            st, res = _gh_call("PUT", api, token, payload)
-            if st in (200, 201):
-                sha = (res.get("commit") or {}).get("sha", "")[:7]
+
+            def _fresh_sha():
+                """SHA actuel du fichier — l'URL unique contourne le cache (~60 s)
+                de l'API GitHub, cause des conflits 409 après une publication."""
+                u = f"{api}?ref={branch}&_={int(_time.time() * 1000)}"
+                st1, cur = _gh_call("GET", u, token)
+                return ((cur or {}).get("sha") or "") if st1 == 200 else ""
+
+            published, result, st = False, {}, 0
+            for attempt in range(3):  # reprise automatique sur conflit 409
+                sha = _fresh_sha()
+                payload = {"message": "Site mis à jour depuis l'espace d'administration",
+                           "content": _b64.b64encode(html.encode()).decode(),
+                           "branch": branch}
+                if sha:
+                    payload["sha"] = sha
+                st, res = _gh_call("PUT", api, token, payload)
+                result = res or {}
+                if st in (200, 201):
+                    published = True
+                    break
+                if st != 409:
+                    break
+                if attempt < 2:
+                    _time.sleep(2)  # le fichier a changé : on relit, on retente
+
+            if published:
+                sha = (result.get("commit") or {}).get("sha", "")[:7]
                 flash(f"Site publié sur GitHub ✔ (commit {sha}). GitHub Pages se met "
                       "à jour dans une à deux minutes.", "ok")
             else:
                 hint = {401: "clé invalide", 403: "clé sans droit d’écriture",
                         404: "dépôt ou branche introuvable",
-                        409: "conflit — réessayez"}.get(st, res.get("message", ""))
+                        409: "conflit GitHub — attendez une minute puis cliquez à "
+                             "nouveau sur Publier"}.get(st, result.get("message", ""))
                 flash(f"Publication refusée ({st}) : {hint}.", "error")
             return redirect(url_for("admin_home"))
         abort(400)

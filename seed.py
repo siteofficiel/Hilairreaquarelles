@@ -102,7 +102,7 @@ NEWS = [
         "images": [],
         "body": (
             "Du 10 au 23 juin 2024, la Galerie des Fuchsias à Saint-Vaast-la-Hougue a "
-            "présenté « Hilaire Légentil — Aquarelliste », aux côtés de Nanou Quelvennec "
+            "présenté « Hilaire Legentil — Aquarelliste », aux côtés de Nanou Quelvennec "
             "et Fabrice Pouteaux.\n\n"
             "Galerie des Fuchsias, 9 rue Verrue, 50550 Saint-Vaast-la-Hougue — du mardi "
             "au samedi de 11 h à 19 h, dimanche de 10 h à 18 h, lundi fermé."
