@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.join(BASE, "vendor"))
 import db  # noqa: E402
 from utils import parse_date  # noqa: E402
 
-OUT = os.path.join(os.path.dirname(BASE), "hilaire-legentil", "index.html")
+OUT = os.path.join(BASE, "index.html")   # toujours DANS le dossier du site
 
 
 def b64(path):

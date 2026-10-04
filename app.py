@@ -1633,7 +1633,27 @@ def security_headers(resp):
     return resp
 
 
+def _restore_first_run():
+    """Premier lancement (base vide + fichier unique présent) : restaure
+    automatiquement œuvres, images, actualités et réglages depuis index.html.
+    Ne s'exécute JAMAIS si la base contient déjà des œuvres."""
+    try:
+        conn = db.connect()
+        n = conn.execute("SELECT COUNT(*) c FROM works").fetchone()["c"]
+        conn.close()
+        if n or not os.path.exists(os.path.join(BASE_DIR, "index.html")):
+            return
+        from tools.restaure import restore_all, DEFAULT_PASSWORD
+        r = restore_all()
+        print(f"* Premier lancement : {r['works']} œuvres, {r['news']} actualités "
+              f"restaurées depuis le fichier unique.")
+        print(f"* Connexion administrateur : hilaire / {DEFAULT_PASSWORD}")
+    except Exception as e:
+        print(f"* Restauration automatique ignorée : {e}")
+
+
 if __name__ == "__main__":
+    _restore_first_run()
     from waitress import serve
     port = int(os.environ.get("PORT", "8000"))
     print(f"* Site d'Hilaire Legentil — http://0.0.0.0:{port}")

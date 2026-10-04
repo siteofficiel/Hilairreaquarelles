@@ -32,14 +32,27 @@ CREATE TABLE IF NOT EXISTS works (
     published INTEGER NOT NULL DEFAULT 1,
     tonality TEXT DEFAULT '',
     chroma REAL DEFAULT 0,
+    sujet TEXT DEFAULT '',
+    ambiance TEXT DEFAULT '',
     created_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS atelier(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    folder TEXT UNIQUE NOT NULL, img_w INTEGER, img_h INTEGER,
+    position INTEGER NOT NULL, kind TEXT NOT NULL DEFAULT 'vif');
+
+CREATE TABLE IF NOT EXISTS works_images(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    work_id INTEGER NOT NULL, image TEXT NOT NULL, position INTEGER NOT NULL);
 
 CREATE TABLE IF NOT EXISTS news (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     slug TEXT UNIQUE NOT NULL,
     event_date TEXT DEFAULT '',
+    event_time TEXT DEFAULT '',
+    place TEXT DEFAULT '',
     body TEXT DEFAULT '',
     link TEXT DEFAULT '',
     cover TEXT DEFAULT '',

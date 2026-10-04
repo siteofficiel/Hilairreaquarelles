@@ -5,8 +5,8 @@
 <div class="admin-page-head">
   <div>
     <h1>Sur le vif</h1>
-    <p class="admin-sub">Les aquarelles peintes devant le sujet, affichées dans
-       la galerie (rubrique «&nbsp;Sur le vif&nbsp;»).</p>
+    <p class="admin-sub">Les aquarelles peintes devant le sujet — affichées dans
+       la galerie (rubrique «&nbsp;Sur le vif&nbsp;») et sur la page L'atelier.</p>
   </div>
   <a class="btn-primary" href="{{ url_for('gallery') }}" target="_blank" rel="noopener">Voir la galerie ↗</a>
 </div>
@@ -20,9 +20,24 @@
       <label for="vif-image">Image (JPG, PNG ou WebP — 26&nbsp;Mo maximum)</label>
       <input id="vif-image" name="image" type="file" accept=".jpg,.jpeg,.png,.webp" required>
     </div>
-    <p><button class="btn-primary" type="submit">Ajouter à la galerie</button></p>
+    <p><button class="btn-primary" type="submit">Ajouter à la galerie et à l'atelier</button></p>
   </form>
 </div>
+
+{% if n_missing %}
+<div class="admin-section">
+  <h2>Photos à intégrer à la galerie</h2>
+  <p class="admin-sub">{{ n_missing }} photo(s) sur le vif présente(s) sur la page
+     L'atelier mais pas encore dans la galerie (ajoutées avec une ancienne version
+     du site). Vos images restent intactes&nbsp;: ce bouton ne fait qu'ajouter
+     les œuvres manquantes dans la galerie.</p>
+  <form method="post" class="form-card">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <input type="hidden" name="action" value="sync">
+    <p><button class="btn-primary" type="submit">Intégrer à la galerie</button></p>
+  </form>
+</div>
+{% endif %}
 
 {% if items %}
 <div class="table-wrap">
@@ -51,11 +66,12 @@
         </td>
         <td class="col-title">
           <span class="row-title">Aquarelle sur le vif</span>
-          <span class="row-meta">n°{{ loop.index }} · {{ a.img_w }}×{{ a.img_h }} px</span>
+          <span class="row-meta">n°{{ loop.index }} · {{ a.img_w }}×{{ a.img_h }} px ·
+            {% if a.folder in gfolders %}galerie ✓{% else %}atelier seule{% endif %}</span>
         </td>
         <td class="col-actions">
           <form method="post" class="inline"
-                onsubmit="return confirm('Supprimer définitivement cette aquarelle ?')">
+                onsubmit="return confirm('Supprimer définitivement cette aquarelle (galerie et atelier) ?')">
             <input type="hidden" name="csrf" value="{{ csrf }}">
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="id" value="{{ a.id }}">

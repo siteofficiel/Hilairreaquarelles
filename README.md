@@ -222,3 +222,19 @@ le jeton y est mémorisé uniquement dans le navigateur.
 - réseaux sociaux discrets : pied de page, page Contacts et page L'artiste ;
 - SEO : balises Open Graph (og:title, og:description, og:image par page),
   sitemap.xml et robots.txt mis à jour avec les nouvelles adresses.
+
+
+## Installation express (tout est dans le fichier unique)
+
+1. Décompressez ce zip où vous voulez.
+2. Installez les dépendances : `pip install -r requirements.txt`
+3. Lancez : `python app.py`
+
+Au premier lancement, le site se restaure **automatiquement** depuis le
+fichier unique `index.html` présent à la racine (œuvres, images, actualités,
+réglages). Connexion administrateur : `hilaire` / `aquarelles_2026`
+(à changer dans Réglages).
+
+La restauration ne s'exécute que si la base est vide : elle ne peut jamais
+écraser un site existant. Pour relancer une restauration manuellement :
+`python tools/restaure.py` (base vide requise).

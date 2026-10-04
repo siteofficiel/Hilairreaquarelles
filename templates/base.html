@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block title %}Hilaire Legentil — Artiste auteur · Aquarelles — mer &amp; paysage{% endblock %}</title>
 <meta name="description" content="{% block desc %}Hilaire LEGENTIL, artiste auteur. Aquarelles — mer &amp; paysage, sur papier 100 % coton.{% endblock %}">
-{% if SITE.domain %}<link rel="canonical" href="{{ SITE.domain }}{{ request.path }}">{% endif %}
+{% if S.get('site_domain') %}<link rel="canonical" href="{{ S.get('site_domain') }}{{ request.path }}">{% endif %}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Hilaire Legentil — Aquarelles">
 <meta property="og:title" content="{{ self.title() }}">
@@ -15,7 +15,7 @@
 <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/static/css/main.css">
 {% block head %}{% endblock %}
-{% if SITE.domain %}<meta property="og:url" content="{{ SITE.domain }}{{ request.path }}">{% endif %}
+{% if S.get('site_domain') %}<meta property="og:url" content="{{ S.get('site_domain') }}{{ request.path }}">{% endif %}
 <meta property="og:image" content="{{ request.host_url }}{% block ogimg %}static/img/favicon.svg{% endblock %}">
 </head>
 <body class="pg-{{ request.endpoint or 'home' }}">
