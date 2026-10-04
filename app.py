@@ -158,8 +158,17 @@ def inject_globals():
     }
 
 
+def current_domain():
+    """Domaine public du site — réglage admin « site_domain » (prioritaire),
+    sinon la constante SITE["domain"]. Vide = site sans domaine personnalisé."""
+    try:
+        return (db.get_settings().get("site_domain") or SITE["domain"]).rstrip("/")
+    except Exception:
+        return SITE["domain"].rstrip("/")
+
+
 def site_url(path="/"):
-    domain = SITE["domain"].rstrip("/")
+    domain = current_domain()
     return domain + path if domain else path
 
 
@@ -238,8 +247,11 @@ def atelier():
         "WHERE kind='palette' ORDER BY position, id").fetchall()
     vif = conn.execute("SELECT folder, img_w, img_h FROM atelier "
                        "WHERE kind='vif' ORDER BY position, id").fetchall()
+    materiel = conn.execute("SELECT folder, img_w, img_h FROM atelier "
+                            "WHERE kind='materiel' ORDER BY position, id").fetchall()
     conn.close()
-    return render_template("atelier.html", photos=photos, vif=vif)
+    return render_template("atelier.html", photos=photos, vif=vif,
+                           materiel=materiel)
 
 
 @app.route("/galerie")
@@ -454,8 +466,9 @@ def sitemap():
 @app.route("/robots.txt")
 def robots():
     body = "User-agent: *\nDisallow: /admin\nDisallow: /uploads\n"
-    if SITE["domain"]:
-        body += f"Sitemap: {SITE['domain']}/sitemap.xml\n"
+    domain = current_domain()
+    if domain:
+        body += f"Sitemap: {domain}/sitemap.xml\n"
     return app.response_class(body, mimetype="text/plain")
 
 
@@ -840,6 +853,16 @@ def admin_work_edit(wid):
         if action == "delete":
             imaging.delete_image_folder(WORKS_DIR, w["folder"])
             conn = db.connect()
+            # œuvre « sur le vif » : la même image vit aussi à l'atelier —
+            # on la retire des deux côtés pour ne laisser aucun fantôme
+            vif_row = conn.execute("SELECT id FROM atelier WHERE kind='vif' AND folder=?",
+                                   (w["folder"],)).fetchone()
+            if vif_row:
+                imaging.delete_image_folder(ATELIER_DIR, w["folder"])
+                conn.execute("DELETE FROM atelier WHERE id=?", (vif_row["id"],))
+                for k, r in enumerate(conn.execute(
+                        "SELECT id FROM atelier WHERE kind='vif' ORDER BY position, id"), 1):
+                    conn.execute("UPDATE atelier SET position=? WHERE id=?", (k, r["id"]))
             for r in conn.execute("SELECT image FROM works_images WHERE work_id=?",
                                   (wid,)).fetchall():
                 imaging.delete_image_folder(WORKS_DIR, r["image"])
@@ -1149,6 +1172,9 @@ def admin_atelier():
         if not auth.csrf_ok(request):
             abort(400)
         action = request.form.get("action")
+        kind = request.form.get("kind", "palette")
+        if kind not in ("palette", "materiel"):
+            kind = "palette"
         conn = db.connect()
         if action == "upload":
             up = request.files.get("image")
@@ -1165,13 +1191,14 @@ def admin_atelier():
             pos = conn.execute(
                 "SELECT COALESCE(MAX(position),0)+1 p FROM atelier").fetchone()["p"]
             conn.execute("INSERT INTO atelier(folder,img_w,img_h,position,kind) "
-                         "VALUES(?,?,?,?,'palette')", (folder, w, h, pos))
+                         "VALUES(?,?,?,?,?)", (folder, w, h, pos, kind))
             conn.commit(); conn.close()
-            flash("Photo ajoutée à la page L’atelier.", "ok")
+            flash("Photo ajoutée à la palette." if kind == "palette"
+                  else "Photo du matériel ajoutée.", "ok")
             return redirect(url_for("admin_atelier"))
         pid = request.form.get("id", "")
-        row = (conn.execute("SELECT * FROM atelier WHERE id=? AND kind='palette'",
-                            (pid,)).fetchone() if pid.isdigit() else None)
+        row = (conn.execute("SELECT * FROM atelier WHERE id=? AND kind=?",
+                            (pid, kind)).fetchone() if pid.isdigit() else None)
         if row is None:
             conn.close()
             abort(404)
@@ -1193,7 +1220,7 @@ def admin_atelier():
         elif action == "move":
             delta = -1 if request.form.get("dir") == "up" else 1
             ids = [r["id"] for r in conn.execute(
-                "SELECT id FROM atelier WHERE kind='palette' ORDER BY position, id")]
+                "SELECT id FROM atelier WHERE kind=? ORDER BY position, id", (kind,))]
             i = ids.index(row["id"])
             j = max(0, min(len(ids) - 1, i + delta))
             if i != j:
@@ -1205,8 +1232,8 @@ def admin_atelier():
             imaging.delete_image_folder(ATELIER_DIR, row["folder"])
             conn.execute("DELETE FROM atelier WHERE id=?", (row["id"],))
             for k, r in enumerate(conn.execute(
-                    "SELECT id FROM atelier WHERE kind='palette' "
-                    "ORDER BY position, id"), 1):
+                    "SELECT id FROM atelier WHERE kind=? "
+                    "ORDER BY position, id", (kind,)), 1):
                 conn.execute("UPDATE atelier SET position=? WHERE id=?", (k, r["id"]))
             flash("Photo supprimée.", "ok")
         else:
@@ -1216,11 +1243,33 @@ def admin_atelier():
     conn = db.connect()
     photos = conn.execute("SELECT * FROM atelier WHERE kind='palette' "
                           "ORDER BY position, id").fetchall()
+    materiel = conn.execute("SELECT * FROM atelier WHERE kind='materiel' "
+                            "ORDER BY position, id").fetchall()
     conn.close()
-    return render_template("admin/atelier.html", photos=photos)
+    return render_template("admin/atelier.html", photos=photos, materiel=materiel)
 
 
 # ---------------------------------------------------------- sur le vif
+
+def _vif_create_work(conn, folder, w, h):
+    """Crée l'œuvre galerie « Sur le vif » liée à une photo de l'atelier.
+
+    L'image reste stockée à l'atelier (dossier unique) et la galerie la sert
+    par le repli works→atelier — exactement comme les œuvres d'origine."""
+    k = conn.execute("SELECT COUNT(*) c FROM works WHERE technique='Sur le vif'"
+                     ).fetchone()["c"] + 1
+    while conn.execute("SELECT 1 FROM works WHERE slug=?",
+                       ("sur-le-vif-%d" % k,)).fetchone():
+        k += 1
+    pos = conn.execute("SELECT COALESCE(MAX(position),0)+1 p FROM works"
+                       ).fetchone()["p"]
+    conn.execute(
+        "INSERT INTO works(title,slug,description,category,technique,dimensions,"
+        "year,folder,img_w,img_h,position,published,created_at) "
+        "VALUES(?,?,?,?,?,?,?,?,?,?,?,1,?)",
+        ("Sur le vif %d" % k, "sur-le-vif-%d" % k, "", "", "Sur le vif", "", "",
+         folder, w, h, pos, db.now_iso()))
+
 
 @app.route("/admin/vif", methods=["GET", "POST"])
 @require_admin
@@ -1246,8 +1295,28 @@ def admin_vif():
                 "SELECT COALESCE(MAX(position),0)+1 p FROM atelier").fetchone()["p"]
             conn.execute("INSERT INTO atelier(folder,img_w,img_h,position,kind) "
                          "VALUES(?,?,?,?,'vif')", (folder, w, h, pos))
+            # même image dans la galerie : œuvre « Sur le vif »
+            # (image stockée une seule fois, à l'atelier, servie par repli)
+            _vif_create_work(conn, folder, w, h)
             conn.commit(); conn.close()
-            flash("Aquarelle sur le vif ajoutée à la galerie.", "ok")
+            flash("Aquarelle sur le vif ajoutée à la galerie et sur la page L’atelier.", "ok")
+            return redirect(url_for("admin_vif"))
+        if action == "sync":
+            # photos ajoutées avec une ancienne version, présentes à l'atelier
+            # mais jamais intégrées à la galerie : on crée les œuvres manquantes
+            # (aucune image n'est modifiée ni supprimée)
+            created = 0
+            for r in conn.execute("SELECT folder, img_w, img_h FROM atelier "
+                                  "WHERE kind='vif' ORDER BY position, id").fetchall():
+                if conn.execute("SELECT 1 FROM works WHERE folder=?",
+                                (r["folder"],)).fetchone():
+                    continue
+                _vif_create_work(conn, r["folder"], r["img_w"], r["img_h"])
+                created += 1
+            conn.commit(); conn.close()
+            flash(("%d aquarelle(s) sur le vif intégrée(s) à la galerie." % created)
+                  if created else
+                  "Toutes les aquarelles sur le vif sont déjà dans la galerie.", "ok")
             return redirect(url_for("admin_vif"))
         vid = request.form.get("id", "")
         row = (conn.execute("SELECT * FROM atelier WHERE id=? AND kind='vif'",
@@ -1257,22 +1326,42 @@ def admin_vif():
             abort(404)
         if action == "move":
             delta = -1 if request.form.get("dir") == "up" else 1
-            ids = [r["id"] for r in conn.execute(
-                "SELECT id FROM atelier WHERE kind='vif' ORDER BY position, id")]
+            rows = conn.execute("SELECT id, folder FROM atelier WHERE kind='vif' "
+                                "ORDER BY position, id").fetchall()
+            ids = [r["id"] for r in rows]
             i = ids.index(row["id"])
             j = max(0, min(len(ids) - 1, i + delta))
             if i != j:
+                fi, fj = rows[i]["folder"], rows[j]["folder"]
                 ids[i], ids[j] = ids[j], ids[i]
                 for k, rid in enumerate(ids, 1):
                     conn.execute("UPDATE atelier SET position=? WHERE id=?", (k, rid))
+                # la galerie suit le même ordre (œuvres liées par le dossier)
+                wi = conn.execute("SELECT id, position FROM works WHERE folder=?",
+                                  (fi,)).fetchone()
+                wj = conn.execute("SELECT id, position FROM works WHERE folder=?",
+                                  (fj,)).fetchone()
+                if wi and wj and wi["position"] != wj["position"]:
+                    conn.execute("UPDATE works SET position=? WHERE id=?",
+                                 (wj["position"], wi["id"]))
+                    conn.execute("UPDATE works SET position=? WHERE id=?",
+                                 (wi["position"], wj["id"]))
             flash("Ordre mis à jour.", "ok")
         elif action == "delete":
             imaging.delete_image_folder(ATELIER_DIR, row["folder"])
             conn.execute("DELETE FROM atelier WHERE id=?", (row["id"],))
+            # retirer aussi l'œuvre liée dans la galerie (même image, même dossier)
+            for wr in conn.execute("SELECT id, folder FROM works WHERE folder=?",
+                                   (row["folder"],)).fetchall():
+                for im in conn.execute("SELECT image FROM works_images WHERE work_id=?",
+                                       (wr["id"],)).fetchall():
+                    imaging.delete_image_folder(WORKS_DIR, im["image"])
+                conn.execute("DELETE FROM works_images WHERE work_id=?", (wr["id"],))
+                conn.execute("DELETE FROM works WHERE id=?", (wr["id"],))
             for k, r in enumerate(conn.execute(
                     "SELECT id FROM atelier WHERE kind='vif' ORDER BY position, id"), 1):
                 conn.execute("UPDATE atelier SET position=? WHERE id=?", (k, r["id"]))
-            flash("Aquarelle sur le vif supprimée.", "ok")
+            flash("Aquarelle sur le vif supprimée (galerie et atelier).", "ok")
         else:
             flash("Action inconnue.", "error")
         conn.commit(); conn.close()
@@ -1280,8 +1369,11 @@ def admin_vif():
     conn = db.connect()
     items = conn.execute("SELECT * FROM atelier WHERE kind='vif' "
                          "ORDER BY position, id").fetchall()
+    gfolders = {r["folder"] for r in conn.execute(
+        "SELECT folder FROM works WHERE technique='Sur le vif'")}
     conn.close()
-    return render_template("admin/vif.html", items=items)
+    return render_template("admin/vif.html", items=items, gfolders=gfolders,
+                           n_missing=sum(1 for a in items if a["folder"] not in gfolders))
 
 
 # ------------------------------------------------- publication GitHub
@@ -1339,6 +1431,9 @@ SETTING_GROUPS = [
     ("Pied de page", [
         ("footer_job", "Métier (première ligne)"),
         ("footer_tag", "Deuxième ligne"),
+    ]),
+    ("Référencement — nom de domaine", [
+        ("site_domain", "Adresse complète du site (ex. https://www.hilaire-legentil.fr — vide tant qu'il n'y a pas de domaine)"),
     ]),
     ("Mesure d'audience", [
         ("ga_id", "ID Google Analytics (ex. G-XXXXXXXXXX — vide = désactivé)"),

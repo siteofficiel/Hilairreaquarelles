@@ -91,7 +91,7 @@ def build_html():
                      "l": n["link"] or ""})
 
     # ------------------------------------------------------------- atelier
-    atelier, photos = [], []
+    atelier, photos, materiel_l = [], [], []
     for a in conn.execute("SELECT folder, img_w, img_h, kind FROM atelier "
                           "ORDER BY position, id"):
         uri, _ = img_uri(a["folder"], "atelier")
@@ -99,12 +99,15 @@ def build_html():
             continue
         if a["kind"] == "palette":
             photos.append({"i": uri, "w": a["img_w"], "h": a["img_h"]})
+        elif a["kind"] == "materiel":
+            materiel_l.append({"i": uri, "w": a["img_w"], "h": a["img_h"]})
         else:
             atelier.append({"i": uri, "w": a["img_w"], "h": a["img_h"]})
     conn.close()
 
     data = {
-        "works": works, "news": news, "pin": "aquarelles_2026",
+        "works": works, "news": news, "materiel": materiel_l,
+        "pin": "aquarelles_2026",
         "homeIntro": S.get("home_intro", ""),
         "artistIntro": S.get("artist_intro", ""),
         "heroB": S.get("hero_baseline", "Aquarelles — mer & paysage"),
@@ -159,6 +162,7 @@ def build_html():
     favicon = ("data:image/svg+xml;base64,"
                + base64.b64encode(open(os.path.join(BASE, "static/img/favicon.svg"), "rb").read()).decode())
 
+    _dom = (S.get("site_domain", "") or "").rstrip("/")
     html = TEMPLATE.replace("__FONTS__", fonts) \
                    .replace("__LEAFLET_CSS__", leaflet_css) \
                    .replace("__LEAFLET_JS__", leaflet_js) \
@@ -167,6 +171,8 @@ def build_html():
                    .replace("__FJOB__", S.get("footer_job", "Artiste auteur")) \
                    .replace("__FTAG__", S.get("footer_tag", "Aquarelles — mer & paysage")) \
                    .replace("__HC1__", "data:image/webp;base64," + b64(os.path.join(BASE, "static", "img", "carousel", "c1.webp"))) \
+                   .replace("__HL_CANON__", ('<link rel="canonical" href="%s/">' % _dom) if _dom else "") \
+                   .replace("__HL_OGURL__", ('<meta property="og:url" content="%s/">' % _dom) if _dom else "") \
                    .replace("__DATA__", data_json)
     return html
 
@@ -230,6 +236,8 @@ TEMPLATE = r"""<!DOCTYPE html>
 <meta property="og:title" content="Hilaire Legentil — Aquarelles mer &amp; paysage">
 <meta property="og:description" content="Aquarelles originales sur papier 100 % coton — mer &amp; paysage de Normandie.">
 <meta property="og:locale" content="fr_FR">
+__HL_CANON__
+__HL_OGURL__
 <meta name="theme-color" content="#0a7d85">
 <link rel="icon" href="__FAVICON__">
 <style>__LEAFLET_CSS__</style>
@@ -1566,7 +1574,7 @@ html{scroll-behavior:smooth}
 var DATA = /*HLDATA*/__DATA__/*HLDATA-END*/;
 var PRISTINE="<!DOCTYPE html>\n"+document.documentElement.outerHTML;
 try{var SAVED=JSON.parse(localStorage.getItem("hl_data")||"null");
-    if(SAVED&&SAVED.data){DATA=SAVED.data;if(!DATA.atelier)DATA.atelier=[];if(!DATA.photos)DATA.photos=DATA.palette?[DATA.palette]:[];
+    if(SAVED&&SAVED.data){DATA=SAVED.data;if(!DATA.atelier)DATA.atelier=[];if(!DATA.photos)DATA.photos=DATA.palette?[DATA.palette]:[];if(!DATA.materiel)DATA.materiel=[];
   DATA.works.forEach(function(w){if(!w.im)w.im=[];});}
 hlGaInit();}catch(e){}
 function hlGaInit(){try{
@@ -1634,6 +1642,7 @@ function pageHome(){
   CAR+
   '</div>'+
   '<div class="hero-after"><p class="hero-intro reveal d3">'+esc(DATA.homeIntro)+'</p>'+
+  '<p class="invitation-cta reveal d3"><a class="link-arrow" href="#/galerie">Découvrir la galerie</a></p>'+
   '</div>'+
   '</section>'+
   '<section class="section section-artist tint-sand"><div class="container artist-home">'+
@@ -1941,7 +1950,11 @@ function parseHash(){
 }
 function pageAtelier(){
   var pal=DATA.photos.map(function(p){
-    return '<figure class="palette-fig"><img loading="lazy" decoding="async" src="'+p.i+'" alt="La palette d\u2019Hilaire Legentil" width="'+p.w+'" height="'+p.h+'"></figure>';
+    return '<figure class="atelier-item reveal"><button type="button" class="atelier-btn" data-full="'+p.i+'" aria-label="Agrandir la palette">'+
+      '<img loading="lazy" decoding="async" src="'+p.i+'" alt="La palette d\u2019Hilaire Legentil" width="'+p.w+'" height="'+p.h+'"></button></figure>';
+  }).join("")+DATA.materiel.map(function(p,i){
+    return '<figure class="atelier-item reveal"><button type="button" class="atelier-btn" data-full="'+p.i+'" aria-label="Agrandir la photo du matériel '+(i+1)+'">'+
+      '<img loading="lazy" decoding="async" src="'+p.i+'" alt="Matériel — photo '+(i+1)+'" width="'+p.w+'" height="'+p.h+'"></button></figure>';
   }).join("");
   var vif=DATA.atelier.map(function(p,i){
     return '<figure class="atelier-item reveal"><span class="vif-badge" aria-hidden="true">sur le vif</span>'+
@@ -1955,7 +1968,7 @@ function pageAtelier(){
     '<section class="section atl-toc-section"><div class="container narrow reveal">'+
     '<p class="label">Sommaire</p><div class="atl-toc">'+
     '<div class="atl-toc-group"><h2 class="h3">Équipement</h2><ul>'+
-    '<li><a href="#materiels">Matériels</a></li><li><a href="#palette">Palette</a></li></ul></div>'+
+    '<li><a href="#materiels">Matériels</a></li></ul></div>'+
     '<div class="atl-toc-group"><h2 class="h3">Cahier technique</h2><ul>'+
     '<li><a href="#etapes">Les étapes d\u2019une aquarelle</a></li>'+
     '<li><a href="#gammes">Gammes et esquisses préparatoires</a></li>'+
@@ -1966,8 +1979,9 @@ function pageAtelier(){
 
     '<section class="section tint-sky" id="materiels"><div class="container">'+
     '<div class="section-head reveal"><div><p class="label">Équipement</p><h2 class="h2">Matériels</h2></div></div>'+
-    '<div class="rel-grid">'+
-    '<div class="tech-card reveal"><h3 class="h3">Différentes techniques de pinceaux.</h3>'+
+    '<div class="atelier-grid" id="materiel-grid" data-cap="Matériels">'+pal+'</div>'+
+    '<p class="atelier-note reveal">Cliquez pour agrandir.</p>'+
+    '<div class="tech-card reveal" style="margin-top:2.4rem"><h3 class="h3">Différentes techniques de pinceaux.</h3>'+
     '<p class="tech-note-txt">Varier les techniques et les effets dynamise la composition et contribue à la qualité visuelle&nbsp;:</p>'+
     '<ul class="chip-list">'+
     '<li class="chip">Gros Pinceau lavis petit gris</li><li class="chip">Pinceau synthétique détail</li>'+
@@ -1978,8 +1992,7 @@ function pageAtelier(){
     '<li class="chip">Retraits</li><li class="chip">Incliner la toile pour déplacer les pigments</li>'+
     '<li class="chip">Coulures</li><li class="chip">Auréoles</li><li class="chip">Vaporisateur</li>'+
     '</ul></div>'+
-    '<div class="tech-card reveal" id="palette"><h3 class="h3">Palette</h3>'+pal+'</div>'+
-    '</div></div></section>'+
+    '</div></section>'+
 
 
     '<section class="section tint-sand" id="etapes"><div class="container">'+
@@ -2030,11 +2043,8 @@ function pageAtelier(){
     '<p>Certaines aquarelles au sein de cette exposition ont été réalisées différemment&nbsp;: le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat. Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté des couleurs.</p>'+
     '<p>Après plusieurs minutes dans l\u2019eau, le papier est agrafé sur le châssis. En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant l\u2019exécution de l\u2019aquarelle.</p>'+
     '<p>Le papier sur châssis est aussi un choix de l\u2019artiste&nbsp;: un papier coton frangé monté sur du bois confère à l\u2019aquarelle une qualité esthétique d\'objet artisanal.</p>'+
+    '<p>La peinture utilisée est fabriquée en France, le papier 100&nbsp;% coton est fabriqué en Italie, le fixatif pour aquarelle est fabriqué en Allemagne et le vernis final est fabriqué en Italie.</p>'+
     '</div>'+
-    '<div class="fact-card reveal" style="max-width:44em"><ul class="tech-list tech-dash">'+
-    '<li>La peinture utilisée est fabriquée en France.</li>'+
-    '<li>Le papier 100&nbsp;% coton est fabriqué en Italie</li>'+
-    '<li>Le fixatif pour aquarelle est fabriqué en Allemagne et le vernis final est fabriqué en Italie.</li></ul></div>'+
     '<div class="narrow reveal"><p>À l\u2019aide de baguettes «&nbsp;quart de rond&nbsp;», d\u2019une boîte à onglets, d\u2019une scie et de colle à bois, je réalise un cadre bois. La feuille de papier en coton découpée à la dimension, est trempée dans l\u2019eau pendant 4 minutes. Excédent d\u2019eau de la feuille enlevé en l\u2019accrochant 10 minutes sur un fil à linge. La feuille positionnée, tendue puis agrafée sur le cadre. Après séchage 1 heure. Le papier sec est tendu sur le châssis. L\u2019aquarelle réalisée, un premier spray pour fixer les pigments suivi d\u2019un vernis mat protègent l\u2019aquarelle de l\u2019humidité. Le cadre peint et verni pour être encadré.</p>'+
     '</div>'+
     '<p class="tech-note reveal">Attention cette protection préserve l\u2019œuvre de quelques gouttes d\u2019eau voire de postillons&nbsp;! Le papier restera vulnérable aux coups et au détrempage.</p>'+
@@ -2135,8 +2145,9 @@ function initAtelier(){
   document.documentElement.style.overflow="";
   var old=document.querySelector(".hl-lightbox");
   if(old&&old.parentNode)old.parentNode.removeChild(old);
-  var grid=document.getElementById("atelier-grid");if(!grid)return;
-  var btns=[].slice.call(grid.querySelectorAll(".atelier-btn"));if(!btns.length)return;
+  var btns=[].slice.call(document.querySelectorAll(".atelier-grid .atelier-btn"));if(!btns.length)return;
+  btns.forEach(function(b){var g=b.closest(".atelier-grid");
+    if(g)b.setAttribute("data-cap",b.getAttribute("data-cap")||g.getAttribute("data-cap")||"Atelier");});
   var idx=0;
   var lb=document.createElement("div");lb.className="hl-lightbox";lb.hidden=true;
   lb.setAttribute("role","dialog");lb.setAttribute("aria-modal","true");lb.setAttribute("aria-label","Photo agrandie");
@@ -2151,7 +2162,7 @@ function initAtelier(){
   var closer=lb.querySelector(".hl-lb-close");
   function show(i){idx=(i+btns.length)%btns.length;var b=btns[idx],t=b.querySelector("img");
     img.src=b.getAttribute("data-full")||t.src;img.alt=t.alt;
-    cap.textContent=(grid.getAttribute("data-cap")||"Atelier")+" — "+(idx+1)+" / "+btns.length;
+    cap.textContent=(b.getAttribute("data-cap")||"Atelier")+" — "+(idx+1)+" / "+btns.length;
     lb.hidden=false;document.documentElement.style.overflow="hidden";closer.focus();}
   function close(){lb.hidden=true;document.documentElement.style.overflow="";
     if(btns[idx])btns[idx].focus();}

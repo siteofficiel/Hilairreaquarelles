@@ -1,0 +1,26 @@
+MISE À JOUR DU SITE — à poser sur votre copie existante
+========================================================
+
+Contenu de ce zip : uniquement les fichiers modifiés (lien galerie sur
+l'accueil, rubrique Matériels avec photos du matériel, montage uniformisé).
+
+INSTALLATION (5 minutes)
+1. Fermez le site s'il tourne.
+2. Sauvegardez votre dossier actuel (ou au minimum les dossiers data/ et uploads/).
+3. Copiez les fichiers de ce zip DANS votre dossier du site, en remplaçant
+   les fichiers existants (mêmes noms, mêmes emplacements).
+   Ne touchez à rien d'autre : vos dossiers data/ et uploads/ ne sont pas
+   dans ce zip et ne doivent jamais être remplacés.
+4. Relancez le site (python app.py).
+5. Tableau de bord -> « Publier le site maintenant ».
+
+NOUVEAUTÉS CÔTÉ ADMIN
+- Rubrique « L'atelier » : deux sections, « La palette » et
+  « Photos du matériel » (ajoutez autant de photos de matériel que vous
+  voulez — elles s'affichent à côté de la palette, avant les pinceaux).
+- À prévoir à la première ouverture : si la rubrique « Sur le vif » propose
+  « Intégrer à la galerie », cliquez (aucune image n'est modifiée).
+
+IMPORTANT : ce zip convient si votre copie date du zip complet précédent.
+Si elle est plus ancienne, utilisez le zip complet et reportez vos dossiers
+data/ et uploads/ comme expliqué dans le tutoriel.

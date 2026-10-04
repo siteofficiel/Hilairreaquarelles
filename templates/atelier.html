@@ -19,7 +19,6 @@
         <h2 class="h3">Équipement</h2>
         <ul>
           <li><a href="#materiels">Matériels</a></li>
-          <li><a href="#palette">Palette</a></li>
         </ul>
       </div>
       <div class="atl-toc-group">
@@ -49,41 +48,55 @@
         <h2 class="h2">Matériels</h2>
       </div>
     </div>
-    <div class="rel-grid">
-      <div class="tech-card reveal">
-        <h3 class="h3">Différentes techniques de pinceaux.</h3>
-        <p class="tech-note-txt">
-          Varier les techniques et les effets dynamise la composition et contribue
-          à la qualité visuelle&nbsp;:</p>
-        <ul class="chip-list">
-          <li class="chip">Gros Pinceau lavis petit gris</li>
-          <li class="chip">Pinceau synthétique détail</li>
-          <li class="chip">Humide sur humide</li>
-          <li class="chip">Humide sur sec</li>
-          <li class="chip">Moucheté</li>
-          <li class="chip">Pinceau sec</li>
-          <li class="chip">Rouler le pinceaux</li>
-          <li class="chip">Pinceau écrasé en touches verticales</li>
-          <li class="chip">Filé Pinceau fin</li>
-          <li class="chip">Pinceau éventail</li>
-          <li class="chip">Retraits</li>
-          <li class="chip">Incliner la toile pour déplacer les pigments</li>
-          <li class="chip">Coulures</li>
-          <li class="chip">Auréoles</li>
-          <li class="chip">Vaporisateur</li>
-        </ul>
-      </div>
-      <div class="tech-card reveal" id="palette">
-        <h3 class="h3">Palette</h3>
-        {% for p in photos %}
-        <figure class="palette-fig">
+    <div class="atelier-grid" id="materiel-grid" data-cap="Matériels">
+      {%- for p in photos %}
+      <figure class="atelier-item reveal">
+        <button type="button" class="atelier-btn"
+                data-full="/uploads/atelier/{{ p.folder }}/medium.webp"
+                aria-label="Agrandir la palette">
           <img loading="lazy" decoding="async"
                src="/uploads/atelier/{{ p.folder }}/medium.webp"
                alt="La palette d’Hilaire Legentil"
                width="{{ p.img_w }}" height="{{ p.img_h }}">
-        </figure>
-        {% endfor %}
-      </div>
+        </button>
+      </figure>
+      {%- endfor %}
+      {%- for p in materiel %}
+      <figure class="atelier-item reveal">
+        <button type="button" class="atelier-btn"
+                data-full="/uploads/atelier/{{ p.folder }}/medium.webp"
+                aria-label="Agrandir la photo du matériel {{ loop.index }}">
+          <img loading="lazy" decoding="async"
+               src="/uploads/atelier/{{ p.folder }}/medium.webp"
+               alt="Matériel — photo {{ loop.index }}"
+               width="{{ p.img_w }}" height="{{ p.img_h }}">
+        </button>
+      </figure>
+      {%- endfor %}
+    </div>
+    <p class="atelier-note reveal">Cliquez pour agrandir.</p>
+    <div class="tech-card reveal" style="margin-top:2.4rem">
+      <h3 class="h3">Différentes techniques de pinceaux.</h3>
+      <p class="tech-note-txt">
+        Varier les techniques et les effets dynamise la composition et contribue
+        à la qualité visuelle&nbsp;:</p>
+      <ul class="chip-list">
+        <li class="chip">Gros Pinceau lavis petit gris</li>
+        <li class="chip">Pinceau synthétique détail</li>
+        <li class="chip">Humide sur humide</li>
+        <li class="chip">Humide sur sec</li>
+        <li class="chip">Moucheté</li>
+        <li class="chip">Pinceau sec</li>
+        <li class="chip">Rouler le pinceaux</li>
+        <li class="chip">Pinceau écrasé en touches verticales</li>
+        <li class="chip">Filé Pinceau fin</li>
+        <li class="chip">Pinceau éventail</li>
+        <li class="chip">Retraits</li>
+        <li class="chip">Incliner la toile pour déplacer les pigments</li>
+        <li class="chip">Coulures</li>
+        <li class="chip">Auréoles</li>
+        <li class="chip">Vaporisateur</li>
+      </ul>
     </div>
   </div>
 </section>
@@ -234,14 +247,11 @@
         Le papier sur châssis est aussi un choix de l’artiste&nbsp;: un papier coton frangé
         monté sur du bois confère à l’aquarelle une qualité esthétique d’"objet artisanal".
       </p>
-    </div>
-    <div class="fact-card reveal" style="max-width:44em">
-      <ul class="tech-list tech-dash">
-        <li>La peinture utilisée est fabriquée en France.</li>
-        <li>Le papier 100&nbsp;% coton est fabriqué en Italie</li>
-        <li>Le fixatif pour aquarelle est fabriqué en Allemagne et le vernis final est
-            fabriqué en Italie.</li>
-      </ul>
+      <p>
+        La peinture utilisée est fabriquée en France, le papier 100&nbsp;% coton est
+        fabriqué en Italie, le fixatif pour aquarelle est fabriqué en Allemagne et le
+        vernis final est fabriqué en Italie.
+      </p>
     </div>
     <div class="narrow reveal">
       <p>

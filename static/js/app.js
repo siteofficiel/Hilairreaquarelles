@@ -393,11 +393,14 @@ window.hlMapMount = function () {
 /* ------------------------------------------------- visionneuse atelier */
 (function () {
   "use strict";
-  var grid = document.getElementById("atelier-grid");
-  if (!grid) return;
-  var btns = [].slice.call(grid.querySelectorAll(".atelier-btn"));
+  var btns = [].slice.call(document.querySelectorAll(".atelier-grid .atelier-btn"));
   if (!btns.length) return;
-  var capPre = grid.getAttribute("data-cap") || "Atelier";
+  btns.forEach(function (b) {
+    var g = b.closest(".atelier-grid");
+    if (g) b.setAttribute("data-cap",
+                          b.getAttribute("data-cap") ||
+                          g.getAttribute("data-cap") || "Atelier");
+  });
   var idx = 0;
   var lb = document.createElement("div");
   lb.className = "hl-lightbox"; lb.hidden = true;
@@ -417,7 +420,8 @@ window.hlMapMount = function () {
     var b = btns[idx], t = b.querySelector("img");
     img.src = b.getAttribute("data-full") || t.src;
     img.alt = t.alt;
-    cap.textContent = capPre + " \u2014 " + (idx + 1) + " / " + btns.length;
+    cap.textContent = (b.getAttribute("data-cap") || "Atelier") +
+      " \u2014 " + (idx + 1) + " / " + btns.length;
     lb.hidden = false;
     document.documentElement.style.overflow = "hidden";
     closer.focus();
