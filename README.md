@@ -238,3 +238,19 @@ réglages). Connexion administrateur : `hilaire` / `aquarelles_2026`
 La restauration ne s'exécute que si la base est vide : elle ne peut jamais
 écraser un site existant. Pour relancer une restauration manuellement :
 `python tools/restaure.py` (base vide requise).
+
+## Mettre le site en ligne (depuis l'espace d'administration)
+
+- **Avec la clé GitHub** : espace administrateur → « Publier le site
+  maintenant ». En cas de conflit GitHub (rare, juste après une publication),
+  un nouvel essai automatique est effectué.
+- **Sans clé** : « ⬇ Télécharger le fichier du site (index.html) » puis, sur
+  github.com → dépôt du site → *Add file* → *Upload files* → déposez le
+  fichier → *Commit changes*.
+
+Sur le site publié (la page unique), l'espace administrateur (même code
+d'accès) propose les deux chemins : modifications gardées dans le navigateur
+(stockage étendu, images comprises), bouton de téléchargement et publication
+directe. Une version publiée plus récente écrase automatiquement les
+modifications locales non publiées d'un navigateur — le site en ligne fait
+foi.

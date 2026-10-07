@@ -16,7 +16,7 @@ if VENDOR not in sys.path:
     sys.path.insert(0, VENDOR)
 
 from flask import (Flask, abort, flash, jsonify, redirect, render_template,
-                   request, send_from_directory, session, url_for)
+                   request, Response, send_from_directory, session, url_for)
 from werkzeug.exceptions import NotFound
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -713,6 +713,21 @@ def admin_home():
                      if (r.get("permissions") or {}).get("push")]
     return render_template("admin/dashboard.html", stats=stats, messages=messages,
                            s=s, repos=repos, login=login, has_token=bool(token))
+
+
+@app.route("/admin/fichier-unique")
+@require_admin
+def admin_mono():
+    """Télécharge la page unique (index.html) prête pour GitHub Pages —
+    voie de secours sans clé : Add file → Upload files sur github.com."""
+    try:
+        import build_standalone
+        html = build_standalone.build_html()
+    except Exception as e:
+        flash(f"Impossible de générer la page unique : {e}", "error")
+        return redirect(url_for("admin_home"))
+    return Response(html, mimetype="text/html; charset=utf-8",
+                    headers={"Content-Disposition": "attachment; filename=index.html"})
 
 
 # ---------------------------------------------------------- œuvres

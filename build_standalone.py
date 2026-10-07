@@ -9,6 +9,7 @@ import json
 import os
 import sqlite3
 import sys
+import time
 
 BASE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, BASE)
@@ -108,6 +109,9 @@ def build_html():
     data = {
         "works": works, "news": news, "materiel": materiel_l,
         "pin": "aquarelles_2026",
+        # Horodatage de construction (ms) : permet au site publié d'ignorer
+        # une copie locale périmée enregistrée dans un navigateur.
+        "bts": int(time.time() * 1000),
         "homeIntro": S.get("home_intro", ""),
         "artistIntro": S.get("artist_intro", ""),
         "heroB": S.get("hero_baseline", "Aquarelles — mer & paysage"),
@@ -1573,10 +1577,44 @@ html{scroll-behavior:smooth}
 "use strict";
 var DATA = /*HLDATA*/__DATA__/*HLDATA-END*/;
 var PRISTINE="<!DOCTYPE html>\n"+document.documentElement.outerHTML;
+/* ---- sauvegarde locale des modifications de l'administrateur ----
+   localStorage est limité (~5 Mo) : avec les images embarquées du site,
+   l'enregistrement échouait silencieusement. On utilise donc localStorage
+   quand c'est possible, sinon IndexedDB (quota très large), et on refuse
+   les copies locales plus anciennes que le fichier publié (bts). */
+var HL_SAVE="init",HL_LS_AT=0,HL_EMB_BTS=DATA.bts||0;
+function hlIdbOpen(cb){try{var rq=indexedDB.open("hilaire-site",1);
+    rq.onupgradeneeded=function(){try{rq.result.createObjectStore("kv");}catch(e){}};
+    rq.onsuccess=function(){cb(rq.result);};rq.onerror=function(){cb(null);};rq.onblocked=function(){cb(null);};}
+  catch(e){cb(null);}}
+function hlIdbSet(json,cb){hlIdbOpen(function(db){if(!db)return cb(false);
+  try{var tx=db.transaction("kv","readwrite");tx.objectStore("kv").put(json,"hl_data");
+    tx.oncomplete=function(){cb(true);};tx.onerror=function(){cb(false);};tx.onabort=function(){cb(false);};}
+  catch(e){cb(false);}});}
+function hlIdbGet(cb){hlIdbOpen(function(db){if(!db)return cb(null);
+  try{var rq=db.transaction("kv").objectStore("kv").get("hl_data");
+    rq.onsuccess=function(){cb(rq.result||null);};rq.onerror=function(){cb(null);};}
+  catch(e){cb(null);}});}
+function hlIdbDel(cb){hlIdbOpen(function(db){if(!db)return cb(false);
+  try{var tx=db.transaction("kv","readwrite");tx.objectStore("kv").delete("hl_data");
+    tx.oncomplete=function(){cb(true);};tx.onerror=function(){cb(false);};}
+  catch(e){cb(false);}});}
+function hlWipeSaved(){try{localStorage.removeItem("hl_data");}catch(e){}hlIdbDel(function(){});}
+function hlApplySaved(s){if(!s||!s.data||!s.data.works)return false;
+  if(HL_EMB_BTS&&s.savedAt&&s.savedAt<HL_EMB_BTS){hlWipeSaved();return false;}
+  DATA=s.data;DATA.bts=HL_EMB_BTS||DATA.bts||0;
+  if(!DATA.atelier)DATA.atelier=[];if(!DATA.photos)DATA.photos=DATA.palette?[DATA.palette]:[];
+  if(!DATA.materiel)DATA.materiel=[];
+  DATA.works.forEach(function(w){if(!w.im)w.im=[];});return true;}
 try{var SAVED=JSON.parse(localStorage.getItem("hl_data")||"null");
-    if(SAVED&&SAVED.data){DATA=SAVED.data;if(!DATA.atelier)DATA.atelier=[];if(!DATA.photos)DATA.photos=DATA.palette?[DATA.palette]:[];if(!DATA.materiel)DATA.materiel=[];
-  DATA.works.forEach(function(w){if(!w.im)w.im=[];});}
-hlGaInit();}catch(e){}
+  if(hlApplySaved(SAVED)){HL_SAVE="ls";HL_LS_AT=SAVED.savedAt||0;}}catch(e){}
+try{hlIdbGet(function(raw){
+  if(!raw)return;
+  var s=null;try{s=typeof raw==="string"?JSON.parse(raw):raw;}catch(e){s=null;}
+  if(!s)return;
+  if(s.savedAt&&s.savedAt>HL_LS_AT){if(hlApplySaved(s)){HL_SAVE="idb";HL_LS_AT=s.savedAt||0;
+    if(window.__hlBooted){try{render();hlGaInit();}catch(e){}}}}});}catch(e){}
+hlGaInit();
 function hlGaInit(){try{
   if(!DATA.ga||window.__hlGaDone)return;var C=hlGet();if(!C.done||!C.ga)return;
   window.__hlGaDone=true;
@@ -2439,13 +2477,29 @@ function pageLegal(){
 function admStatus(msg,err){var el=document.getElementById("adm-status");
   if(el){el.textContent=msg||"";el.classList.toggle("err",!!err);}}
 var admTimer=null;
+function hlSaveUI(){var el=document.getElementById("adm-savestate");if(!el)return;
+  el.classList.toggle("err",HL_SAVE==="failed");
+  if(HL_SAVE==="failed")el.textContent="⚠ Impossible d’enregistrer dans ce navigateur : publiez en ligne ou téléchargez le fichier du site avant de fermer cette page.";
+  else if(HL_SAVE==="idb")el.textContent="💾 Modifications gardées dans ce navigateur (stockage étendu) — cliquez sur « Publier » pour les mettre en ligne.";
+  else if(HL_SAVE==="ls")el.textContent="💾 Modifications gardées dans ce navigateur.";
+  else el.textContent="";}
 function persistLocal(quiet){
-  try{localStorage.setItem("hl_data",JSON.stringify({savedAt:Date.now(),data:DATA}));
-    if(!quiet)admStatus("Enregistré dans ce navigateur. Pensez à « Exporter » pour diffuser la version à jour.");
-    return true;}
-  catch(e){if(!quiet)admStatus("Stockage local indisponible ou plein : les modifications n’ont pas pu être gardées dans ce navigateur.",true);
-    return false;}}
+  var json;
+  try{json=JSON.stringify({savedAt:Date.now(),data:DATA});}
+  catch(e){HL_SAVE="failed";hlSaveUI();
+    if(!quiet)admStatus("Enregistrement impossible dans ce navigateur.",true);return false;}
+  var ok=false;
+  try{localStorage.setItem("hl_data",json);HL_SAVE="ls";ok=true;}catch(e){}
+  if(ok){hlSaveUI();return true;}
+  /* localStorage plein (site avec images embarquées) → IndexedDB */
+  hlIdbSet(json,function(done){
+    if(done){HL_SAVE="idb";}
+    else{HL_SAVE="failed";
+      if(!quiet)admStatus("Stockage du navigateur indisponible : publiez en ligne ou téléchargez le fichier du site avant de fermer cette page.",true);}
+    hlSaveUI();});
+  return true;}
 function updatedHtml(){
+  DATA.bts=Date.now();
   var json=JSON.stringify(DATA).replace(/<\//g,"<\\/");
   return PRISTINE.replace(/\/\*HLDATA\*\/[\s\S]*?\/\*HLDATA-END\*\//,"/*HLDATA*/"+json+"/*HLDATA-END*/");}
 function processImage(file,maxSide,cb){
@@ -2564,8 +2618,10 @@ function pageAdmin(){
   admGitHub()+
   '<p class="adm-status" id="adm-status" role="status"></p>'+
   '<div class="adm-bar">'+
+  '<button class="btn" id="adm-export" type="button">⬇ Télécharger le fichier du site</button>'+
   '<button class="btn" id="adm-reset" type="button">Réinitialiser</button>'+
   '<button class="btn" id="adm-logout" type="button">Verrouiller</button></div>'+
+  '<p class="adm-status" id="adm-savestate" role="status"></p>'+
   '<h2 class="h3">Les œuvres <span class="muted small">('+DATA.works.length+')</span></h2>'+
   '<div id="adm-works">'+DATA.works.map(admWorkRow).join("")+'</div>'+admAddWork()+
   '<h2 class="h3">Sur le vif <span class="muted small">('+DATA.atelier.length+')</span></h2>'+
@@ -2752,19 +2808,35 @@ function bindGitHub(){
   var p=document.getElementById("gh-publish");
   if(p)p.onclick=function(){save();var c=ghCfgLoad();
     if(!c.repo||!c.token){st.textContent="Renseignez la clé (1) et le dépôt (2) d'abord.";return;}
+    p.disabled=true;p.textContent="Publication en cours…";
     admStatus("Publication en cours — ne fermez pas la page…");
-    ghApi("/repos/"+c.repo+"/contents/index.html?ref="+encodeURIComponent(c.branch))
-    .then(function(r){return r.json().then(function(j){return {s:r.status,j:j};});})
-    .then(function(x){var sha=x.s===200?x.j.sha:null;
+    var attempt=0;
+    /* le paramètre &_= évite le cache (~60 s) de l'API GitHub, cause de
+       conflits 409 juste après une publication ; en cas de conflit on
+       relit l'état du fichier et on retente automatiquement. */
+    function freshSha(){return ghApi("/repos/"+c.repo+"/contents/index.html?ref="
+      +encodeURIComponent(c.branch)+"&_="+Date.now())
+      .then(function(r){return r.json().then(function(j){return {s:r.status,sha:(j&&j.sha)||null};});});}
+    function go(){freshSha().then(function(x){
       var payload={message:"Site mis à jour depuis l'administration",branch:c.branch,
-        content:b64u(updatedHtml())};if(sha)payload.sha=sha;
+        content:b64u(updatedHtml())};if(x.sha)payload.sha=x.sha;
       return ghApi("/repos/"+c.repo+"/contents/index.html",{method:"PUT",
         headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)})
       .then(function(r){return r.json().then(function(j){return {s:r.status,j:j};});});})
-    .then(function(x){if(x.s===200||x.s===201)
-        admStatus("Publié ✔ GitHub Pages se met à jour dans une à deux minutes.");
-      else admStatus("Publication refusée ("+x.s+") : "+(x.j.message||"")+".",true);})
-    .catch(function(e){admStatus("Réseau indisponible : "+e,true);});};}
+    .then(function(x){
+      if(x.s===200||x.s===201){var sha=((x.j.commit||{}).sha||"").slice(0,7);
+        admStatus("Publié ✔ (commit "+sha+") — GitHub Pages se met à jour dans une à deux minutes.");
+        st.textContent="✓ Dernière publication : à l’instant.";
+        p.disabled=false;p.textContent="Publier le site maintenant";}
+      else if(x.s===409&&attempt<2){attempt++;
+        admStatus("Conflit GitHub (mise à jour précédente en cours) — nouvel essai "+attempt+"/2…");
+        setTimeout(go,2500);}
+      else{admStatus("Publication refusée ("+x.s+") : "+((x.j&&x.j.message)||"")+
+        (x.s===409?" — attendez une minute puis cliquez à nouveau.":"."),true);
+        p.disabled=false;p.textContent="Publier le site maintenant";}})
+    .catch(function(e){admStatus("Réseau indisponible : "+e,true);
+      p.disabled=false;p.textContent="Publier le site maintenant";});}
+    go();};}
 function initAdmin(){
   var go=document.getElementById("adm-go");
   if(go){
@@ -2835,10 +2907,21 @@ function initAdmin(){
   document.getElementById("adm-logout").addEventListener("click",function(){
     try{sessionStorage.removeItem("hl_admin");}catch(e){}
     ADMIN=false;location.hash="#/accueil";render();});
+  var ex=document.getElementById("adm-export");
+  if(ex)ex.addEventListener("click",function(){
+    try{var blob=new Blob([updatedHtml()],{type:"text/html;charset=utf-8"});
+      var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="index.html";
+      document.body.appendChild(a);a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},4000);
+      admStatus("Fichier du site téléchargé ✔ — sans clé GitHub : github.com → dépôt du site → Add file → Upload files → déposez index.html → Commit changes.");}
+    catch(e){admStatus("Téléchargement impossible : "+e,true);}});
   document.getElementById("adm-reset").addEventListener("click",function(){
     if(confirm("Revenir aux données d’origine du fichier ? Les modifications locales seront perdues.")){
       try{localStorage.removeItem("hl_data");}catch(e){}
-      location.reload();}});}
+      var done=false;function fin(){if(done)return;done=true;location.reload();}
+      hlIdbDel(function(){fin();});
+      setTimeout(fin,1500);}});
+  hlSaveUI();}
 
 /* ------- édition directe des titres quand l'espace est déverrouillé ------- */
 function makeEditable(){
@@ -2914,6 +2997,7 @@ document.getElementById("year").textContent=new Date().getFullYear();
     hlSet({map:m?m.checked:true,ga:(!!DATA.ga&&g)?g.checked:false,off:!!DATA.ga});hlApplyConsent();};
 })();
 render();
+window.__hlBooted=1;
 </script>
 </body>
 </html>
