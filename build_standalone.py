@@ -43,6 +43,7 @@ def img_uri(folder, area="works", prefer="medium"):
 
 def font_face(family, style, weight, filename):
     return ("@font-face{font-family:'%s';font-style:%s;font-weight:%d;"
+            "font-display:swap;"
             "src:url(data:font/woff2;base64,%s) format('woff2');}"
             % (family, style, weight,
                b64(os.path.join(BASE, "static", "fonts", filename))))
@@ -1516,7 +1517,7 @@ html{scroll-behavior:smooth}
             aria-controls="site-nav" aria-label="Ouvrir le menu"><span></span><span></span></button>
   </div>
 </header>
-<main id="contenu"></main>
+<main id="contenu"><div style="min-height:62vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;text-align:center"><p style="margin:0;font-family:Georgia,serif;font-style:italic;font-size:1.5rem;color:#31555a">Hilaire Legentil</p><p style="margin:0;font-family:Georgia,serif;font-size:.95rem;color:#31555a;opacity:.7">Chargement des aquarelles…</p><noscript><p style="font-size:.9rem;color:#b3552d">Le site nécessite JavaScript.</p></noscript></div></main>
 <div class="spectrum" aria-hidden="true"></div>
 <footer class="site-footer">
   <div class="footer-inner">
@@ -1645,12 +1646,13 @@ function spanClass(w,i){var r=w.h?w.w/w.h:1;
 function workCard(w,i){return '<a class="work '+spanClass(w,i)+'" href="#/oeuvre/'+w.s+
   '" data-cat="'+esc(w.c)+'" data-tn="'+esc(w.tn||"")+
   '" data-sujet="'+esc(w.sj||"")+'" data-amb="'+esc(w.am||"")+'" data-tech="'+esc(w.tc||"")+
-  '" data-year="'+esc(w.y||"")+'"><span class="work-frame"><img loading="lazy" alt="Aquarelle — '+
+  '" data-year="'+esc(w.y||"")+'"><span class="work-frame"><img loading="lazy" decoding="async" '+
+  'width="'+(w.w||800)+'" height="'+(w.h||600)+'" alt="Aquarelle — '+
   esc(w.t)+(w.c?" — "+esc(w.c):"")+'" src="'+w.i+'"></span><span class="work-caption">'+
   '<span class="work-title">'+esc(w.t)+'</span><span class="work-meta">'+esc(meta(w))+
   '</span></span></a>';}
 function newsRow(n,excerpt,upcoming){return '<a class="news-row" href="#/evenement/'+n.s+'">'+
-  (n.cov?'<span class="news-thumb"><img loading="lazy" alt="'+esc(n.t)+'" src="'+n.cov+'"></span>':"")+
+  (n.cov?'<span class="news-thumb"><img loading="lazy" decoding="async" alt="'+esc(n.t)+'" src="'+n.cov+'"></span>':"")+
   '<span class="news-body">'+(n.dt?'<span class="news-date">'+esc(n.dt)+(n.tm?' · '+esc(n.tm):'')+(n.pl?' · '+esc(n.pl):'')+'</span>'+((upcoming)?' <span class="evt-badge">à venir</span>':''):'')+
   '<span class="news-title">'+esc(n.t)+'</span>'+
   (excerpt&&n.p[0]?'<span class="news-excerpt">'+esc(n.p[0].slice(0,160))+
@@ -1689,7 +1691,7 @@ function pageHome(){
   '<p class="lead">'+esc(DATA.artistIntro)+'</p>'+
   '<blockquote class="mini-quote">«&nbsp;Mes aquarelles sont sur papier 100&nbsp;% coton, cette matière apporte une tonalité douce à la couleur et permet des superpositions qui n’altèrent pas les lavis.&nbsp;»<cite>— Hilaire Legentil</cite></blockquote>'+
   '<a class="link-arrow" href="#/artiste">La démarche de l’artiste</a></div>'+
-  (fig?'<div class="artist-home-figure reveal"><img src="'+fig.i+'" alt="Aquarelle — '+esc(fig.t)+'">'+
+  (fig?'<div class="artist-home-figure reveal"><img loading="lazy" decoding="async" src="'+fig.i+'" alt="Aquarelle — '+esc(fig.t)+'">'+
    '<span class="figure-caption">'+esc(fig.t)+'</span></div>':"")+
   '</div></section>'+
   '<section class="section quote-section"><div class="container narrow center reveal">'+QUOTE+
@@ -1851,8 +1853,8 @@ function pageWork(slug){
   '<h1 class="page-title">'+esc(w.t)+'</h1><p class="page-sub">'+esc(meta(w))+'</p></div></header>'+
   '<section class="section"><div class="container work-layout">'+
   '<figure class="work-figure reveal wk-carousel" id="wk-carousel" tabindex="0" role="group" aria-roledescription="carrousel" aria-label="Images de l’œuvre — flèches pour naviguer, cliquer pour agrandir"><div class="wk-track">'+
-  '<img class="wk-img" src="'+w.i+'" alt="Aquarelle « '+esc(w.t)+' » d’Hilaire Legentil">'+
-  (w.im||[]).map(function(u){return '<img class="wk-img" loading="lazy" src="'+u+'" alt="Aquarelle (vue complémentaire) — '+esc(w.t)+'">';}).join("")+
+  '<img class="wk-img" decoding="async" width="'+(w.w||800)+'" height="'+(w.h||600)+'" src="'+w.i+'" alt="Aquarelle « '+esc(w.t)+' » d’Hilaire Legentil">'+
+  (w.im||[]).map(function(u){return '<img class="wk-img" loading="lazy" decoding="async" src="'+u+'" alt="Aquarelle (vue complémentaire) — '+esc(w.t)+'">';}).join("")+
   '</div>'+
   '<button class="wk-zoom" type="button" aria-label="Agrandir l’image">⤢</button>'+
   ((w.im&&w.im.length)?'<button class="wk-btn wk-prev" type="button" aria-label="Image précédente">‹</button>'+
@@ -1910,7 +1912,7 @@ function pageNewsItem(slug){
   return '<header class="page-head"><div class="container reveal">'+
   '<p class="label">'+(n.dt?esc(n.dt)+(n.tm?" — "+esc(n.tm):"")+(n.pl?" — "+esc(n.pl):""):"Événement")+'</p><h1 class="page-title">'+esc(n.t)+'</h1></div></header>'+
   '<article class="section"><div class="container article">'+
-  (n.cov?'<figure class="article-cover reveal"><img src="'+n.cov+'" alt="'+esc(n.t)+'"></figure>':"")+
+  (n.cov?'<figure class="article-cover reveal"><img decoding="async" src="'+n.cov+'" alt="'+esc(n.t)+'"></figure>':"")+
   '<div class="article-body reveal">'+n.p.map(function(p){return '<p>'+esc(p)+'</p>';}).join("")+'</div>'+
   (n.img.length?'<div class="article-gallery reveal">'+n.img.map(function(u,i){
     return '<img loading="lazy" src="'+u+'" alt="'+esc(n.t)+' — image '+(i+1)+'">';}).join("")+'</div>':"")+
@@ -2521,7 +2523,7 @@ function processImage(file,maxSide,cb){
         if(uri.indexOf("image/webp")<0)uri=c.toDataURL("image/jpeg",.85);}
       catch(e){uri=c.toDataURL("image/jpeg",.85);}
       cb(uri,c.width,c.height);};
-    img.onerror=function(){admStatus("Cette image n’a pas pu être lue.",true);};
+    img.onerror=function(){admStatus("Cette image n’a pas pu être lue — vérifiez qu’il s’agit d’un fichier JPG, PNG ou WebP (les photos iPhone « HEIC » doivent être partagées en JPG).",true);};
     img.src=fr.result;};
   fr.readAsDataURL(file);}
 
@@ -2537,7 +2539,7 @@ function pageAdminGate(){
   '<p class="form-note">Code défini dans Réglages (par défaut : aquarelles_2026).</p>'+
   '</div></div></section>';}
 
-function admThumb(src){return src?'<img class="adm-thumb" src="'+src+'" alt="">':
+function admThumb(src){return src?'<img class="adm-thumb" loading="lazy" decoding="async" src="'+src+'" alt="">':
   '<span class="adm-thumb adm-noimg">—</span>';}
 function admWorkRow(w,i){
   return '<div class="adm-row" data-i="'+i+'">'+admThumb(w.i)+
@@ -2549,7 +2551,7 @@ function admWorkRow(w,i){
   '<div class="adm-inline"><input data-f="sj" value="'+escA(w.sj||"")+'" placeholder="Sujet (ex. Marée basse, Barfleur)">'+
   '<input data-f="am" value="'+escA(w.am||"")+'" placeholder="Ambiance (ex. Lumière douce)"></div>'+
   '<div class="adm-wimgs">'+((w.im&&w.im.length)?w.im.map(function(u,k){
-    return '<span class="adm-wimg"><img src="'+u+'" alt=""><button type="button" data-a="imdel" data-k="'+k+'" aria-label="Retirer l\u2019image">✕</button></span>';}).join(""):"")+
+    return '<span class="adm-wimg"><img loading="lazy" decoding="async" src="'+u+'" alt=""><button type="button" data-a="imdel" data-k="'+k+'" aria-label="Retirer l\u2019image">✕</button></span>';}).join(""):"")+
   ((w.im||[]).length<5?'<label class="adm-wadd">＋ image<input type="file" accept="image/*" hidden data-a="addimg"></label>':"")+
   '</div>'+
   '</div><div class="adm-actions">'+

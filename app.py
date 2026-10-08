@@ -31,6 +31,7 @@ app.config["MAX_CONTENT_LENGTH"] = 30 * 1024 * 1024
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 12  # 12 h
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 3600  # 1 h de cache pour les fichiers statiques
 
 # --------------------------------------------- notifications navigateur
 # Web Push (VAPID) : la clé privée est générée localement si absente,
