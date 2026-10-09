@@ -23,8 +23,11 @@
       </div>
       {% endif %}
 
-      <form class="contact-form" method="post" action="{{ url_for('contact_send') }}" novalidate>
+      <form id="contact-form" class="contact-form" method="post" novalidate
+            {% if not static_export %}action="{{ url_for('contact_send') }}"{% endif %}>
+        {% if not static_export %}
         <input type="hidden" name="csrf" value="{{ csrf }}">
+        {% endif %}
         <input type="hidden" name="form_ts" id="form-ts" value="0">
 
         <div class="field">
@@ -158,4 +161,21 @@
 
 {% block scripts %}
 <script src="/static/js/leaflet.js" defer></script>
+{% if static_export %}
+<script>
+/* Version statique (sans serveur) : le bouton ouvre la messagerie
+   avec le message pré-rempli — aucun envoi de données à un serveur. */
+document.getElementById("contact-form").addEventListener("submit", function (e) {
+  "use strict";
+  e.preventDefault();
+  var g = function (id) { return (document.getElementById(id).value || "").trim(); };
+  var body = "Nom : " + g("f-name") + "\nE-mail : " + g("f-email") +
+    (g("f-phone") ? "\nTéléphone : " + g("f-phone") : "") + "\n\n" + g("f-message");
+  var href = "mailto:{{ S.get('contact_email') }}?subject=" +
+    encodeURIComponent("[" + g("f-category") + "] " + g("f-subject")) +
+    "&body=" + encodeURIComponent(body);
+  window.location.href = href;
+});
+</script>
+{% endif %}
 {% endblock %}

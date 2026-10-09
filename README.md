@@ -241,6 +241,30 @@ La restauration ne s'exécute que si la base est vide : elle ne peut jamais
 
 ## Mettre le site en ligne (depuis l'espace d'administration)
 
+Deux méthodes, de la plus recommandée à la plus rustique :
+
+1. **« Publier le site en ligne (rapide) »** (recommandé) : le site part en
+   fichiers séparés — page d'accueil de quelques kilo-octets, images chargées
+   à la demande par les visiteurs, sans perte de qualité (mêmes images WebP).
+   Seuls les fichiers modifiés depuis la dernière publication sont envoyés ;
+   la progression s'affiche en direct. Première publication : 1 à 2 minutes.
+2. **Fichier unique tout-en-un** (secours) : « ⬇ Télécharger le fichier de
+   secours (index.html) » puis, sur github.com → dépôt → *Add file* →
+   *Upload files* → déposez le fichier → *Commit changes*. Toutes les images
+   sont dans le fichier (~18 Mo, sous la limite de 25 Mo de l’upload
+   web GitHub) : simple à sauvegarder, mais plus lent à charger pour
+   les visiteurs.
+
+Le fichier de vérification Google Search Console
+(`googlec60e4c98e6dd7367.html`, à la racine) est servi tel quel : il part
+avec chaque publication et permet à Google de confirmer le propriétaire
+du site (référencement — https://search.google.com/search-console).
+
+L'administration (œuvres, « sur le vif », actualités, réglages) se fait
+uniquement dans l'espace administrateur local — tout y est enregistré
+immédiatement et durablement. Le site publié est une version publique
+figée ; on republie après chaque modification.
+
 - **Avec la clé GitHub** : espace administrateur → « Publier le site
   maintenant ». En cas de conflit GitHub (rare, juste après une publication),
   un nouvel essai automatique est effectué.

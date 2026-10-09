@@ -32,6 +32,7 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["PERMANENT_SESSION_LIFETIME"] = 60 * 60 * 12  # 12 h
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 3600  # 1 h de cache pour les fichiers statiques
+app.config["STATIC_EXPORT"] = os.environ.get("HL_STATIC_EXPORT") == "1"
 
 # --------------------------------------------- notifications navigateur
 # Web Push (VAPID) : la clé privée est générée localement si absente,
@@ -156,6 +157,7 @@ def inject_globals():
         "hl_slugs": ",".join(w["slug"] for w in hl_works),
         "hl_total": len(hl_works),
         "vapid_pub": VAPID_PUB,
+        "static_export": app.config.get("STATIC_EXPORT", False),
     }
 
 
@@ -512,6 +514,19 @@ def service_worker():
     return resp
 
 
+@app.route("/google<token>.html")
+def google_verification(token):
+    """Fichier de vérification Google Search Console (référencement) :
+    servi tel quel à la racine du site, contenu strictement identique
+    au fichier déposé par Google."""
+    import re as _re
+    name = f"google{token}.html"
+    if not _re.fullmatch(r"[a-f0-9]+", token) or \
+            not os.path.isfile(os.path.join(BASE_DIR, name)):
+        abort(404)
+    return send_from_directory(BASE_DIR, name, mimetype="text/plain")
+
+
 @app.route("/push/subscribe", methods=["POST"])
 def push_subscribe():
     d = request.get_json(silent=True) or {}
@@ -631,6 +646,26 @@ def admin_home():
                 db.set_setting("github_branch", branch)
                 flash(f"Dépôt enregistré : {repo} (branche {branch}).", "ok")
             return redirect(url_for("admin_home"))
+        if action == "github_publish_site":
+            s = db.get_settings()
+            repo = s.get("github_repo", "")
+            branch = s.get("github_branch", "main") or "main"
+            token = s.get("github_token", "")
+            if not token:
+                flash("Ajoutez d’abord votre clé GitHub (étape 1).", "error")
+                return redirect(url_for("admin_home"))
+            if not repo:
+                flash("Choisissez d’abord le dépôt (étape 2).", "error")
+                return redirect(url_for("admin_home"))
+            if _PUB.get("state") == "running":
+                flash("Une publication est déjà en cours — suivez sa progression "
+                      "ci-dessous.", "error")
+                return redirect(url_for("admin_home"))
+            threading.Thread(target=_publish_site_thread,
+                             args=(repo, branch, token), daemon=True).start()
+            flash("Publication du site rapide lancée — suivez la progression "
+                  "ci-dessous.", "ok")
+            return redirect(url_for("admin_home"))
         if action == "github_publish":
             s = db.get_settings()
             repo = s.get("github_repo", "")
@@ -729,6 +764,118 @@ def admin_mono():
         return redirect(url_for("admin_home"))
     return Response(html, mimetype="text/html; charset=utf-8",
                     headers={"Content-Disposition": "attachment; filename=index.html"})
+
+
+# ---------------------------------------- publication multi-fichiers
+# Site public exporté en fichiers séparés : accueil léger, images chargées
+# à la demande — la version « rapide » du site pour les visiteurs.
+import threading  # noqa: E402
+
+_PUB = {"state": "idle", "phase": "", "done": 0, "total": 0, "current": "",
+        "error": "", "log": []}
+
+# chemins que nous gérons sur le dépôt (jamais touchés : CNAME, .gitignore…)
+_MANAGED = ("galerie/", "evenements/", "uploads/", "static/", "index.html",
+            "404.html", "sitemap.xml", "robots.txt", "sw.js", "artiste",
+            "atelier", "contact", "demande-specifique", "mentions-legales",
+            "confidentialite")
+
+
+def _git_blob_sha(data):
+    """Empreinte Git d'un contenu — pour n'envoyer que les fichiers changés."""
+    import hashlib
+    h = hashlib.sha1()
+    h.update(b"blob %d\0" % len(data))
+    h.update(data)
+    return h.hexdigest()
+
+
+def _publish_site_thread(repo, branch, token):
+    api = f"https://api.github.com/repos/{repo}"
+    try:
+        _PUB.update(state="running", phase="Fabrication du site rapide…",
+                    done=0, total=0, current="", error="", log=[])
+        from tools.export_static import export
+        dist = export(progress=_PUB)
+        files = {}
+        for root, _dirs, fnames in os.walk(dist):
+            for fn in fnames:
+                p = os.path.join(root, fn)
+                rel = os.path.relpath(p, dist).replace(os.sep, "/")
+                files[rel] = open(p, "rb").read()
+        _PUB.update(phase="Lecture du dépôt GitHub…", total=len(files), done=0)
+
+        st, ref = _gh_call("GET", f"{api}/git/ref/heads/{branch}", token)
+        if st != 200:
+            raise RuntimeError(f"dépôt ou branche introuvable ({st}) : "
+                               f"{(ref or {}).get('message', '')}")
+        head = ref["object"]["sha"]
+        st, tree = _gh_call("GET", f"{api}/git/trees/{head}?recursive=1", token)
+        remote = {}
+        if st == 200:
+            remote = {e["path"]: e.get("sha") for e in tree.get("tree", [])
+                      if e.get("type") == "blob"}
+
+        entries = []
+        for rel in sorted(files):
+            data = files[rel]
+            if remote.get(rel) == _git_blob_sha(data):
+                continue  # déjà en ligne, à l'identique
+            _PUB.update(phase="Envoi des fichiers…", current=rel,
+                        done=len(entries))
+            st, blob = _gh_call("POST", f"{api}/git/blobs", token,
+                                {"content": base64.b64encode(data).decode(),
+                                 "encoding": "base64"})
+            if st not in (200, 201):
+                raise RuntimeError(f"échec de l'envoi de {rel} ({st}) : "
+                                   f"{(blob or {}).get('message', '')}")
+            entries.append({"path": rel, "mode": "100644",
+                            "type": "blob", "sha": blob["sha"]})
+        _PUB["done"] = len(entries)
+
+        # retraits : fichiers présents sur le dépôt mais plus dans l'export
+        gone = 0
+        for path in remote:
+            if path not in files and any(path == m or path.startswith(m)
+                                         for m in _MANAGED):
+                entries.append({"path": path, "mode": "100644",
+                                "type": "blob", "sha": None})
+                gone += 1
+
+        if not entries:
+            _PUB.update(state="done", phase="Le site en ligne est déjà à jour "
+                        "— rien à envoyer.", current="")
+            return
+        _PUB.update(phase="Finalisation de la publication…",
+                    current=f"{len(entries)} fichier(s) modifié(s), {gone} retiré(s)")
+        st, newtree = _gh_call("POST", f"{api}/git/trees", token,
+                               {"base_tree": head, "tree": entries})
+        if st not in (200, 201):
+            raise RuntimeError(f"arbre refusé ({st}) : {(newtree or {}).get('message', '')}")
+        st, commit = _gh_call("POST", f"{api}/git/commits", token,
+                              {"message": "Site mis à jour (version rapide)",
+                               "tree": newtree["sha"], "parents": [head]})
+        if st not in (200, 201):
+            raise RuntimeError(f"commit refusé ({st}) : {(commit or {}).get('message', '')}")
+        st, res = _gh_call("PATCH", f"{api}/git/refs/heads/{branch}", token,
+                           {"sha": commit["sha"]})
+        if st not in (200, 201):
+            raise RuntimeError(f"mise à jour de la branche refusée ({st}) : "
+                               f"{(res or {}).get('message', '')} — "
+                               "retentez dans une minute")
+        _PUB.update(state="done",
+                    phase=f"Publié ✔ {len(entries) - gone} fichier(s) envoyé(s), "
+                    f"{gone} retiré(s) — commit {commit['sha'][:7]}. "
+                    "GitHub Pages se met à jour dans une à deux minutes.",
+                    current="")
+    except Exception as e:  # noqa: BLE001
+        _PUB.update(state="error", error=str(e), phase="")
+
+
+@app.route("/admin/publier/etat")
+@require_admin
+def admin_publish_state():
+    return jsonify(_PUB)
 
 
 # ---------------------------------------------------------- œuvres

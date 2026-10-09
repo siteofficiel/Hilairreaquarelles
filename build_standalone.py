@@ -2693,9 +2693,11 @@ function admAddAtelier(){
   '</form></div>';}
 function admAddVif(){
   return '<div class="adm-add"><h3 class="h3">Ajouter une aquarelle sur le vif</h3>'+
+  '<p class="muted small">L’aquarelle sera publiée aux deux endroits&nbsp;: dans la galerie (rubrique «&nbsp;Sur le vif&nbsp;») et sur la page L’atelier.</p>'+
   '<form id="adm-add-vif">'+
-  '<div><label>Image de l’aquarelle</label><input type="file" accept="image/*" required></div>'+
-  '<button class="btn" type="submit" style="margin-top:1.1rem">Ajouter à la galerie</button>'+
+  '<div><label>Photographie de l’aquarelle</label><input type="file" accept="image/*" required></div>'+
+  '<img id="vif-preview" alt="" hidden style="max-width:280px;border-radius:10px;margin-top:.8rem;display:block">'+
+  '<button class="btn" type="submit" style="margin-top:1.1rem">Ajouter à la galerie et à l’atelier</button>'+
   '</form></div>';}
 function vifWorkIdx(img){
   var idx=-1;
@@ -2920,17 +2922,26 @@ function initAdmin(){
       admStatus("Actualité publiée.");};
     if(file)processImage(file,1400,done);else done("");});
   var av=document.getElementById("adm-add-vif");
-  if(av)av.addEventListener("submit",function(e){e.preventDefault();
-    var f=av.querySelector('input[type=file]').files[0];
-    if(!f){admStatus("Choisissez d’abord l’image de l’aquarelle.",true);return;}
-    processImage(f,1400,function(uri,w,h){
-      DATA.atelier.push({i:uri,w:w,h:h});
-      var k=DATA.atelier.length;
-      while(workBySlug("sur-le-vif-"+k))k++;
-      DATA.works.push({t:"Sur le vif "+k,s:"sur-le-vif-"+k,c:"",y:"",d:"",
-        i:uri,w:w,h:h,tn:"",cf:0,sj:"",am:"",tc:"Sur le vif",im:[]});
-      persistLocal();render();
-      admStatus("Aquarelle sur le vif ajoutée à la galerie et sur la page L’atelier.");});});
+  if(av){
+    var avf=av.querySelector('input[type=file]'),avb=av.querySelector('button[type=submit]');
+    avf.addEventListener("change",function(){
+      var pv=document.getElementById("vif-preview");
+      if(!pv)return;
+      if(avf.files[0]){pv.src=URL.createObjectURL(avf.files[0]);pv.hidden=false;}
+      else{pv.hidden=true;pv.src="";}});
+    av.addEventListener("submit",function(e){e.preventDefault();
+      var f=avf.files[0];
+      if(!f){admStatus("Choisissez d’abord la photographie de l’aquarelle.",true);return;}
+      avb.disabled=true;avb.textContent="Ajout en cours…";
+      processImage(f,1400,function(uri,w,h){
+        avb.disabled=false;avb.textContent="Ajouter à la galerie et à l’atelier";
+        DATA.atelier.push({i:uri,w:w,h:h});
+        var k=DATA.atelier.length;
+        while(workBySlug("sur-le-vif-"+k))k++;
+        DATA.works.push({t:"Sur le vif "+k,s:"sur-le-vif-"+k,c:"",y:"",d:"",
+          i:uri,w:w,h:h,tn:"",cf:0,sj:"",am:"",tc:"Sur le vif",im:[]});
+        persistLocal();render();
+        admStatus("Aquarelle sur le vif ajoutée à la galerie et sur la page L’atelier.");});});}
   document.querySelectorAll("[data-s]").forEach(function(inp){
     inp.addEventListener("input",function(){
       DATA[inp.getAttribute("data-s")]=inp.value;persistLocal(true);});});

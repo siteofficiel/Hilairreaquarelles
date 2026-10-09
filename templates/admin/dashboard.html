@@ -13,8 +13,12 @@
 <div class="admin-section">
   <div class="gh-gate">
     <h2 class="gh-title">Mettre le site <em>en ligne</em></h2>
-    <p class="admin-sub">Collez votre clé GitHub une seule fois&nbsp;: les photos ajoutées
-       partent directement en ligne et le site se met à jour automatiquement en 1 à 2 minutes.</p>
+    <p class="admin-sub">Collez votre clé GitHub une seule fois, puis cliquez
+       <strong>« Publier le site en ligne (rapide) »</strong>&nbsp;: le site part en
+       fichiers séparés — accueil léger, images chargées à la demande, sans perte
+       de qualité. GitHub Pages se met à jour en 1 à 2 minutes. Tout le reste
+       (œuvres, «&nbsp;sur le vif&nbsp;», actualités) se gère uniquement ici,
+       dans cet espace administrateur.</p>
     <p class="gh-state">
       <strong>Clé&nbsp;:</strong> {{ '✔ enregistrée' if has_token else '— absente' }}
       {% if login %} — connecté en tant que {{ login }}{% endif %}
@@ -57,8 +61,8 @@
     <div class="gh-actions">
       <form method="post" style="display:inline">
         <input type="hidden" name="csrf" value="{{ csrf }}">
-        <input type="hidden" name="action" value="github_publish">
-        <button class="btn-primary" type="submit">Publier le site maintenant</button>
+        <input type="hidden" name="action" value="github_publish_site">
+        <button class="btn-primary" type="submit">🚀 Publier le site en ligne (rapide)</button>
       </form>
       <form method="post" style="display:inline">
         <input type="hidden" name="csrf" value="{{ csrf }}">
@@ -66,15 +70,66 @@
         <button class="btn-secondary" type="submit">Supprimer la clé</button>
       </form>
     </div>
+    <div id="pub-progress" class="admin-sub" style="margin-top:1rem" hidden>
+      <p id="pub-phase" style="margin:0 0 .4rem"><strong>Publication en cours…</strong></p>
+      <div style="height:10px;border-radius:6px;background:#e4eceb;overflow:hidden">
+        <div id="pub-bar" style="height:100%;width:0;background:#0A7D85;transition:width .4s"></div>
+      </div>
+      <p id="pub-current" class="admin-sub" style="margin:.4rem 0 0;font-size:.85rem"></p>
+    </div>
+    <script>
+    (function () {
+      var box = document.getElementById("pub-progress");
+      function tick() {
+        fetch("/admin/publier/etat").then(function (r) { return r.json(); })
+          .then(function (s) {
+            var phase = document.getElementById("pub-phase"),
+                bar = document.getElementById("pub-bar"),
+                cur = document.getElementById("pub-current");
+            if (s.state === "running") {
+              box.hidden = false;
+              phase.innerHTML = "<strong>Publication en cours…</strong> " + (s.phase || "");
+              var pct = s.total ? Math.round(100 * s.done / s.total) : 5;
+              bar.style.width = pct + "%";
+              cur.textContent = s.current || "";
+              setTimeout(tick, 1500);
+            } else if (s.state === "done") {
+              box.hidden = false;
+              phase.innerHTML = "✅ " + (s.phase || "Terminé.");
+              bar.style.width = "100%";
+              cur.textContent = "";
+            } else if (s.state === "error") {
+              box.hidden = false;
+              phase.innerHTML = "❌ Publication interrompue : " + (s.error || "");
+              cur.textContent = "Vous pouvez relancer la publication.";
+            } else { box.hidden = true; }
+          }).catch(function () { setTimeout(tick, 3000); });
+      }
+      tick();
+    })();
+    </script>
     {% endif %}
 
     <div class="gh-actions" style="margin-top:1rem">
       <a class="btn-secondary" href="/admin/fichier-unique"
-         title="Télécharge index.html : la version à jour de tout le site (textes + images), prête pour GitHub">
-        ⬇ Télécharger le fichier du site (index.html)</a>
-      <span class="admin-sub">Sans clé GitHub&nbsp;: github.com → dépôt du site →
-        <strong>Add file → Upload files</strong> → déposez ce fichier → Commit changes.</span>
+         title="Télécharge index.html : la version tout-en-un de secours du site (textes + images)">
+        ⬇ Télécharger le fichier de secours (index.html)</a>
+      <span class="admin-sub">Version tout-en-un — sauvegarde ou publication d'urgence
+        sans clé&nbsp;: github.com → dépôt → <strong>Add file → Upload files</strong> →
+        déposez ce fichier → Commit changes.</span>
     </div>
+
+    <details class="gh-help">
+      <summary>🧰 Méthode d'urgence — publier le fichier unique avec la clé</summary>
+      <p class="admin-sub">Remplace le site rapide par le fichier tout-en-un
+         (28&nbsp;Mo, plus lent à charger) — à n'utiliser que si la méthode
+         rapide échoue.</p>
+      <form method="post">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input type="hidden" name="action" value="github_publish">
+        <button class="btn-secondary" type="submit">Publier le fichier unique (secours)</button>
+      </form>
+    </details>
 
     <details class="gh-help">
       <summary>📖 Comment obtenir un jeton&nbsp;? (2 minutes, aucun dépôt à choisir)</summary>
