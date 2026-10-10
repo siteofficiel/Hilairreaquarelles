@@ -75,29 +75,6 @@
       {%- endfor %}
     </div>
     <p class="atelier-note reveal">Cliquez pour agrandir.</p>
-    <div class="tech-card reveal" style="margin-top:2.4rem">
-      <h3 class="h3">Différentes techniques de pinceaux.</h3>
-      <p class="tech-note-txt">
-        Varier les techniques et les effets dynamise la composition et contribue
-        à la qualité visuelle&nbsp;:</p>
-      <ul class="chip-list">
-        <li class="chip">Gros Pinceau lavis petit gris</li>
-        <li class="chip">Pinceau synthétique détail</li>
-        <li class="chip">Humide sur humide</li>
-        <li class="chip">Humide sur sec</li>
-        <li class="chip">Moucheté</li>
-        <li class="chip">Pinceau sec</li>
-        <li class="chip">Rouler le pinceaux</li>
-        <li class="chip">Pinceau écrasé en touches verticales</li>
-        <li class="chip">Filé Pinceau fin</li>
-        <li class="chip">Pinceau éventail</li>
-        <li class="chip">Retraits</li>
-        <li class="chip">Incliner la toile pour déplacer les pigments</li>
-        <li class="chip">Coulures</li>
-        <li class="chip">Auréoles</li>
-        <li class="chip">Vaporisateur</li>
-      </ul>
-    </div>
   </div>
 </section>
 
@@ -109,8 +86,7 @@
         <h2 class="h2">Les étapes d’une aquarelle</h2>
       </div>
     </div>
-    <p class="lead reveal">L’aquarelle est très exigeante et ne s’improvise pas.
-      La technique est un prérequis indispensable pour libérer le geste et s’exprimer.</p>
+    <p class="lead reveal">{{ S.get('t_lead', 'L’aquarelle est très exigeante et ne s’improvise pas. La technique est un prérequis indispensable pour libérer le geste et s’exprimer.') }}</p>
 
     <h3 class="h3 reveal">Avant de commencer</h3>
     <div class="rel-grid">
@@ -151,20 +127,48 @@
       <div class="tech-card reveal">
         <h4>Lavis&nbsp;:</h4>
         <ul class="tech-list">
-          <li>Liaison des premiers lavis</li>
-          <li>Pureté des lavis durant l’exécution</li>
-          <li>Laisser les imperfections, jouer avec, les utiliser a bon escient</li>
-          <li>Éclaircir les lavis pour la profondeur (plus légers et plus bleus pour les lointains)</li>
+          {%- for item in S.get('t_exec_lavis', 'Liaison des premiers lavis
+Pureté des lavis durant l’exécution
+Laisser les imperfections, jouer avec, les utiliser a bon escient
+Éclaircir les lavis pour la profondeur (plus légers et plus bleus pour les lointains)').split('\n') %}
+          <li>{{ item|trim }}</li>
+          {%- endfor %}
         </ul>
       </div>
       <div class="tech-card reveal">
         <h4>Ajuster&nbsp;:</h4>
         <ul class="tech-list">
-          <li>Vérifier la carte des formes de près et de loin (ajuster la peinture)</li>
-          <li>Placer les détails à la fin en fonction du chemin visuel</li>
-          <li>Glacis pour rehausser le contraste chaud / froid</li>
+          {%- for item in S.get('t_exec_ajuster', 'Vérifier la carte des formes de près et de loin (ajuster la peinture)
+Placer les détails à la fin en fonction du chemin visuel
+Glacis pour rehausser le contraste chaud / froid').split('\n') %}
+          <li>{{ item|trim }}</li>
+          {%- endfor %}
         </ul>
       </div>
+    </div>
+
+    <div class="tech-card reveal" style="margin-top:2.4rem">
+      <h3 class="h3">Différentes techniques de pinceaux.</h3>
+      <p class="tech-note-txt">{{ S.get('t_pinceaux_intro', 'Varier les techniques et les effets dynamise la composition et contribue à la qualité visuelle :') }}</p>
+      <ul class="chip-list">
+        {%- for item in S.get('t_pinceaux', 'Gros Pinceau lavis petit gris
+Pinceau synthétique détail
+Humide sur humide
+Humide sur sec
+Moucheté
+Pinceau sec
+Rouler le pinceaux
+Pinceau écrasé en touches verticales
+Filé Pinceau fin
+Pinceau éventail
+Retraits
+Incliner la toile pour déplacer les pigments
+Coulures
+Auréoles
+Vaporisateur').split('\n') %}
+        <li class="chip">{{ item|trim }}</li>
+        {%- endfor %}
+      </ul>
     </div>
   </div>
 </section>
@@ -173,7 +177,7 @@
   <div class="container narrow reveal">
     <p class="label">Cahier technique</p>
     <h2 class="h2">Gammes et esquisses préparatoires</h2>
-    <p class="muted">Les gammes et esquisses préparatoires d’Hilaire seront présentées ici prochainement.</p>
+    <p class="muted">{{ S.get('t_gammes', 'Les gammes et esquisses préparatoires d’Hilaire seront présentées ici prochainement.') }}</p>
   </div>
 </section>
 

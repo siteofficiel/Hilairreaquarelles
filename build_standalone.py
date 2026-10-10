@@ -93,7 +93,7 @@ def build_html():
                      "l": n["link"] or ""})
 
     # ------------------------------------------------------------- atelier
-    atelier, photos, materiel_l = [], [], []
+    atelier, photos, materiel_l, hero_l = [], [], [], []
     for a in conn.execute("SELECT folder, img_w, img_h, kind FROM atelier "
                           "ORDER BY position, id"):
         uri, _ = img_uri(a["folder"], "atelier")
@@ -103,6 +103,8 @@ def build_html():
             photos.append({"i": uri, "w": a["img_w"], "h": a["img_h"]})
         elif a["kind"] == "materiel":
             materiel_l.append({"i": uri, "w": a["img_w"], "h": a["img_h"]})
+        elif a["kind"] == "hero":
+            hero_l.append({"i": uri, "w": a["img_w"], "h": a["img_h"]})
         else:
             atelier.append({"i": uri, "w": a["img_w"], "h": a["img_h"]})
     conn.close()
@@ -135,6 +137,23 @@ def build_html():
         "fb": S.get("facebook", ""), "ga": S.get("ga_id", ""),
         "atelier": atelier,
         "photos": photos,
+        "hero": hero_l,
+        "a_demarche": S.get("a_demarche", ""),
+        "a_evasion": S.get("a_evasion", ""),
+        "a_cotentin": S.get("a_cotentin", ""),
+        "t_lead": S.get("t_lead", ""),
+        "t_avant_compo": S.get("t_avant_compo", ""),
+        "t_avant_couleurs": S.get("t_avant_couleurs", ""),
+        "t_avant_valeurs": S.get("t_avant_valeurs", ""),
+        "t_exec_lavis": S.get("t_exec_lavis", ""),
+        "t_exec_ajuster": S.get("t_exec_ajuster", ""),
+        "t_pinceaux_intro": S.get("t_pinceaux_intro", ""),
+        "t_pinceaux": S.get("t_pinceaux", ""),
+        "t_gammes": S.get("t_gammes", ""),
+        "t_cadres": S.get("t_cadres", ""),
+        "t_montage": S.get("t_montage", ""),
+        "t_fabrication": S.get("t_fabrication", ""),
+        "t_protection": S.get("t_protection", ""),
         "portrait": "data:image/jpeg;base64,"
                     + b64(os.path.join(BASE, "static", "img", "portrait.jpg")),
     }
@@ -1664,8 +1683,33 @@ var QUOTE='<svg class="quote-mark" viewBox="0 0 72 48" aria-hidden="true" xmlns=
 var WASH='<div class="hero-wash" aria-hidden="true"><img src="__WASHCARD__" alt="" decoding="async"></div>';
 
 /* ------------------------------------------------------- pages --------- */
-var CAR='<figure class="hc-carousel reveal d2">'+
-  '<img class="hc-img on" src="__HC1__" alt="Photographie de l\u2019univers d\u2019Hilaire Legentil" decoding="async" fetchpriority="high"></figure>';
+var DEFAULTS={a_demarche:"Peindre, c’est voyager, peindre c’est aussi une façon de pouvoir méditer. J’ai choisi d’être paysagiste marine car la mer, les ports, la côte et les nuages m’apaisent et me recentrent. Onirique résumerait assez bien mon approche de l’aquarelle. Derrière ces paysages, ces couleurs et ces formes en mouvement, il y a une énergie, quelque chose de profond qui me bouleverse. Un ciel ombrageux, une vague verte éclairée dans un soleil d’hiver, un vol planant de Goéland engendrent une impression que j’aime explorer et faire grandir en moi. C’est probablement cela que je tente de traduire et de partager.",
+a_evasion:"L’aquarelle est un fabuleux moyen d’évasion.",
+a_cotentin:"Pour un court séjour dans le Cotentin, ou habitant cette région, je souhaite aussi de tout cœur que cette exposition vous donne envie — quel que soit votre parcours, de peindre, d’utiliser vos mains ou votre corps pour exprimer ce qui vibre en vous (peinture, sculpture, chant, danse, méditation…).",
+t_lead:"L’aquarelle est très exigeante et ne s’improvise pas. La technique est un prérequis indispensable pour libérer le geste et s’exprimer.",
+t_avant_compo:"Point de focal fixé avant de peindre\n2 narrations, 2 niveaux de lecture : 1 paysage et 2 les personnages\nDynamique de la composition\nChoisir un format\nDéplacer le cadre sur le sujet\nRespecter le dessin (proportions, horizontales, verticales et point de fuite)",
+t_avant_couleurs:"Contraste couleurs chaudes et froides\nHarmonie colorée\nLe choix des couleurs doit traduire l’émotion éprouvée face au sujet\nPréparer les couleurs avant de peindre (faire de la place sur sa palette)\nPigments (granuleux, lisses, crémeux..)",
+t_avant_valeurs:"Contraste des valeur équilibré\nRéserver blancs\nZones laissées claires\nDrawing gum",
+t_exec_lavis:"Liaison des premiers lavis\nPureté des lavis durant l’exécution\nLaisser les imperfections, jouer avec, les utiliser a bon escient\nÉclaircir les lavis pour la profondeur (plus légers et plus bleus pour les lointains)",
+t_exec_ajuster:"Vérifier la carte des formes de près et de loin (ajuster la peinture)\nPlacer les détails à la fin en fonction du chemin visuel\nGlacis pour rehausser le contraste chaud / froid",
+t_pinceaux_intro:"Varier les techniques et les effets dynamise la composition et contribue à la qualité visuelle :",
+t_pinceaux:"Gros Pinceau lavis petit gris\nPinceau synthétique détail\nHumide sur humide\nHumide sur sec\nMoucheté\nPinceau sec\nRouler le pinceaux\nPinceau écrasé en touches verticales\nFilé Pinceau fin\nPinceau éventail\nRetraits\nIncliner la toile pour déplacer les pigments\nCoulures\nAuréoles\nVaporisateur",
+t_gammes:"Les gammes et esquisses préparatoires d’Hilaire seront présentées ici prochainement.",
+t_cadres:"Les châssis en bois sont confectionnés dans la Manche par le peintre, ou réalisés par une entreprise française, avec du bois issu de forêts (européennes) durables.",
+t_montage:"Traditionnellement, les aquarelles sont protégées par un sous verre et un cadre.\n\nCertaines aquarelles au sein de cette exposition ont été réalisées différemment : le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat. Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté des couleurs.\n\nAprès plusieurs minutes dans l’eau, le papier est agrafé sur le châssis. En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant l’exécution de l’aquarelle.\n\nLe papier sur châssis est aussi un choix de l’artiste : un papier coton frangé monté sur du bois confère à l’aquarelle une qualité esthétique d’\"objet artisanal\".\n\nLa peinture utilisée est fabriquée en France, le papier 100 % coton est fabriqué en Italie, le fixatif pour aquarelle est fabriqué en Allemagne et le vernis final est fabriqué en Italie.",
+t_fabrication:"À l’aide de baguettes « quart de rond », d’une boîte à onglets, d’une scie et de colle à bois, je réalise un cadre bois. La feuille de papier en coton découpée à la dimension, est trempée dans l’eau pendant 4 minutes. Excédent d’eau de la feuille enlevé en l’accrochant 10 minutes sur un fil à linge. La feuille positionnée, tendue puis agrafée sur le cadre. Après séchage 1 heure. Le papier sec est tendu sur le châssis. L’aquarelle réalisée, un premier spray pour fixer les pigments suivi d’un vernis mat protègent l’aquarelle de l’humidité. Le cadre peint et verni pour être encadré.",
+t_protection:"Attention cette protection préserve l’œuvre de quelques gouttes d’eau voire de postillons ! Le papier restera vulnérable aux coups et au détrempage."};
+function txt(k){return (DATA[k]!==undefined&&DATA[k]!=="")?DATA[k]:(DEFAULTS[k]||"");}
+function tlines(k){return String(txt(k)).split(/\n/).map(function(s){return s.trim();})
+  .filter(function(s){return s;});}
+function tparas(k){return String(txt(k)).split(/\n\s*\n/).map(function(s){return s.replace(/\s*\n\s*/g," ").trim();})
+  .filter(function(s){return s;});}
+var CAR=(function(){var _hl=(DATA.hero&&DATA.hero.length)?DATA.hero:[{i:"__HC1__"}];
+  return '<figure class="hc-carousel reveal d2" id="hc-carousel" role="region" aria-label="Aquarelles — carrousel de l\u2019accueil">'+
+  _hl.map(function(h,n){return '<img class="hc-img'+(n?'':' on')+'" src="'+h.i+'" alt="Aquarelle — l\u2019univers d\u2019Hilaire Legentil" decoding="async"'+(n?' loading="lazy"':' fetchpriority="high"')+'>';}).join('')+
+  (_hl.length>1?'<button class="wk-btn wk-prev" type="button" aria-label="Image précédente">\u2039</button>'+
+  '<button class="wk-btn wk-next" type="button" aria-label="Image suivante">\u203a</button>':'')+
+  '</figure>';})();
 function waveB(s){s=String(s||"");var p=s.split("\u2014");
   if(p.length<2)return esc(s);
   return esc(p[0].trim())+'<svg class="hw-wave" viewBox="0 0 44 12" aria-hidden="true"><path d="M2 8c5-7 11-7 16 0s11 7 16 0 7-5 8-3" fill="none" stroke="#0a7d85" stroke-width="2" stroke-linecap="round"/></svg>'+esc(p[1].trim());}
@@ -1695,7 +1739,7 @@ function pageHome(){
    '<span class="figure-caption">'+esc(fig.t)+'</span></div>':"")+
   '</div></section>'+
   '<section class="section quote-section"><div class="container narrow center reveal">'+QUOTE+
-  '<blockquote class="big-quote">Peindre, c’est voyager, peindre c’est aussi une façon de pouvoir méditer. J’ai choisi d’être paysagiste marine car la mer, les ports, la côte et les nuages m’apaisent et me recentrent.<cite>Hilaire Legentil</cite></blockquote></div></section>'+
+  '<blockquote class="big-quote">'+txt("a_demarche")+'<cite>Hilaire Legentil</cite></blockquote></div></section>'+
   '<section class="section tint-sky"><div class="container"><div class="section-head reveal">'+
   '<div><p class="label">Événements</p><h2 class="h2">Événements &amp; expositions</h2>'+
   '<p class="section-sub">Chaque année, je présente mes aquarelles dans des galeries du Cotentin.</p></div>'+
@@ -1743,7 +1787,7 @@ function pageArtist(){
   '<section class="section tint-sky"><div class="container narrow reveal">'+
   '<h2 class="h2">Traduire quelque chose de profond</h2>'+
   '<p>L’«&nbsp;art figuratif&nbsp;» que je pratique n’est pas copier le sujet, ce qui a peu d’intérêt en effet. J’essaie modestement de synthétiser, de trouver le chemin qui fera voyager le regardant. L’abstrait ou le figuratif pour moi ne font pas débat, l’essentiel étant de faire rêver.</p>'+
-  '<p>Peindre, c’est voyager, peindre c’est aussi une façon de pouvoir méditer. J’ai choisi d’être paysagiste marine car la mer, les ports, la côte et les nuages m’apaisent et me recentrent. Onirique résumerait assez bien mon approche de l’aquarelle. Derrière ces paysages, ces couleurs et ces formes en mouvement, il y a une énergie, quelque chose de profond qui me bouleverse. Un ciel ombrageux, une vague verte éclairée dans un soleil d’hiver, un vol planant de Goéland engendrent une impression que j’aime explorer et faire grandir en moi. C’est probablement cela que je tente de traduire et de partager.</p></div></section>'+
+  '<p>'+esc(txt("a_demarche"))+'</p></div></section>'+
 
   '<section class="section"><div class="container narrow reveal">'+
   '<h2 class="h2">La technique</h2>'+
@@ -1752,13 +1796,13 @@ function pageArtist(){
   '<p>Ma couleur de prédilection est le bleu&nbsp;: en particulier l’Outremer qui apporte une granulation si belle sur le papier. Pour la mer, j’associe des bleus tirant sur le vert (Bleu Winsor, Bleu de prusse) que je mélange en quantité variable à des terres ou à des verts (vert d’eau). Ces couleurs forment la trame de mes compositions.</p>'+
   '<p>J’utilise assez régulièrement le Marron de Pérylène (plus transparent que le rouge indien et tirant sur le gris). Associé au bleu d’Indanthrène, il forme de magnifiques violets pour les nuages sombres.</p>'+
   '<p>Les gris enfin, le gris chaud pour le sable humide et le gris froid très utile pour contrôler la profondeur du paysage.</p>'+
-  '<blockquote class="big-quote reveal">L’aquarelle est un fabuleux moyen d’évasion.</blockquote></div></section>'+
+  '<blockquote class="big-quote reveal">'+esc(txt("a_evasion"))+'</blockquote></div></section>'+
 
   '<section class="section tint-sand"><div class="container narrow reveal">'+
   '<h2 class="h2">Les expos</h2>'+
   '<p>Chaque année, j’expose dans le nord Cotentin à Barfleur, Saint-Vaast, Montfarville…</p>'+
   '<p>J’espère que vous aurez l’occasion de participer à la prochaine saison d’exposition et qu’elle vous permette d’accéder à l’univers sensible du paysage et de l’aquarelle. Et nous aurons peut-être le plaisir d’échanger, c’est toujours un moment d’humanité privilégié.</p>'+
-  '<p>Pour un court séjour dans le Cotentin, ou habitant cette région, je souhaite aussi de tout cœur que cette exposition vous donne envie — quel que soit votre parcours, de peindre, d’utiliser vos mains ou votre corps pour exprimer ce qui vibre en vous (peinture, sculpture, chant, danse, méditation…).</p></div></section>'+
+  '<p>'+esc(txt("a_cotentin"))+'</p></div></section>'+
 
   '<section class="section"><div class="container narrow reveal">'+
   '<h2 class="h2">L’art comme thérapie.</h2>'+
@@ -2021,50 +2065,36 @@ function pageAtelier(){
     '<div class="section-head reveal"><div><p class="label">Équipement</p><h2 class="h2">Matériels</h2></div></div>'+
     '<div class="atelier-grid" id="materiel-grid" data-cap="Matériels">'+pal+'</div>'+
     '<p class="atelier-note reveal">Cliquez pour agrandir.</p>'+
-    '<div class="tech-card reveal" style="margin-top:2.4rem"><h3 class="h3">Différentes techniques de pinceaux.</h3>'+
-    '<p class="tech-note-txt">Varier les techniques et les effets dynamise la composition et contribue à la qualité visuelle&nbsp;:</p>'+
-    '<ul class="chip-list">'+
-    '<li class="chip">Gros Pinceau lavis petit gris</li><li class="chip">Pinceau synthétique détail</li>'+
-    '<li class="chip">Humide sur humide</li><li class="chip">Humide sur sec</li>'+
-    '<li class="chip">Moucheté</li><li class="chip">Pinceau sec</li>'+
-    '<li class="chip">Rouler le pinceaux</li><li class="chip">Pinceau écrasé en touches verticales</li>'+
-    '<li class="chip">Filé Pinceau fin</li><li class="chip">Pinceau éventail</li>'+
-    '<li class="chip">Retraits</li><li class="chip">Incliner la toile pour déplacer les pigments</li>'+
-    '<li class="chip">Coulures</li><li class="chip">Auréoles</li><li class="chip">Vaporisateur</li>'+
-    '</ul></div>'+
     '</div></section>'+
 
 
     '<section class="section tint-sand" id="etapes"><div class="container">'+
     '<div class="section-head reveal"><div><p class="label">Cahier technique</p><h2 class="h2">Les étapes d\u2019une aquarelle</h2></div></div>'+
-    '<p class="lead reveal">L\u2019aquarelle est très exigeante et ne s\u2019improvise pas. La technique est un prérequis indispensable pour libérer le geste et s\u2019exprimer.</p>'+
+    '<p class="lead reveal">'+esc(txt("t_lead"))+'</p>'+
     '<h3 class="h3 reveal">Avant de commencer</h3><div class="rel-grid">'+
     '<div class="tech-card reveal"><h4>Composition / dessin&nbsp;:</h4><ul class="tech-list">'+
-    '<li>Point de focal fixé avant de peindre</li><li>2 narrations, 2 niveaux de lecture&nbsp;: 1 paysage et 2 les personnages</li>'+
-    '<li>Dynamique de la composition</li><li>Choisir un format</li><li>Déplacer le cadre sur le sujet</li>'+
-    '<li>Respecter le dessin (proportions, horizontales, verticales et point de fuite)</li></ul></div>'+
+    tlines("t_avant_compo").map(function(it){return '<li>'+esc(it)+'</li>';}).join("")+'</ul></div>'+
     '<div class="tech-card reveal"><h4>Couleurs&nbsp;:</h4><ul class="tech-list">'+
-    '<li>Contraste couleurs chaudes et froides</li><li>Harmonie colorée</li>'+
-    '<li>Le choix des couleurs doit traduire l\u2019émotion éprouvée face au sujet</li>'+
-    '<li>Préparer les couleurs avant de peindre (faire de la place sur sa palette)</li>'+
-    '<li>Pigments (granuleux, lisses, crémeux..)</li></ul></div>'+
+    tlines("t_avant_couleurs").map(function(it){return '<li>'+esc(it)+'</li>';}).join("")+'</ul></div>'+
     '<div class="tech-card reveal"><h4>Valeurs&nbsp;:</h4><ul class="tech-list">'+
-    '<li>Contraste des valeur équilibré</li><li>Réserver blancs</li><li>Zones laissées claires</li><li>Drawing gum</li></ul></div>'+
+    tlines("t_avant_valeurs").map(function(it){return '<li>'+esc(it)+'</li>';}).join("")+'</ul></div>'+
     '</div>'+
     '<h3 class="h3 reveal" style="margin-top:2.4rem">Durant l\u2019exécution</h3><div class="rel-grid rel-grid-2">'+
     '<div class="tech-card reveal"><h4>Lavis&nbsp;:</h4><ul class="tech-list">'+
-    '<li>Liaison des premiers lavis</li><li>Pureté des lavis durant l\u2019exécution</li>'+
-    '<li>Laisser les imperfections, jouer avec, les utiliser a bon escient</li>'+
-    '<li>Éclaircir les lavis pour la profondeur (plus légers et plus bleus pour les lointains)</li></ul></div>'+
+    tlines("t_exec_lavis").map(function(it){return '<li>'+esc(it)+'</li>';}).join("")+'</ul></div>'+
     '<div class="tech-card reveal"><h4>Ajuster&nbsp;:</h4><ul class="tech-list">'+
-    '<li>Vérifier la carte des formes de près et de loin (ajuster la peinture)</li>'+
-    '<li>Placer les détails à la fin en fonction du chemin visuel</li>'+
-    '<li>Glacis pour rehausser le contraste chaud / froid</li></ul></div>'+
+    tlines("t_exec_ajuster").map(function(it){return '<li>'+esc(it)+'</li>';}).join("")+'</ul></div>'+
+    '</div>'+
+    '<div class="tech-card reveal" style="margin-top:2.4rem"><h3 class="h3">Différentes techniques de pinceaux.</h3>'+
+    '<p class="tech-note-txt">'+esc(txt("t_pinceaux_intro"))+'</p>'+
+    '<ul class="chip-list">'+
+    tlines("t_pinceaux").map(function(it){return '<li class="chip">'+esc(it)+'</li>';}).join("")+
+    '</ul></div>'+
     '</div></div></section>'+
 
     '<section class="section" id="gammes"><div class="container narrow reveal">'+
     '<p class="label">Cahier technique</p><h2 class="h2">Gammes et esquisses préparatoires</h2>'+
-    '<p class="muted">Les gammes et esquisses préparatoires d\u2019Hilaire seront présentées ici prochainement.</p>'+
+    '<p class="muted">'+esc(txt("t_gammes"))+'</p>'+
     '</div></section>'+
 
     (vif?'<section class="section tint-sky" id="vif"><div class="container">'+
@@ -2077,17 +2107,13 @@ function pageAtelier(){
 
     '<section class="section tint-sand" id="cadres"><div class="container">'+
     '<div class="section-head reveal"><div><p class="label">Des aquarelles "locales"&nbsp;!</p><h2 class="h2">Fabrication des cadres</h2></div></div>'+
-    '<p class="lead reveal">Les châssis en bois sont confectionnés dans la Manche par le peintre, ou réalisés par une entreprise française, avec du bois issu de forêts (européennes) durables.</p>'+
+    '<p class="lead reveal">'+esc(txt("t_cadres"))+'</p>'+
     '<div class="narrow reveal"><h3 class="h3">Montage des feuilles sur châssis</h3>'+
-    '<p>Traditionnellement, les aquarelles sont protégées par un sous verre et un cadre.</p>'+
-    '<p>Certaines aquarelles au sein de cette exposition ont été réalisées différemment&nbsp;: le papier est tendu sur un châssis et la peinture est protégée avec un vernis mat. Ce mode de réalisation supprime les reflets du verre et préserve ainsi la clarté des couleurs.</p>'+
-    '<p>Après plusieurs minutes dans l\u2019eau, le papier est agrafé sur le châssis. En séchant, il se rétracte. Tendu comme un tambour, il ne gondolera pas durant l\u2019exécution de l\u2019aquarelle.</p>'+
-    '<p>Le papier sur châssis est aussi un choix de l\u2019artiste&nbsp;: un papier coton frangé monté sur du bois confère à l\u2019aquarelle une qualité esthétique d\'objet artisanal.</p>'+
-    '<p>La peinture utilisée est fabriquée en France, le papier 100&nbsp;% coton est fabriqué en Italie, le fixatif pour aquarelle est fabriqué en Allemagne et le vernis final est fabriqué en Italie.</p>'+
+    tparas("t_montage").map(function(p){return '<p>'+esc(p)+'</p>';}).join("")+
     '</div>'+
-    '<div class="narrow reveal"><p>À l\u2019aide de baguettes «&nbsp;quart de rond&nbsp;», d\u2019une boîte à onglets, d\u2019une scie et de colle à bois, je réalise un cadre bois. La feuille de papier en coton découpée à la dimension, est trempée dans l\u2019eau pendant 4 minutes. Excédent d\u2019eau de la feuille enlevé en l\u2019accrochant 10 minutes sur un fil à linge. La feuille positionnée, tendue puis agrafée sur le cadre. Après séchage 1 heure. Le papier sec est tendu sur le châssis. L\u2019aquarelle réalisée, un premier spray pour fixer les pigments suivi d\u2019un vernis mat protègent l\u2019aquarelle de l\u2019humidité. Le cadre peint et verni pour être encadré.</p>'+
+    '<div class="narrow reveal"><p>'+esc(txt("t_fabrication"))+'</p>'+
     '</div>'+
-    '<p class="tech-note reveal">Attention cette protection préserve l\u2019œuvre de quelques gouttes d\u2019eau voire de postillons&nbsp;! Le papier restera vulnérable aux coups et au détrempage.</p>'+
+    '<p class="tech-note reveal">'+esc(txt("t_protection"))+'</p>'+
     '<blockquote class="big-quote reveal" style="margin-top:2.6rem">Alors, à vos outils&nbsp;! À vos pinceaux&nbsp;!</blockquote>'+
     '</div></section>'+
 
@@ -2600,6 +2626,8 @@ function admSettings(){
   function f(l,k){return '<div><label>'+l+'</label><input data-s="'+k+'" value="'+escA(DATA[k]||"")+'"></div>';}
   function t(l,k){return '<div style="margin-top:.8rem"><label>'+l+'</label>'+
     '<textarea data-s="'+k+'" rows="3">'+esc(DATA[k]||"")+'</textarea></div>';}
+  function d(l,k){return '<div style="margin-top:.8rem"><label>'+l+'</label>'+
+    '<textarea data-s="'+k+'" rows="5">'+esc(txt(k))+'</textarea></div>';}
   return '<div class="adm-add"><h3 class="h3">Réglages</h3>'+
   '<div class="adm-grid2">'+f("Code d’accès administrateur","pin")+f("Téléphone affiché","phone")+
   f("E-mail affiché","email")+
@@ -2610,6 +2638,24 @@ function admSettings(){
   t("Bandeau — petite ligne","heroB")+t("Bandeau — nom","heroT")+t("Bandeau — ligne sous le nom","heroS")+
   t("Phrase d’accroche de l’accueil","homeIntro")+
   t("Présentation de l’artiste","artistIntro")+
+  '<h3 class="h3" style="margin-top:1.4rem">Textes — La démarche de l’artiste</h3>'+
+  t("Grand texte « Peindre, c’est voyager… » (accueil et démarche)","a_demarche")+
+  t("Citation « L’aquarelle est un fabuleux moyen d’évasion »","a_evasion")+
+  t("Paragraphe « Pour un court séjour dans le Cotentin »","a_cotentin")+
+  '<h3 class="h3" style="margin-top:1.4rem">Textes — L’atelier (cahier technique)</h3>'+
+  t("Les étapes d’une aquarelle — phrase d’introduction","t_lead")+
+  t("Avant de commencer — Composition / dessin (un point par ligne)","t_avant_compo")+
+  t("Avant de commencer — Couleurs (un point par ligne)","t_avant_couleurs")+
+  t("Avant de commencer — Valeurs (un point par ligne)","t_avant_valeurs")+
+  t("Durant l’exécution — Lavis (un point par ligne)","t_exec_lavis")+
+  t("Durant l’exécution — Ajuster (un point par ligne)","t_exec_ajuster")+
+  t("Différentes techniques de pinceaux — phrase d’introduction","t_pinceaux_intro")+
+  t("Différentes techniques de pinceaux (une technique par ligne)","t_pinceaux")+
+  t("Gammes et esquisses préparatoires — texte","t_gammes")+
+  t("Fabrication des cadres — introduction","t_cadres")+
+  t("Montage des feuilles sur châssis (un paragraphe par ligne vide)","t_montage")+
+  t("La réalisation d’un cadre (paragraphe)","t_fabrication")+
+  t("Note « Attention, cette protection… »","t_protection")+
   '<p class="form-note" style="margin-top:.6rem">Chaque modification est enregistrée automatiquement dans ce navigateur.</p>'+
   '</div>';}
 function pageAdmin(){
@@ -2624,8 +2670,10 @@ function pageAdmin(){
   '<button class="btn" id="adm-reset" type="button">Réinitialiser</button>'+
   '<button class="btn" id="adm-logout" type="button">Verrouiller</button></div>'+
   '<p class="adm-status" id="adm-savestate" role="status"></p>'+
+  admAddWork()+
   '<h2 class="h3">Les œuvres <span class="muted small">('+DATA.works.length+')</span></h2>'+
-  '<div id="adm-works">'+DATA.works.map(admWorkRow).join("")+'</div>'+admAddWork()+
+  '<div id="adm-works">'+DATA.works.map(admWorkRow).join("")+'</div>'+
+  admHero()+
   '<h2 class="h3">Sur le vif <span class="muted small">('+DATA.atelier.length+')</span></h2>'+
   '<p class="muted small">Les aquarelles peintes devant le sujet, affichées dans la galerie (rubrique Sur le vif).</p>'+
   '<div id="adm-atelier">'+DATA.atelier.map(admVifRow).join("")+'</div>'+
@@ -2691,6 +2739,53 @@ function admAddAtelier(){
   '<div><label>Image</label><input type="file" accept="image/*" required></div>'+
   '<button class="btn" type="submit" style="margin-top:1.1rem">Ajouter la photo</button>'+
   '</form></div>';}
+function admHeroRow(h,i){
+  return '<div class="adm-row" data-i="'+i+'">'+admThumb(h.i)+
+  '<div class="adm-fields"><p style="margin:0">Image du carrousel — n°'+(i+1)+'</p>'+
+  '<p class="muted small" style="margin:.2rem 0 0">Défile en haut de la page d\u2019accueil</p></div>'+
+  '<div class="adm-actions">'+
+  '<button type="button" data-a="up" title="Monter">↑</button>'+
+  '<button type="button" data-a="down" title="Descendre">↓</button>'+
+  '<label>Remplacer<input type="file" accept="image/*" hidden data-a="img"></label>'+
+  '<button type="button" data-a="del" class="danger">Supprimer</button>'+
+  '</div></div>';}
+function admHero(){
+  var hl=DATA.hero||[];
+  return '<h2 class="h3">Le carrousel de l\u2019accueil <span class="muted small">('+hl.length+')</span></h2>'+
+  '<p class="muted small">Les images qui défilent en haut de la page d\u2019accueil. Elles tournent seules, avec les flèches ‹ › pour naviguer.</p>'+
+  '<div id="adm-hero">'+hl.map(admHeroRow).join("")+'</div>'+
+  '<div class="adm-add"><h3 class="h3">Ajouter une image au carrousel</h3>'+
+  '<form id="adm-add-hero">'+
+  '<div><label>Image (photographie ou aquarelle)</label><input type="file" accept="image/*" required></div>'+
+  '<button class="btn" type="submit" style="margin-top:1.1rem">Ajouter au carrousel</button>'+
+  '</form></div>';}
+function bindHero(){
+  var box=document.getElementById("adm-hero");
+  if(box){
+    box.addEventListener("click",function(e){
+      var b=e.target.closest("button[data-a]");if(!b)return;
+      var row=b.closest(".adm-row");if(!row)return;
+      var i=+row.getAttribute("data-i"),a=b.getAttribute("data-a");
+      if(!DATA.hero||!DATA.hero[i])return;
+      if(a==="del"){DATA.hero.splice(i,1);persistLocal();render();admStatus("Image retirée du carrousel.");return;}
+      if(a==="up"&&i>0){var t=DATA.hero[i];DATA.hero[i]=DATA.hero[i-1];DATA.hero[i-1]=t;persistLocal();render();return;}
+      if(a==="down"&&i<DATA.hero.length-1){var u=DATA.hero[i];DATA.hero[i]=DATA.hero[i+1];DATA.hero[i+1]=u;persistLocal();render();return;}});
+    box.addEventListener("change",function(e){
+      if(e.target.getAttribute("data-a")!=="img")return;
+      var row=e.target.closest(".adm-row");if(!row)return;
+      var i=+row.getAttribute("data-i"),f=e.target.files[0];
+      if(!f||!DATA.hero[i])return;
+      processImage(f,1400,function(uri,w,h){
+        DATA.hero[i]={i:uri,w:w,h:h};persistLocal();render();
+        admStatus("Image du carrousel remplacée.");});});}
+  var af=document.getElementById("adm-add-hero");
+  if(af)af.addEventListener("submit",function(e){e.preventDefault();
+    var f=af.querySelector('input[type=file]').files[0];
+    if(!f){admStatus("Choisissez d\u2019abord une image.",true);return;}
+    processImage(f,1400,function(uri,w,h){
+      if(!DATA.hero)DATA.hero=[];
+      DATA.hero.push({i:uri,w:w,h:h});persistLocal();render();
+      admStatus("Image ajoutée au carrousel de l\u2019accueil.");});});}
 function admAddVif(){
   return '<div class="adm-add"><h3 class="h3">Ajouter une aquarelle sur le vif</h3>'+
   '<p class="muted small">L’aquarelle sera publiée aux deux endroits&nbsp;: dans la galerie (rubrique «&nbsp;Sur le vif&nbsp;») et sur la page L’atelier.</p>'+
@@ -2890,6 +2985,7 @@ function initAdmin(){
       it.im.splice(+b.getAttribute("data-k"),1);persistLocal();render();});}
   bindList("adm-news",DATA.news);
   bindAtelier();
+  bindHero();
   bindGitHub();
   var aw=document.getElementById("adm-add-work");
   aw.addEventListener("submit",function(e){e.preventDefault();

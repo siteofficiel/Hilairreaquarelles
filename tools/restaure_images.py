@@ -52,6 +52,9 @@ def main():
         for i, p in enumerate(data.get("photos", []), 1):
             if "pal%02d" % i == folder:
                 return p["i"]
+        for i, p in enumerate(data.get("hero", []), 1):
+            if "hero%02d" % i == folder:
+                return p["i"]
         return None
 
     # actualités : correspondance PAR SLUG (la base trie les news par date,

@@ -549,23 +549,11 @@ window.hlMapMount = function () {
   var imgs = [].slice.call(car.querySelectorAll(".hc-img"));
   if (!imgs.length) return;
   var prev = car.querySelector(".wk-prev"), next = car.querySelector(".wk-next");
-  var dots = car.querySelector(".wk-dots");
   var i = 0, timer = null, hovering = false;
   function show(k) {
     i = (k + imgs.length) % imgs.length;
     imgs.forEach(function (im, n) { im.className = "hc-img" + (n === i ? " on" : ""); });
-    if (dots) [].forEach.call(dots.children, function (d, n) {
-      d.className = "wk-dot" + (n === i ? " on" : ""); });
   }
-  if (dots) imgs.forEach(function (im, k) {
-    var d = document.createElement("button");
-    d.type = "button";
-    d.className = "wk-dot" + (k ? "" : " on");
-    d.setAttribute("aria-label", "Voir l\u2019image " + (k + 1));
-    if (im.tagName === "IMG") d.style.backgroundImage = "url('" + (im.currentSrc || im.src) + "')";
-    d.addEventListener("click", function () { show(k); restart(); });
-    dots.appendChild(d);
-  });
   if (prev) prev.addEventListener("click", function () { show(i - 1); restart(); });
   if (next) next.addEventListener("click", function () { show(i + 1); restart(); });
   var x0 = null;

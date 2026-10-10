@@ -5,14 +5,15 @@
 <div class="admin-page-head">
   <div>
     <h1>L’atelier</h1>
-    <p class="admin-sub">La palette et les photos du matériel, affichées sur la page
-       «&nbsp;L’atelier&nbsp;» dans la rubrique Matériels. Ajoutez-en autant que vous
-       voulez, remplacez-les ou réordonnez-les.</p>
+    <p class="admin-sub">Le carrousel de l’accueil, la palette et les photos du
+       matériel. Ajoutez-en autant que vous voulez, remplacez-les ou
+       réordonnez-les.</p>
   </div>
   <a class="btn-primary" href="{{ url_for('atelier') }}" target="_blank" rel="noopener">Voir la page ↗</a>
 </div>
 
 {% set groups = [
+  ('hero', 'Le carrousel de l’accueil', 'du carrousel', 'Image du carrousel', hero),
   ('palette', 'La palette', 'de la palette', 'Photo de la palette', photos),
   ('materiel', 'Photos du matériel', 'du matériel', 'Photo du matériel', materiel),
 ] %}

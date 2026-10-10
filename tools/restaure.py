@@ -103,6 +103,12 @@ def restore_all():
         "ga_id": data.get("ga", ""),
         "site_domain": _domain_from_mono(html),
     }
+    for k in ("a_demarche", "a_evasion", "a_cotentin", "t_lead", "t_avant_compo",
+              "t_avant_couleurs", "t_avant_valeurs", "t_exec_lavis", "t_exec_ajuster",
+              "t_pinceaux_intro", "t_pinceaux", "t_gammes", "t_cadres", "t_montage",
+              "t_fabrication", "t_protection"):
+        if data.get(k):
+            SET[k] = data[k]
     for k, v in SET.items():
         conn.execute("INSERT OR REPLACE INTO settings(key,value) VALUES(?,?)", (k, v or ""))
 
@@ -145,6 +151,15 @@ def restore_all():
         open(os.path.join(d, "medium.webp"), "wb").write(_img_bytes(p["i"]))
         conn.execute("INSERT INTO atelier(folder,img_w,img_h,position,kind) "
                      "VALUES(?,?,?,?, 'palette')", (folder, p.get("w", 0), p.get("h", 0), i))
+
+    # ── carrousel de l'accueil ──
+    for i, p in enumerate(data.get("hero", []), 1):
+        folder = "hero%02d" % i
+        d = os.path.join(UPLOADS, "atelier", folder)
+        os.makedirs(d, exist_ok=True)
+        open(os.path.join(d, "medium.webp"), "wb").write(_img_bytes(p["i"]))
+        conn.execute("INSERT INTO atelier(folder,img_w,img_h,position,kind) "
+                     "VALUES(?,?,?,?, 'hero')", (folder, p.get("w", 0), p.get("h", 0), i))
 
     # ── actualités ──
     for i, n in enumerate(data.get("news", []), 1):

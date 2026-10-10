@@ -233,8 +233,12 @@ def home():
                       key=lambda n: n["event_date"] or "")
     past = sorted([n for n in items if (n["event_date"] or "")[:10] < today],
                   key=lambda n: n["event_date"] or "", reverse=True)
+    conn = db.connect()
+    hero_imgs = conn.execute("SELECT folder, img_w, img_h FROM atelier "
+                             "WHERE kind='hero' ORDER BY position, id").fetchall()
+    conn.close()
     return render_template("index.html", works=works[:6], news=(upcoming + past)[:3],
-                           hero_works=works[:5], flip=works[:10])
+                           hero_works=works[:5], flip=works[:10], hero_imgs=hero_imgs)
 
 
 @app.route("/artiste")
@@ -1336,7 +1340,7 @@ def admin_atelier():
             abort(400)
         action = request.form.get("action")
         kind = request.form.get("kind", "palette")
-        if kind not in ("palette", "materiel"):
+        if kind not in ("palette", "materiel", "hero"):
             kind = "palette"
         conn = db.connect()
         if action == "upload":
@@ -1357,7 +1361,8 @@ def admin_atelier():
                          "VALUES(?,?,?,?,?)", (folder, w, h, pos, kind))
             conn.commit(); conn.close()
             flash("Photo ajoutée à la palette." if kind == "palette"
-                  else "Photo du matériel ajoutée.", "ok")
+                  else ("Photo du carrousel de l'accueil ajoutée." if kind == "hero"
+                        else "Photo du matériel ajoutée."), "ok")
             return redirect(url_for("admin_atelier"))
         pid = request.form.get("id", "")
         row = (conn.execute("SELECT * FROM atelier WHERE id=? AND kind=?",
@@ -1408,8 +1413,11 @@ def admin_atelier():
                           "ORDER BY position, id").fetchall()
     materiel = conn.execute("SELECT * FROM atelier WHERE kind='materiel' "
                             "ORDER BY position, id").fetchall()
+    hero = conn.execute("SELECT * FROM atelier WHERE kind='hero' "
+                        "ORDER BY position, id").fetchall()
     conn.close()
-    return render_template("admin/atelier.html", photos=photos, materiel=materiel)
+    return render_template("admin/atelier.html", photos=photos, materiel=materiel,
+                           hero=hero)
 
 
 # ---------------------------------------------------------- sur le vif
@@ -1578,6 +1586,26 @@ SETTING_GROUPS = [
         ("regard_univers", "Encadré « En un regard » — Univers"),
         ("regard_support", "Encadré « En un regard » — Support"),
         ("regard_region", "Encadré « En un regard » — Région"),
+    ]),
+    ("Page « La démarche de l'artiste » — textes", [
+        ("a_demarche", "Grand texte « Peindre, c'est voyager… » (accueil et démarche)"),
+        ("a_evasion", "Citation « L'aquarelle est un fabuleux moyen d'évasion »"),
+        ("a_cotentin", "Paragraphe « Pour un court séjour dans le Cotentin »"),
+    ]),
+    ("Page « L'atelier » — textes du cahier technique", [
+        ("t_lead", "Les étapes d'une aquarelle — phrase d'introduction"),
+        ("t_avant_compo", "Avant de commencer — Composition / dessin (un point par ligne)"),
+        ("t_avant_couleurs", "Avant de commencer — Couleurs (un point par ligne)"),
+        ("t_avant_valeurs", "Avant de commencer — Valeurs (un point par ligne)"),
+        ("t_exec_lavis", "Durant l'exécution — Lavis (un point par ligne)"),
+        ("t_exec_ajuster", "Durant l'exécution — Ajuster (un point par ligne)"),
+        ("t_pinceaux_intro", "Différentes techniques de pinceaux — phrase d'introduction"),
+        ("t_pinceaux", "Différentes techniques de pinceaux (une technique par ligne)"),
+        ("t_gammes", "Gammes et esquisses préparatoires — texte"),
+        ("t_cadres", "Fabrication des cadres — introduction"),
+        ("t_montage", "Montage des feuilles sur châssis (un paragraphe par ligne vide)"),
+        ("t_fabrication", "La réalisation d'un cadre (paragraphe)"),
+        ("t_protection", "Note « Attention, cette protection… »"),
     ]),
     ("Sous-titres des pages", [
         ("gallery_sub", "Page Galerie — sous-titre"),

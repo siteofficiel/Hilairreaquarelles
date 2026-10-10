@@ -16,8 +16,20 @@
     <h1 class="hero-title reveal d1">{{ S.get('hero_title', 'Hilaire Legentil') }}</h1>
     <p class="hero-sub reveal d2">{{ S.get('hero_sub', 'Artiste auteur') }}</p>
 
-    <figure class="hc-carousel reveal d2">
+    <figure class="hc-carousel reveal d2" id="hc-carousel" role="region" aria-label="Aquarelles — carrousel de l’accueil">
+      {% if hero_imgs %}
+        {% for h in hero_imgs %}
+      <img class="hc-img{{ ' on' if loop.first }}" src="/uploads/atelier/{{ h.folder }}/medium.webp"
+           alt="Aquarelle — l’univers d’Hilaire Legentil" decoding="async"
+           {% if loop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %}>
+        {% endfor %}
+        {% if hero_imgs|length > 1 %}
+      <button class="wk-btn wk-prev" type="button" aria-label="Image précédente">‹</button>
+      <button class="wk-btn wk-next" type="button" aria-label="Image suivante">›</button>
+        {% endif %}
+      {% else %}
       <img class="hc-img on" src="{{ url_for('static', filename='img/carousel/c1.webp') }}" alt="Photographie de l’univers d’Hilaire Legentil" decoding="async" fetchpriority="high">
+      {% endif %}
     </figure>
   </div>
 
@@ -65,9 +77,7 @@
             transform="translate(34 4)" fill="#38a888" opacity=".28"/>
     </svg>
     <blockquote class="big-quote">
-      Peindre, c’est voyager, peindre c’est aussi une façon de pouvoir méditer.
-      J’ai choisi d’être paysagiste marine car la mer, les ports, la côte et les
-      nuages m’apaisent et me recentrent.
+      {{ S.get('a_demarche', 'Peindre, c’est voyager, peindre c’est aussi une façon de pouvoir méditer. J’ai choisi d’être paysagiste marine car la mer, les ports, la côte et les nuages m’apaisent et me recentrent.') }}
       <cite>Hilaire Legentil</cite>
     </blockquote>
   </div>

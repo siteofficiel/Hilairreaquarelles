@@ -55,10 +55,15 @@ Depuis l'administration, Hilaire peut, sans toucher au code :
 - écrire, modifier, publier / masquer / supprimer les actualités
   (image principale + images complémentaires, date, lien externe) ;
 - gérer les photos de la page L'atelier (ajout, remplacement, ordre, suppression) ;
+- gérer **le carrousel de la page d'accueil** (ajout, remplacement, ordre,
+  suppression) — page L'atelier de l'administration, première section ;
 - gérer les aquarelles « sur le vif » de la galerie, depuis la page Œuvres ;
 - lire et répondre aux messages du formulaire de contact ;
 - modifier les textes d'accroche (accueil, page L'artiste) et ses
   coordonnées (téléphone, e-mail, Instagram) ;
+- **modifier lui-même tous les textes des pages « La démarche de l'artiste »
+  et « L'atelier »** (parcours, citation, Cotentin, étapes d'une aquarelle,
+  gammes et esquisses préparatoires, fabrication des cadres…) — Réglages ;
 - changer son mot de passe.
 
 Les images envoyées sont automatiquement vérifiées (format, taille),
@@ -201,6 +206,9 @@ le jeton y est mémorisé uniquement dans le navigateur.
   (`/aquarelles`, `/actualites`) sont redirigées automatiquement (301) ;
 - la page d'accueil propose une sélection d'œuvres à feuilleter (défilement
   horizontal, flèches, tactile) et un bouton « Découvrir la galerie » ;
+- **carrousel de l'accueil** : les images défilent seules (toutes les 5,5 s),
+  flèches ‹ › et balayage tactile, sans vignettes ; les images se gèrent
+  dans l'administration (page L'atelier) ;
 - chaque œuvre peut recevoir jusqu'à 5 images complémentaires : carrousel sur
   la page de l'œuvre (flèches, points-miniatures cliquables, balayage tactile,
   flèches du clavier) ;
@@ -251,7 +259,7 @@ Deux méthodes, de la plus recommandée à la plus rustique :
 2. **Fichier unique tout-en-un** (secours) : « ⬇ Télécharger le fichier de
    secours (index.html) » puis, sur github.com → dépôt → *Add file* →
    *Upload files* → déposez le fichier → *Commit changes*. Toutes les images
-   sont dans le fichier (~18 Mo, sous la limite de 25 Mo de l’upload
+   sont dans le fichier (~22 Mo, sous la limite de 25 Mo de l’upload
    web GitHub) : simple à sauvegarder, mais plus lent à charger pour
    les visiteurs.
 
